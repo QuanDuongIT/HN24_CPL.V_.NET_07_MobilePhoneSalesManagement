@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.PL\\ServerApp.PL.csproj": {}
+    "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.PL\\ServerApp.PL.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\ServerApp.BLL.csproj": {
+    "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\ServerApp.BLL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\ServerApp.BLL.csproj",
+        "projectUniqueName": "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\ServerApp.BLL.csproj",
         "projectName": "ServerApp.BLL",
-        "projectPath": "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\ServerApp.BLL.csproj",
-        "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\obj\\",
+        "projectPath": "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\ServerApp.BLL.csproj",
+        "packagesPath": "C:\\Users\\TieuDuong\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\TieuDuong\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -26,14 +22,15 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\ServerApp.DAL.csproj": {
-                "projectPath": "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\ServerApp.DAL.csproj"
+              "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\ServerApp.DAL.csproj": {
+                "projectPath": "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\ServerApp.DAL.csproj"
               }
             }
           }
@@ -47,8 +44,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.100"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -69,25 +65,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\ServerApp.DAL.csproj": {
+    "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\ServerApp.DAL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\ServerApp.DAL.csproj",
+        "projectUniqueName": "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\ServerApp.DAL.csproj",
         "projectName": "ServerApp.DAL",
-        "projectPath": "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\ServerApp.DAL.csproj",
-        "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\obj\\",
+        "projectPath": "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\ServerApp.DAL.csproj",
+        "packagesPath": "C:\\Users\\TieuDuong\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.DAL\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\TieuDuong\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -95,6 +87,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -112,8 +105,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.100"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -158,25 +150,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.PL\\ServerApp.PL.csproj": {
+    "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.PL\\ServerApp.PL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.PL\\ServerApp.PL.csproj",
+        "projectUniqueName": "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.PL\\ServerApp.PL.csproj",
         "projectName": "ServerApp.PL",
-        "projectPath": "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.PL\\ServerApp.PL.csproj",
-        "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.PL\\obj\\",
+        "projectPath": "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.PL\\ServerApp.PL.csproj",
+        "packagesPath": "C:\\Users\\TieuDuong\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.PL\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\TieuDuong\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -184,14 +172,15 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\ServerApp.BLL.csproj": {
-                "projectPath": "C:\\Users\\Lenovo\\Desktop\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\ServerApp.BLL.csproj"
+              "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\ServerApp.BLL.csproj": {
+                "projectPath": "C:\\Users\\TieuDuong\\Desktop\\HN24_CPL.V_.NET_07_MobilePhoneSalesManagement\\SourceCode\\MobilePhoneSalesManagement\\ServerApp.BLL\\ServerApp.BLL.csproj"
               }
             }
           }
@@ -205,8 +194,7 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.100"
+        }
       },
       "frameworks": {
         "net8.0": {
@@ -246,7 +234,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
