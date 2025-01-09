@@ -98,23 +98,23 @@ namespace ServerApp.PL.Controllers
             return Ok("Delete success");
         }
 
-        // [HttpGet("filter-by-last-active/{days}")]
-        // public async Task<ActionResult<List<User>>> FilterUsersByLastActive(int days)
-        // {
-        //     if (days < 0)
-        //     {
-        //         return BadRequest("Days must be a non-negative integer.");
-        //     }
+        [HttpGet("filter-by-last-active/{days}")]
+        public async Task<ActionResult<List<User>>> FilterUsersByLastActive(int days)
+        {
+            if (days < 0)
+            {
+                return BadRequest("Days must be a non-negative integer.");
+            }
 
-        //     var filteredUsers = await _userService.FilterUsersByLastActiveAsync(days);
+            var filteredUsers = await _userService.FilterUsersByLastActiveAsync(days);
 
-        //     if (filteredUsers == null || !filteredUsers.Any())
-        //     {
-        //         return NotFound($"No users found who were last active {days} or more days ago.");
-        //     }
+            if (filteredUsers == null || !filteredUsers.Any())
+            {
+                return NotFound($"No users found who were last active {days} or more days ago.");
+            }
 
-        //     return Ok(filteredUsers);
-        // }
+            return Ok(filteredUsers);
+        }
     }
 
 }
