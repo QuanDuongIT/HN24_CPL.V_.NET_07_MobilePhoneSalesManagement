@@ -67,6 +67,7 @@ namespace ServerApp.PL.Controllers
 
             if (user != null && await _userManager.CheckPasswordAsync(user, loginVm.Password))
             {
+                user.LastOnlineAt = DateTime.UtcNow;
                 var token = await GenerateJwtToken(user);
 
                 return Ok(token);
