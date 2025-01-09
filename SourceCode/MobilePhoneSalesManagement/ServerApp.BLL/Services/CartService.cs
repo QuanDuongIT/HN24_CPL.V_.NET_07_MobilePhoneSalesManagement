@@ -8,7 +8,8 @@ using ServerApp.DAL.Repositories.Generic;
 
 namespace ServerApp.BLL.Services
 {
-    public class CartService : BaseService<Cart>, ICartService
+    public class CartService : BaseService<Cart>, 
+
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGenericRepository<Cart> _cartRepository;
