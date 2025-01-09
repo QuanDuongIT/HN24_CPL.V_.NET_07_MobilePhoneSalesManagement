@@ -1,81 +1,53 @@
 ﻿using ServerApp.BLL.Services.Base;
-using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
+using ServerApp.DAL.Repositories.Generic;
 
 namespace ServerApp.BLL.Services
 {
-    public interface IUserDetailsService : IBaseService<UserDetails>
-    {
-        Task<int> AddUserDetailsAsync(int id, UserVm userVm);
-        Task<bool> UpdateUserDetailsAsync(int id, UserVm userVm);
-
-        Task<bool> DeleteUserDetailsByUserIdAsync(int userId);
-
-        //Task<User?> GetByUserIdAsync(int id);
-
-        //Task<IEnumerable<User>> GetAllUserAsync();
-        Task<UserDetails?> GetByUserIdAsync(int id);
-    }
-    public class UserDetailsService : BaseService<UserDetails>, IUserDetailsService
+    public class UserDetailsService : BaseService<UserDetails>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGenericRepository<UserDetails> _userDetailsRepository;
 
         public UserDetailsService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
+            _userDetailsRepository = unitOfWork.GenericRepository<UserDetails>();
         }
 
-        public async Task<int> AddUserDetailsAsync(int id, UserVm userVm)
+        public async Task<int> AddAsync(UserDetails entity)
         {
-            var details = new UserDetails()
-            {
-                UserId = id,
-                FullName = userVm.FullName,
-                DateOfBirth = userVm.DateOfBirth,
-                Gender = userVm.Gender,
-                Address = userVm.Address,
-                PhoneNumber = userVm.PhoneNumber
-
-            };
-            await AddAsync(details);
-            await _unitOfWork.SaveChangesAsync();
-            return details.UserDetailsId;
+            await _userDetailsRepository.AddAsync(entity);
+            return await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<bool> UpdateUserDetailsAsync(int id, UserVm userVm)
+        public async Task<bool> UpdateAsync(UserDetails entity)
         {
-            var detailsExists = await GetByUserIdAsync(id);
-            if (detailsExists == null)
-            {
-                throw new ArgumentException("UserDetails not found.");
-            }
-
-            detailsExists.FullName = userVm.FullName;
-            detailsExists.DateOfBirth = userVm.DateOfBirth;
-            detailsExists.Gender = userVm.Gender;
-            detailsExists.Address = userVm.Address;
-            detailsExists.PhoneNumber = userVm.PhoneNumber;
-
-            await UpdateAsync(detailsExists);
+            await _userDetailsRepository.UpdateAsync(entity);
             return await _unitOfWork.SaveChangesAsync() > 0;
         }
 
-        public async Task<UserDetails?> GetByUserIdAsync(int id)
+        public bool Delete(int id)
         {
-            return await _unitOfWork.UserDetailsRepository.FirstOrDefaultAsync(x => x.UserId == id);
-        }
-
-        public async Task<bool> DeleteUserDetailsByUserIdAsync(int userId)
-        {
-            var details = await GetByUserIdAsync(userId);
-            if (details != null)
+            var entity = _userDetailsRepository.GetByIdAsync(id);
+            if (entity != null)
             {
-                await DeleteAsync(details.UserDetailsId);
-                await _unitOfWork.SaveChangesAsync();
+                _userDetailsRepository.DeleteAsync(id);
+                _unitOfWork.SaveChanges();
                 return true;
             }
             return false;
+        }
+
+        public async Task<UserDetails?> GetByIdAsync(int id)
+        {
+            return await _userDetailsRepository.GetByIdAsync(id);
+        }
+
+        public async Task<IEnumerable<UserDetails>> GetAllAsync()
+        {
+            return await _userDetailsRepository.GetAllAsync();
         }
     }
 

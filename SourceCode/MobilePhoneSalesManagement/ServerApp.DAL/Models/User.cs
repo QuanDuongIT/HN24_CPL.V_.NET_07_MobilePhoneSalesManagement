@@ -11,7 +11,6 @@ namespace ServerApp.DAL.Models
         public string Role { get; set; } = "client";
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
-        public DateTime LastOnlineAt { get; set; } = DateTime.Now;
 
         public virtual UserDetails? UserDetails { get; set; } // Không bắt buộc
         public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>(); // Danh sách rỗng

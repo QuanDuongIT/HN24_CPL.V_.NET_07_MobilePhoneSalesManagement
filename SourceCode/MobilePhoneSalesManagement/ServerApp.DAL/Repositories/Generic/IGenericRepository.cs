@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace ServerApp.DAL.Repositories.Generic
 {
@@ -15,7 +14,7 @@ namespace ServerApp.DAL.Repositories.Generic
         IEnumerable<T> GetAll();
 
         Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null);
-
+        
         T? GetById(Guid id);
         Task<T?> GetByIdAsync(Guid id);
         T? GetById(int id);
@@ -38,15 +37,5 @@ namespace ServerApp.DAL.Repositories.Generic
              Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
              string includesProperties = ""
          );
-
-        Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
-        Task<IEnumerable<T>> GetAllAsync(
-            Expression<Func<T, bool>>? filter = null,
-            Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null
-        );
-        Task<T?> GetAsync(
-            Expression<Func<T, bool>> filter,
-            Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null
-        );
     }
 }

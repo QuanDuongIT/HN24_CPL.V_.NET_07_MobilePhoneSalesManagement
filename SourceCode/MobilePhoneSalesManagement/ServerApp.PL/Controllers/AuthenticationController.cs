@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using ServerApp.BLL.Services.ViewModels.Authentication;
+using ServerApp.BLL.ViewModels.Authentication;
 using ServerApp.DAL.Data;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Models.AuthenticationModels;
+using ServerApp.PL.ViewModels.Authentication;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -66,7 +67,6 @@ namespace ServerApp.PL.Controllers
 
             if (user != null && await _userManager.CheckPasswordAsync(user, loginVm.Password))
             {
-                user.LastOnlineAt = DateTime.UtcNow;
                 var token = await GenerateJwtToken(user);
 
                 return Ok(token);
