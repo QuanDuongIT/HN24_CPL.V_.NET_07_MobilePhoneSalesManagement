@@ -20,3 +20,5 @@ git commit
 
 Bước 4: Đẩy thay đổi lên remote
 git push origin main
+
+merge test - quan
