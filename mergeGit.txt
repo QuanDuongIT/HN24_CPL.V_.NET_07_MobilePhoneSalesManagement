@@ -1,0 +1,22 @@
+Để gộp nhánh cho vào nhánh main trên Git, bạn có thể làm theo các bước sau:
+Bước 1: Chuyển sang nhánh main
+git checkout main
+
+Bước 2: Kéo về nhánh main mới nhất từ remote
+git pull origin main
+
+git merge cho
+Nếu không có xung đột, Git sẽ tự động gộp mã.
+Nếu có xung đột:
+Mở các tệp bị xung đột, giải quyết xung đột (Git sẽ đánh dấu các phần bị xung đột bằng <<<<<<<, =======, và >>>>>>>).
+Sau khi giải quyết xung đột, thêm các tệp đã chỉnh sửa:
+bash
+Sao chép mã
+git add <file>
+Hoàn tất merge bằng lệnh:
+bash
+Sao chép mã
+git commit
+
+Bước 4: Đẩy thay đổi lên remote
+git push origin main
