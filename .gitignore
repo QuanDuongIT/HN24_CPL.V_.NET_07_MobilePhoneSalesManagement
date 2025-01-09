@@ -38,5 +38,5 @@ project.fragment.lock.json
 .idea/
 
 # ASP.NET runtime secrets
-*.json
+
 secrets.json
