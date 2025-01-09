@@ -18,11 +18,11 @@ namespace ServerApp.PL.Controllers
             _cartService = cartService;
         }
 
-        // Lấy tất cả người dùng
+        // Lấy tất cả cart
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Cart>>> GetAllCarts()
         {
-            var carts = await _cartService.GetAllAsync();
+            var carts = await _cartService.GetAllCartAsync();
             if (carts == null || !carts.Any())
             {
                 return NotFound("No carts found.");
@@ -34,7 +34,7 @@ namespace ServerApp.PL.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Cart>> GetCartById(int id)
         {
-            var cart = await _cartService.GetByIdAsync(id);
+            var cart = await _cartService.GetByCartIdAsync(id);
             if (cart == null)
             {
                 return NotFound($"Cart with ID {id} not found.");
@@ -80,8 +80,8 @@ namespace ServerApp.PL.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCart(int id)
         {
-            var deleted = await _cartService.DeleteAsync(id);
-            if (deleted == 0)
+            var deleted = await _cartService.DeleteByIdAsync(id);
+            if (deleted)
             {
                 return NotFound($"Car with ID {id} not found.");
             }

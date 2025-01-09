@@ -18,10 +18,10 @@ namespace ServerApp.BLL.Services.InterfaceServices
 
         Task<bool> UpdateCartAsync(int id, CartVm cartVm);
 
-        bool Delete(int id);
+        Task<bool> DeleteByIdAsync(int id);
 
-        Task<Cart?> GetByIdAsync(int id);
+        Task<Cart?> GetByCartIdAsync(int id);
 
-        Task<IEnumerable<Cart>> GetAllAsync();
+        Task<IEnumerable<Cart>> GetAllCartAsync();
     }
 }
