@@ -40,3 +40,5 @@ project.fragment.lock.json
 # ASP.NET runtime secrets
 *.json
 secrets.json
+
+SourceCode/MobilePhoneSalesManagement/ServerApp.PL/appsettings.json
