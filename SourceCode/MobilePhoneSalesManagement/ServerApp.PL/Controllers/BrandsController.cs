@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ServerApp.BLL.Services;
 using ServerApp.BLL.Services.ViewModels;
+
 namespace ServerApp.PL.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
 
@@ -20,14 +23,7 @@ namespace ServerApp.PL.Controllers
         {
             try
             {
-                var brand = await _brandService.GetAllBrandAsync();
-
-                if (brand.Any())
-                {
-                    return StatusCode(200, brand);
-                }
-
-                return StatusCode(200, "No data");
+                return Ok(await _brandService.GetAllAsync());
             }
             catch (Exception e)
             {
@@ -41,14 +37,8 @@ namespace ServerApp.PL.Controllers
         {
             try
             {
-                var brand = await _brandService.GetByBrandIdAsync(id);
 
-                if (brand!=null)
-                {
-                    return StatusCode(200, brand);
-                }
-
-                return StatusCode(200, "No data");
+                return Ok(await _brandService.GetByBrandIdAsync(id));
             }
             catch (Exception e)
             {
@@ -58,23 +48,17 @@ namespace ServerApp.PL.Controllers
 
 
         [HttpPost("add-new-brand")]
-        public async Task<ActionResult<BrandVm>> PostBrand(AddBrandVm brandViewModel)
+        public async Task<ActionResult<BrandVm>> PostBrand(BrandVm brandViewModel)
         {
-
             if (string.IsNullOrWhiteSpace(brandViewModel.Name))
             {
                 return BadRequest("Title and Description cannot be empty.");
             }
+
             try
             {
-                var result = await _brandService.AddBrandAsync(brandViewModel);
-
-                if (result != null)
-                {
-                    return Ok(result);
-                }
-
-                return BadRequest(result);
+                _brandService.AddBrandAsync(brandViewModel);
+                return Ok(brandViewModel);
             }
             catch (Exception e)
             {
@@ -82,55 +66,39 @@ namespace ServerApp.PL.Controllers
             }
         }
 
-        //[HttpPut("update-brand/{id}")]
-        //public async Task<IActionResult> PutBrand(int id, AddBrandVm brandViewModel)
-        //{
-        //    if (id == null)
-        //    {
-        //        return BadRequest("Invalid Brand ID.");
-        //    }
+        [HttpPut("update-brand/{id}")]
+        public async Task<IActionResult> PutBrand(int id, BrandVm brandViewModel)
+        {
+            if (id == null)
+            {
+                return BadRequest("Invalid Brand ID.");
+            }
 
-
-        //    if (string.IsNullOrWhiteSpace(brandViewModel.Name))
-        //    {
-        //        return BadRequest("Title and Description cannot be empty.");
-        //    }
-        //    try
-        //    {
-        //        var result = await _brandService.UpdateBrandAsync(id,brandViewModel);
-
-        //        if (result != null)
-        //        {
-        //            return Ok(result);
-        //        }
-
-        //        return BadRequest(result);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return StatusCode(500, $"Internal server error: {e.Message}");
-        //    }
-        //}
+            try
+            {
+                await _brandService.UpdateBrandAsync(id, brandViewModel);
+                return Ok(brandViewModel);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Internal server error: {e.Message}");
+            }
+        }
 
         [HttpDelete("delete-brand-by-id/{id}")]
         public async Task<IActionResult> DeleteBrand(int id)
         {
             try
             {
-                var Brand = await _brandService.GetByIdAsync(id);
-                if (Brand == null)
-                {
-                    return BadRequest("Brand not found.");
-                }
-
-                await _brandService.DeleteAsync(Brand);
-
-                return Ok(Brand);
+                if (_brandService.DeleteByIdAsync(id))
+                    return BadRequest();
+                return Ok();
             }
             catch (Exception e)
             {
                 return StatusCode(500, $"Internal server error: {e.Message}");
             }
         }
+
     }
 }

@@ -11,14 +11,13 @@ using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories;
 using ServerApp.DAL.Repositories.Generic;
-using ServerApp.DAL.Seed;
 using System.Text;
 
 namespace ServerApp.PL
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -93,28 +92,25 @@ namespace ServerApp.PL
                 });
 
 
+            //// Đăng ký IUnitOfWork và UnitOfWork
             builder.Services.AddScoped<IGenericRepository<User>, UserRepository>();
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IBrandService, BrandService>();
             builder.Services.AddScoped<ICartService, CartService>();
-            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IUserDetailsService, UserDetailsService>();
+
+
+            builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+            });
+
 
             var app = builder.Build();
-            // Seed data khi khởi chạy ứng dụng
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                var context = services.GetRequiredService<ShopDbContext>();
 
-                //context.Database.EnsureDeleted();
-                // Áp dụng migrations nếu chưa có
-                //context.Database.EnsureCreated();
-
-                // Gọi seed data
-                //await SeedData.SeedAsync(context);
-            }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

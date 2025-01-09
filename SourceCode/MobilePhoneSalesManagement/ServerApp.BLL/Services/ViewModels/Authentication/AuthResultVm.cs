@@ -1,4 +1,4 @@
-﻿namespace ServerApp.BLL.ViewModels.Authentication
+﻿namespace ServerApp.BLL.Services.ViewModels.Authentication
 {
     public class AuthResultVm
     {
