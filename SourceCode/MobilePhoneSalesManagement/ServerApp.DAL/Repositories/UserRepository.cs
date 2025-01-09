@@ -2,12 +2,12 @@
 using ServerApp.DAL.Data;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories.Generic;
+using System.Linq.Expressions;
 
 namespace ServerApp.DAL.Repositories
 {
     public interface IUserRepository : IGenericRepository<User>
     {
-        Task<User?> GetByEmailAsync(string email);
     }
 
     public class UserRepository : GenericRepository<User>, IUserRepository
@@ -18,11 +18,7 @@ namespace ServerApp.DAL.Repositories
         {
             _context = context;
         }
-        public async Task<User?> GetByEmailAsync(string email)
-        {
-            return await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == email);
-        }
+
     }
 
 

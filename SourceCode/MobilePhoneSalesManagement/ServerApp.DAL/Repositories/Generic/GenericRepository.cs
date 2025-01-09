@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using ServerApp.DAL.Data;
 using System.Linq.Expressions;
+using System.Linq;
+using System;
 
 namespace ServerApp.DAL.Repositories.Generic
 {
@@ -173,49 +174,6 @@ namespace ServerApp.DAL.Repositories.Generic
             }
             return await _dbSet.ToListAsync();
         }
-
-        public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _dbSet.FirstOrDefaultAsync(predicate);
-        }
-        public async Task<T?> GetAsync(
-        Expression<Func<T, bool>> filter,
-        Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
-        {
-            IQueryable<T> query = _dbSet;
-
-            // Thêm Include nếu được truyền vào
-            if (include != null)
-            {
-                query = include(query);
-            }
-
-            // Áp dụng bộ lọc
-            return await query.FirstOrDefaultAsync(filter);
-        }
-
-        public async Task<IEnumerable<T>> GetAllAsync(
-            Expression<Func<T, bool>>? filter = null,
-            Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null
-        )
-        {
-            IQueryable<T> query = _context.Set<T>();
-
-            // Áp dụng filter nếu có
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-
-            // Áp dụng include nếu có
-            if (include != null)
-            {
-                query = include(query);
-            }
-
-            return await query.ToListAsync();
-        }
-
     }
 
 
