@@ -1,0 +1,42 @@
+# Binaries
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+
+# Build outputs
+*.log
+*.cache
+*.csproj.user
+
+# User-specific files
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet Packages
+packages/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+
+# Publish outputs
+*.publish/
+*.pubxml
+*.pubxml.user
+
+# Database files
+*.mdf
+*.ldf
+
+# Visual Studio temporary files
+.vs/
+.idea/
+
+# ASP.NET runtime secrets
+*.json
+secrets.json
