@@ -133,6 +133,10 @@ on = "v1" });
             app.ConfigureBuildInExceptionHandler();
 
 
+
+                // Gọi seed data
+
+                
             // Seed data khi khởi chạy ứng dụng
             using (var scope = app.Services.CreateScope())
             {
@@ -142,5 +146,3 @@ on = "v1" });
                 //context.Database.EnsureDeleted();
                 // Áp dụng migrations nếu chưa có
                 //context.Database.EnsureCreated();
-
-                // Gọi seed data
