@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ServerApp.PL.ViewModels.Authentication
+namespace ServerApp.BLL.Services.ViewModels.Authentication
 {
     public class LoginVm
     {

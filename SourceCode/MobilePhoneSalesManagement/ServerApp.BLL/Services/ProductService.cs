@@ -1,60 +1,54 @@
 ﻿using ServerApp.BLL.Services.Base;
-using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
+using ServerApp.DAL.Repositories.Generic;
 
 namespace ServerApp.BLL.Services
 {
-    public interface IProductService : IBaseService<Product>
-    {
-        Task<IEnumerable<ProductVm>> GetAllProductAsync();
-    }
-    public class ProductService : BaseService<Product>, IProductService
+    public class ProductService : BaseService<Product>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGenericRepository<Product> _productRepository;
 
         public ProductService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
+            _productRepository = unitOfWork.GenericRepository<Product>();
         }
 
-
-        public async Task<IEnumerable<ProductVm>> GetAllProductAsync()
+        public async Task<int> AddAsync(Product entity)
         {
-            var resuilt= await GetAllAsync(
-                    includesProperties: "ProductSpecifications,ProductSpecifications.SpecificationType"
-                );
-            var productViewModels = resuilt.Select(product => new ProductVm
-            {
-                ProductId = product.ProductId,
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                OldPrice = product.OldPrice,
-                StockQuantity = product.StockQuantity,
-                BrandId = product.BrandId,
-                ImageUrl = product.ImageUrl,
-                Manufacturer = product.Manufacturer,
-                IsActive = product.IsActive,
-                Color = product.Color,
-                Discount = 0, // Gán mặc định hoặc tính toán tùy theo logic
-                CreatedAt = product.CreatedAt,
-                UpdatedAt = product.UpdatedAt,
-                Brand = product.Brand, // Bao gồm dữ liệu liên kết Brand
-                ProductSpecifications = product.ProductSpecifications.Select(ps => new ProductSpecificationVm
-                {
-                    ProductId = ps.ProductId,
-                    SpecificationTypeId = ps.SpecificationTypeId,
-                    Value = ps.Value,
-                    SpecificationType = new SpecificationTypeVm
-                    {
-                        SpecificationTypeId = ps.SpecificationType.SpecificationTypeId,
-                        Name = ps.SpecificationType.Name
-                    }
-                }).ToList()
-            });
+            await _productRepository.AddAsync(entity);
+            return await _unitOfWork.SaveChangesAsync();
+        }
 
-            return productViewModels;
+        public async Task<bool> UpdateAsync(Product entity)
+        {
+            await _productRepository.UpdateAsync(entity);
+            return await _unitOfWork.SaveChangesAsync() > 0;
+        }
+
+        public bool Delete(int id)
+        {
+            var entity = _productRepository.GetByIdAsync(id);
+            if (entity != null)
+            {
+                _productRepository.DeleteAsync(id);
+                _unitOfWork.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<Product?> GetByIdAsync(int id)
+        {
+            return await _productRepository.GetByIdAsync(id);
+        }
+
+        public async Task<IEnumerable<Product>> GetAllAsync()
+        {
+            return await _productRepository.GetAllAsync();
         }
     }
+
 }
