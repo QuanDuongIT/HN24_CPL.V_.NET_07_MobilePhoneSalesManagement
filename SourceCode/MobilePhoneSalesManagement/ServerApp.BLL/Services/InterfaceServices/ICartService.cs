@@ -18,7 +18,7 @@ namespace ServerApp.BLL.Services.InterfaceServices
 
         Task<bool> UpdateCartAsync(int id, CartVm cartVm);
 
-        bool Delete(int id);
+        Task<bool> Delete(int id);
 
         Task<Cart?> GetByIdAsync(int id);
 

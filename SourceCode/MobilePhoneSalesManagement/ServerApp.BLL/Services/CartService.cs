@@ -11,12 +11,10 @@ namespace ServerApp.BLL.Services
     public class CartService : BaseService<Cart>, ICartService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IGenericRepository<Cart> _cartRepository;
 
         public CartService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _cartRepository = unitOfWork.GenericRepository<Cart>();
         }
 
         public async Task<int> AddCartAsync(CartVm cartVm)
@@ -29,8 +27,7 @@ namespace ServerApp.BLL.Services
                 Quantity = cartVm.Quantity,
                 AddedAt = cartVm.AddedAt
             };
-            await _cartRepository.AddAsync(cart);
-            return await _unitOfWork.SaveChangesAsync();
+            return await AddAsync(cart);
         }
 
         public async Task<bool> UpdateCartAsync(int id, CartVm cartVm)
@@ -40,30 +37,22 @@ namespace ServerApp.BLL.Services
             cart.Quantity = cartVm.Quantity;
             cart.UserId = cartVm.UserId;
             cart.AddedAt = cartVm.AddedAt;
-            await _cartRepository.UpdateAsync(cart);
-            return await _unitOfWork.SaveChangesAsync() > 0;
+            return await UpdateAsync(cart) > 0;
         }
 
-        public bool Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            var entity = _cartRepository.GetByIdAsync(id);
-            if (entity != null)
-            {
-                _cartRepository.DeleteAsync(id);
-                _unitOfWork.SaveChanges();
-                return true;
-            }
-            return false;
+            return await DeleteAsync(id) > 0;
         }
 
         public async Task<Cart?> GetByIdAsync(int id)
         {
-            return await _cartRepository.GetByIdAsync(id);
+            return await GetByIdAsync(id);
         }
 
         public async Task<IEnumerable<Cart>> GetAllAsync()
         {
-            return await _cartRepository.GetAllAsync();
+            return await GetAllAsync();
         }
     }
 
