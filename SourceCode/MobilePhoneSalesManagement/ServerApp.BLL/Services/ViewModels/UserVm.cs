@@ -1,25 +1,33 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ServerApp.DAL.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ServerApp.BLL.Services.ViewModels
 {
-    public class UserVm
+    public class AddUserVm
     {
-        public int? UserId { get; set; }
-        public string UserName { get; set; }
+        public string Username { get; set; }
         public string PasswordHash { get; set; }
-
-        [Required(ErrorMessage = "Email is required.")]
-        [EmailAddress(ErrorMessage = "Invalid email address.")]
         public string Email { get; set; }
         public bool Status { get; set; } = true;
         public string Role { get; set; } = "client";
-        public DateTime LastOnlineAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
-        public string? FullName { get; set; }
-        public DateTime? DateOfBirth { get; set; }
-        public string? Gender { get; set; }
-        public string? Address { get; set; }
-        public string? PhoneNumber { get; set; }
+    }
+    public class UserVm
+    {
+        public int UserId { get; set; }
+        public string Username { get; set; }
+        public string PasswordHash { get; set; }
+        public string Email { get; set; }
+        public bool Status { get; set; } = true;
+        public string Role { get; set; } = "client";
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
     }
 }

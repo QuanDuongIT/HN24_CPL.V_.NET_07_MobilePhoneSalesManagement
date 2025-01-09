@@ -9,6 +9,7 @@ namespace ServerApp.BLL.Services.ViewModels
 {
     public class BrandVm
     {
+        public int BrandId { get; set; }
         public string Name { get; set; }
         public bool IsActive { get; set; }
 

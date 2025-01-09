@@ -7,13 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\**" />
-    <EmbeddedResource Remove="Models\**" />
-    <None Remove="Models\**" />
+    <ProjectReference Include="..\ServerApp.DAL\ServerApp.DAL.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ServerApp.DAL\ServerApp.DAL.csproj" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>
