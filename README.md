@@ -1,26 +1,112 @@
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using PresentationLayer.Exceptions;
+using ServerApp.BLL.Services;
+using ServerApp.BLL.Services.InterfaceServices;
+using ServerApp.DAL.Data;
+using ServerApp.DAL.Infrastructure;
+using ServerApp.DAL.Models;
+using ServerApp.DAL.Repositories;
+using ServerApp.DAL.Repositories.Generic;
+using ServerApp.DAL.Seed;
+using System.Text;
+
 namespace ServerApp.PL
 {
-    public class WeatherForecast
+    public class Program
     {
-        public DateOnly Date { get; set; }
+        public static async Task Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-        public int TemperatureC { get; set; }
+            // Add services to the container.
 
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-namespace ServerApp.PL
-{
-    public class WeatherForecast
-    {
-        public DateOnly Date { get; set; }
+            builder.Services.AddControllers();
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
-        public int TemperatureC { get; set; }
+            builder.Services.AddSwaggerGen(c =>
+            {
+                //c.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Sceed data khi khởi chạy ứng dụng
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<ShopDbContext>();
 
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+                //context.Database.EnsureDeleted();
+                // Áp dụng migrations nếu chưa có
+                //context.Database.EnsureCreated();
 
-        public string? Summary { get; set; }
+                // Gọi seed data
+                await SeedData.SeedAsync(context);
+            }
+            // Configure the HTTP request pipeline.
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseCors(o =>
+            {
+                o.AllowAnyHeader();
+                o.AllowAnyMethod();
+                o.AllowAnyOrigin();
+            });
+
+
+            app.UseAuthorization();
+
+
+            app.MapControllers();
+            app.Run();
+        }
     }
 }
+enticationScheme;
+            })
+                .AddJwtBearer(options =>
+                {
+                    options.SaveToken = true;
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:Secret"].ToString())),
+                        ValidateIssuer = true,
+                        ValidIssuer = builder.Configuration["JWT:Issuer"],
+                        ValidateAudience = true,
+                        ValidAudience = builder.Configuration["JWT:Audience"]
+                    };
+                });
 
-        public string? Summary { get; set; }
-    }
-}
+
+            builder.Services.AddScoped<IGenericRepository<User>, UserRepository>();
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IBrandService, BrandService>();
+            builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+
+            var app = builder.Build();
+            app.ConfigureBuildInExceptionHandler();
+
+
+            // S
