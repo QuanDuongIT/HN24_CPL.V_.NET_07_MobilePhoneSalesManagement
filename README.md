@@ -116,35 +116,3 @@ on = "v1" });
         }
     }
 }
-
-                });
-
-
-            builder.Services.AddScoped<IGenericRepository<User>, UserRepository>();
-
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<IBrandService, BrandService>();
-            builder.Services.AddScoped<ICartService, CartService>();
-            builder.Services.AddScoped<IProductService, ProductService>();
-
-            var app = builder.Build();
-            app.ConfigureBuildInExceptionHandler();
-
-
-
-                // Gọi seed data
-
-                
-            // Seed data khi khởi chạy ứng dụng
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                var context = services.GetRequiredService<ShopDbContext>();
-
-                //context.Database.EnsureDeleted();
-                // Áp dụng migrations nếu chưa có
-
-                //context.Database.EnsureCreated();
-
-

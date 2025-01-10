@@ -23,6 +23,19 @@ namespace ServerApp.PL.Controllers
             var result = await _productService.GetAllProductAsync();
             return Ok(result); // 200 OK nếu có dữ liệu.
         }
+        [HttpPost("filter")]
+        public async Task<ActionResult<IEnumerable<ProductVm>>> FilterProducts([FromBody] FilterRequest filterRequest)
+        {
+            try
+            {
+                var filteredProducts = await _productService.FilterProductsAsync(filterRequest);
+                return Ok(filteredProducts);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Internal server error: {e.Message}");
+            }
+        }
 
         [HttpGet("get-product-by-id/{id}")]
         public async Task<ActionResult<ProductVm>> GetProduct(int id)
