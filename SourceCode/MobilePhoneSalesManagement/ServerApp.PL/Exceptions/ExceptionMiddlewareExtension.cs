@@ -27,11 +27,6 @@ namespace PresentationLayer.Exceptions
 
                         switch (exception)
                         {
-                            case ArgumentException: //  tham số không hợp lệ
-                                statusCode = (int)HttpStatusCode.BadRequest;
-                                message = exception.Message;
-                                break;
-
                             case ExceptionNotFound: //  không tìm thấy bản ghi
                                 statusCode = (int)HttpStatusCode.NotFound;
                                 message = exception.Message; 
@@ -42,9 +37,10 @@ namespace PresentationLayer.Exceptions
                                 message = "Unauthorized access.";
                                 break;
 
+                            case ArgumentException://  tham số không hợp lệ
                             case ExceptionBusinessLogic:
                             case ExceptionForeignKeyViolation: //  vi phạm quy tắc dữ liệu
-                                statusCode = (int)HttpStatusCode.Conflict;
+                                statusCode = (int)HttpStatusCode.BadRequest;
                                 message = exception.Message; // Ví dụ: "Tên đã tồn tại" hoặc "Vi phạm ràng buộc dữ liệu"
                                 break;
 
@@ -70,7 +66,7 @@ namespace PresentationLayer.Exceptions
 
                             default:
                                 statusCode = (int)HttpStatusCode.InternalServerError;
-                                message = "An unexpected error occurred. Please try again later.";
+                                message = $"An unexpected error of type '{exception.GetType().Name}' occurred. Details: {exception.Message}";
                                 break;
                         }
 

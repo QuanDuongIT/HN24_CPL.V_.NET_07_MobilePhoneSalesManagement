@@ -35,5 +35,6 @@ namespace ServerApp.BLL.Services.Base
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
             string includesProperties = ""
         );
+        void ValidateModelPropertiesWithAttribute<T>(T model);
     }
 }

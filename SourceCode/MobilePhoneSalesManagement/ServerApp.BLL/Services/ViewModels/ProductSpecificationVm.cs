@@ -7,21 +7,22 @@ using System.Threading.Tasks;
 
 namespace ServerApp.BLL.Services.ViewModels
 {
-    public class AddProductSpecificationVm
+    public class InputProductSpecificationVm
     {
-        public int ProductId { get; set; }
         public int SpecificationTypeId { get; set; }
         public string Value { get; set; } // Giá trị thông số (vd: "Đỏ", "15cm")
 
         // Navigation properties
         //public virtual Product Product { get; set; }
-        //public virtual SpecificationType SpecificationType { get; set; }
+        public virtual InputSpecificationTypeVm SpecificationType { get; set; }
     }
     public class ProductSpecificationVm
     {        
         public int ProductId { get; set; } 
         public int SpecificationTypeId { get; set; } 
         public string Value { get; set; } // Giá trị thông số (vd: "Đỏ", "15cm")
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
         // Navigation properties
         //public virtual Product Product { get; set; }

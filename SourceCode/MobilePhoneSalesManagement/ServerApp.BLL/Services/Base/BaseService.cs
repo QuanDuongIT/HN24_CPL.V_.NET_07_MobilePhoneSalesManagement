@@ -4,6 +4,7 @@ using ServerApp.DAL.Repositories.Generic;
 using System.Linq.Expressions;
 using System.Linq;
 using BusinessLogic;
+using ServerApp.BLL.Services.ViewModels;
 
 namespace ServerApp.BLL.Services.Base
 {
@@ -242,6 +243,38 @@ namespace ServerApp.BLL.Services.Base
             // Trả về đối tượng đầu tiên hoặc null nếu không tìm thấy
             return await query.FirstOrDefaultAsync();
         }
+
+        public void ValidateModelPropertiesWithAttribute<T>(T model)
+        {
+            var properties = typeof(T).GetProperties();
+
+            foreach (var property in properties)
+            {
+                // Bỏ qua các thuộc tính có attribute SkipValidation
+                if (property.GetCustomAttributes(typeof(SkipValidationAttribute), false).Any())
+                {
+                    continue;
+                }
+
+                // Lấy giá trị của thuộc tính
+                var value = property.GetValue(model);
+
+                // Kiểm tra nếu giá trị là null
+                if (value == null)
+                {
+                    throw new ArgumentException($"Property '{property.Name}' cannot be null.");
+                }
+
+                // Kiểm tra nếu là chuỗi rỗng hoặc chỉ chứa khoảng trắng
+                if (value is string strValue && string.IsNullOrWhiteSpace(strValue))
+                {
+                    throw new ArgumentException($"Property '{property.Name}' cannot be an empty string or whitespace.");
+                }
+
+                // Thêm các kiểm tra khác nếu cần
+            }
+        }
+
     }
 
 }
