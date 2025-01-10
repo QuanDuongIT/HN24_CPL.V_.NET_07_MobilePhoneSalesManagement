@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using ServerApp.DAL.Data;
 using System.Linq.Expressions;
-using System.Linq;
-using System;
 
 namespace ServerApp.DAL.Repositories.Generic
 {
@@ -39,7 +38,6 @@ namespace ServerApp.DAL.Repositories.Generic
         public async Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
-            await _context.SaveChangesAsync();
         }
         public async Task<int> ModifyAsync(T entity)
         {
@@ -60,7 +58,6 @@ namespace ServerApp.DAL.Repositories.Generic
             if (entity != null)
             {
                 _dbSet.Remove(entity);
-                await _context.SaveChangesAsync();
             }
         }
         public IEnumerable<T> GetAll()
@@ -124,37 +121,32 @@ namespace ServerApp.DAL.Repositories.Generic
             return orderBy != null ? orderBy(query) : query;
         }
         public async Task<T?> GetAsync(
-             Expression<Func<T, bool>>? filter = null,
-             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
-             string includesProperties = ""
-         )
+    Expression<Func<T, bool>> filter,
+    Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+    Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null
+)
         {
             IQueryable<T> query = _dbSet;
 
-            // Áp dụng filter nếu có
-            if (filter != null)
+            // Áp dụng filter
+            query = query.Where(filter);
+
+            // Áp dụng include nếu có
+            if (include != null)
             {
-                query = query.Where(filter);
+                query = include(query);
             }
 
-            // Bao gồm các thuộc tính (relationships) nếu có
-            if (!string.IsNullOrWhiteSpace(includesProperties))
-            {
-                foreach (var property in includesProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    query = query.Include(property); // Bao gồm quan hệ
-                }
-            }
-
-            // Áp dụng sắp xếp nếu có
+            // Áp dụng orderBy nếu có
             if (orderBy != null)
             {
                 query = orderBy(query);
             }
 
-            // Trả về đối tượng đầu tiên hoặc null nếu không tìm thấy
+            // Trả về kết quả đầu tiên hoặc null
             return await query.FirstOrDefaultAsync();
         }
+
 
         public T? GetById(Guid id)
         {
@@ -184,6 +176,33 @@ namespace ServerApp.DAL.Repositories.Generic
                 return await _dbSet.Where(predicate).ToListAsync();
             }
             return await _dbSet.ToListAsync();
+        }
+
+        public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.FirstOrDefaultAsync(predicate);
+        }
+
+        public async Task<IEnumerable<T>> GetAllAsync(
+            Expression<Func<T, bool>>? filter = null,
+            Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null
+        )
+        {
+            IQueryable<T> query = _context.Set<T>();
+
+            // Áp dụng filter nếu có
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            // Áp dụng include nếu có
+            if (include != null)
+            {
+                query = include(query);
+            }
+
+            return await query.ToListAsync();
         }
     }
 

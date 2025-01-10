@@ -94,6 +94,7 @@ namespace ServerApp.PL
                 });
 
 
+            // Đăng ký services
             builder.Services.AddScoped<IGenericRepository<User>, UserRepository>();
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -101,6 +102,7 @@ namespace ServerApp.PL
             builder.Services.AddScoped<IBrandService, BrandService>();
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IUserDetailsService, UserDetailsService>();
 
             var app = builder.Build();
             app.ConfigureBuildInExceptionHandler();
