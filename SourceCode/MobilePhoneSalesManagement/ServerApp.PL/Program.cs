@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using PresentationLayer.Exceptions;
 using ServerApp.BLL.Services;
 using ServerApp.BLL.Services.InterfaceServices;
+using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Data;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
@@ -67,6 +68,10 @@ namespace ServerApp.PL
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            // Đăng ký EmailService
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
+            //
             builder.Services.AddIdentity<User, IdentityRole<int>>()
                             .AddEntityFrameworkStores<ShopDbContext>()
                             .AddDefaultTokenProviders();
@@ -78,20 +83,24 @@ namespace ServerApp.PL
                 config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 config.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-                .AddJwtBearer(options =>
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters()
                 {
-                    options.SaveToken = true;
-                    options.RequireHttpsMetadata = false;
-                    options.TokenValidationParameters = new TokenValidationParameters()
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:Secret"].ToString())),
-                        ValidateIssuer = true,
-                        ValidIssuer = builder.Configuration["JWT:Issuer"],
-                        ValidateAudience = true,
-                        ValidAudience = builder.Configuration["JWT:Audience"]
-                    };
-                });
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:Secret"].ToString())),
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["JWT:Audience"],
+                    // Thêm phần xử lý để gia hạn thời gian hết hạn của token nếu cần
+                    ValidateLifetime = true,  // Xác thực thời gian sống của token
+                    ClockSkew = TimeSpan.Zero  // Giảm độ trễ khi kiểm tra thời gian hết hạn
+                };
+            });
+
 
 
             // Đăng ký services
@@ -103,6 +112,9 @@ namespace ServerApp.PL
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IUserDetailsService, UserDetailsService>();
+            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddSingleton<IEmailService, EmailService>();
+
 
             var app = builder.Build();
             app.ConfigureBuildInExceptionHandler();

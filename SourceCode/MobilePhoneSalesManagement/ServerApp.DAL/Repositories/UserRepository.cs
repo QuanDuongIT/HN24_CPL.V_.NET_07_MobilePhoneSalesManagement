@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ServerApp.DAL.Data;
+﻿using ServerApp.DAL.Data;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories.Generic;
-using System.Linq.Expressions;
 
 namespace ServerApp.DAL.Repositories
 {
@@ -18,7 +16,6 @@ namespace ServerApp.DAL.Repositories
         {
             _context = context;
         }
-
     }
 
 

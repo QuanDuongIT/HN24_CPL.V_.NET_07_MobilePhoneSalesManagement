@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ServerApp.BLL.Services.Base;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
@@ -18,16 +19,19 @@ namespace ServerApp.BLL.Services
         Task<IEnumerable<UserVm>> GetAllUserAsync();
         Task<User?> GetUserByEmailAsync(string email);
         Task<IEnumerable<UserVm>> FilterUsersByLastActiveAsync(int days);
+        Task<IdentityResult> ChangePasswordAsync(int userId, ChangePasswordVm model);
     }
     public class UserService : BaseService<User>, IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserDetailsService _userDetailsService;
+        private readonly UserManager<User> _userManager;
 
-        public UserService(IUnitOfWork unitOfWork, IUserDetailsService userDetailsService) : base(unitOfWork)
+        public UserService(IUnitOfWork unitOfWork, IUserDetailsService userDetailsService, UserManager<User> userManager) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _userDetailsService = userDetailsService;
+            _userManager = userManager;
         }
 
         public async Task<int> AddUserAsync(UserVm userVm)
@@ -147,6 +151,29 @@ namespace ServerApp.BLL.Services
             // Sử dụng UserRepository từ UnitOfWork để tìm kiếm người dùng theo email
             return await _unitOfWork.UserRepository
                 .FirstOrDefaultAsync(u => u.Email == email);
+        }
+        public async Task<IdentityResult> ChangePasswordAsync(int userId, ChangePasswordVm model)
+        {
+            // Tìm người dùng theo UserId
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            // Kiểm tra mật khẩu cũ
+            var isCorrectPassword = await _userManager.CheckPasswordAsync(user, model.CurrentPassword);
+
+            if (!isCorrectPassword)
+            {
+                throw new UnauthorizedAccessException("The current password is incorrect.");
+            }
+
+            // Đổi mật khẩu
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+            return result;
         }
 
         public async Task<IEnumerable<UserVm>> FilterUsersByLastActiveAsync(int days)

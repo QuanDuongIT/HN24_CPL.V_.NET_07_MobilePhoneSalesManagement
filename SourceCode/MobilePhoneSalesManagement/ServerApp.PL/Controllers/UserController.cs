@@ -2,6 +2,7 @@
 using ServerApp.BLL.Services;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Models;
+using System.Security.Claims;
 
 namespace ServerApp.PL.Controllers
 {
@@ -119,6 +120,34 @@ namespace ServerApp.PL.Controllers
             }
 
             return Ok("Delete success");
+        }
+
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordVm model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // Giả sử bạn lấy userId từ Claims của người dùng đang đăng nhập
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+                var result = await _userService.ChangePasswordAsync(userId, model);
+
+                if (result.Succeeded)
+                {
+                    return Ok("Password changed successfully.");
+                }
+
+                return BadRequest("Failed to change password.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("filter-by-last-active/{days}")]
