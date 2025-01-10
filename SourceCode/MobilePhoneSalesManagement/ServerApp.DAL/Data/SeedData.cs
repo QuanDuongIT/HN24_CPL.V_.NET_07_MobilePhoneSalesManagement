@@ -18,8 +18,8 @@ namespace ServerApp.DAL.Seed
                 if (!context.Brands.Any())
                 {
                     context.Brands.AddRange(
-                        new Brand { Name = "TechCorp", IsActive = true },
-                        new Brand { Name = "PhoneInc", IsActive = true }
+                        new Brand { Name = "Samsung", IsActive = true },
+                        new Brand { Name = "Apple", IsActive = true }
                     );
                     await context.SaveChangesAsync();  // Đảm bảo đã lưu Brands trước khi thêm Products
                 }
@@ -30,34 +30,34 @@ namespace ServerApp.DAL.Seed
                     context.Products.AddRange(
                         new Product
                         {
-                            Name = "Laptop",
-                            Description = "High-end laptop",
-                            Price = 1000m,
-                            OldPrice = 1200m,
-                            StockQuantity = 10,
-                            BrandId = 1,  // Đảm bảo BrandId này tồn tại trong bảng Brands
-                            ImageUrl = "laptop.jpg",
-                            Manufacturer = "TechCorp",
-                            IsActive = true,
-                            Color = "Silver",
-                            CreatedAt = DateTime.Now,
-                            UpdatedAt = DateTime.Now
-                        },
-                        new Product
-                        {
-                            Name = "Smartphone",
-                            Description = "Latest smartphone",
-                            Price = 800m,
-                            OldPrice = 900m,
-                            StockQuantity = 20,
-                            BrandId = 2,  // Đảm bảo BrandId này tồn tại trong bảng Brands
-                            ImageUrl = "smartphone.jpg",
-                            Manufacturer = "PhoneInc",
+                            Name = "Product 1",
+                            Description = "Description for Product 1",
+                            Price = 3000000,
+                            OldPrice = 3500000,
+                            StockQuantity = 50,
+                            BrandId = 1,
+                            ImageUrl = "http://example.com/image1.jpg",
+                            Manufacturer = "Manufacturer 1",
                             IsActive = true,
                             Color = "Black",
                             CreatedAt = DateTime.Now,
                             UpdatedAt = DateTime.Now
-                        }
+                        },
+                            new Product
+                            {
+                                Name = "Product 2",
+                                Description = "Description for Product 2",
+                                Price = 4500000,
+                                OldPrice = 5000000,
+                                StockQuantity = 30,
+                                BrandId = 2,
+                                ImageUrl = "http://example.com/image2.jpg",
+                                Manufacturer = "Manufacturer 2",
+                                IsActive = true,
+                                Color = "White",
+                                CreatedAt = DateTime.Now,
+                                UpdatedAt = DateTime.Now
+                            }
                     );
                     await context.SaveChangesAsync();
                 }
@@ -66,14 +66,10 @@ namespace ServerApp.DAL.Seed
                 if (!context.SpecificationTypes.Any())
                 {
                     context.SpecificationTypes.AddRange(
-                        new SpecificationType
-                        {
-                            Name = "Màn hình"
-                        },
-                        new SpecificationType
-                        {
-                            Name = "Bộ nhớ"
-                        }
+                        new SpecificationType { Name = "Color" },
+                        new SpecificationType { Name = "ScreenSize" },
+                        new SpecificationType { Name = "RAM" },
+                        new SpecificationType { Name = "Storage" }
                     );
                     await context.SaveChangesAsync();
                 }
@@ -82,18 +78,11 @@ namespace ServerApp.DAL.Seed
                 if (!context.ProductSpecifications.Any())
                 {
                     context.ProductSpecifications.AddRange(
-                        new ProductSpecification
-                        {
-                            ProductId = 1,
-                            SpecificationTypeId = 1,
-                            Value = "5.1 inch"
-                        },
-                        new ProductSpecification
-                        {
-                            ProductId = 1,
-                            SpecificationTypeId = 2,
-                            Value = "60GB"
-                        }
+                        new ProductSpecification { ProductId = 1, SpecificationTypeId = 1, Value = "Black" },
+                        new ProductSpecification { ProductId = 1, SpecificationTypeId = 2, Value = "6,5" },
+                        new ProductSpecification { ProductId = 2, SpecificationTypeId = 1, Value = "White" },
+                        new ProductSpecification { ProductId = 2, SpecificationTypeId = 3, Value = "8GB" },
+                        new ProductSpecification { ProductId = 2, SpecificationTypeId = 4, Value = "128" }
                     );
                     await context.SaveChangesAsync();
                 }

@@ -2,6 +2,8 @@
 using PresentationLayer.Exceptions;
 using ServerApp.BLL.Services;
 using ServerApp.BLL.Services.ViewModels;
+using ServerApp.DAL.Models;
+using System;
 namespace ServerApp.PL.Controllers
 {
     [Route("api/[controller]")]
@@ -19,127 +21,58 @@ namespace ServerApp.PL.Controllers
         [HttpGet("get-all-brands")]
         public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands()
         {
-            try
-            {
-                var brand = await _brandService.GetAllBrandAsync();
-
-                if (brand.Any())
-                {
-                    return StatusCode(200, brand);
-                }
-
-                return StatusCode(200, "No data");
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, $"Internal server error: {e.Message}");
-            }
+            var result = await _brandService.GetAllBrandAsync();
+            return Ok(result); // 200 OK nếu có dữ liệu.
         }
-
 
         [HttpGet("get-brand-by-id/{id}")]
         public async Task<ActionResult<BrandVm>> GetBrand(int id)
         {
-            try
-            {
-                var brand = await _brandService.GetByBrandIdAsync(id);
+            var result = await _brandService.GetByBrandIdAsync(id);
 
-                if (brand!=null)
-                {
-                    return StatusCode(200, brand);
-                }
-
-                return StatusCode(200, "No data");
-            }
-            catch (Exception e)
+            if (result == null)
             {
-                return StatusCode(500, $"Internal server error: {e.Message}");
+                return NotFound(new { Message = $"Brand with ID {id} not found." }); // 404 Not Found nếu không tìm thấy.
             }
+
+            return Ok(result); // 200 OK nếu tìm thấy.
         }
-
 
         [HttpPost("add-new-brand")]
-        public async Task<ActionResult<BrandVm>> PostBrand(AddBrandVm brandViewModel)
+        public async Task<ActionResult<BrandVm>> PostBrand(InputBrandVm brandVm)
         {
+            var result = await _brandService.AddBrandAsync(brandVm);
 
-            if (string.IsNullOrWhiteSpace(brandViewModel.Name))
+            if (result == null)
             {
-                return BadRequest("Title and Description cannot be empty.");
+                return BadRequest(new { Message = "Failed to create the brand." }); // 400 Bad Request nếu không tạo được.
             }
-            try
-            {
-                var result = await _brandService.AddBrandAsync(brandViewModel);
 
-                if (result != null)
-                {
-                    return Ok(result);
-                }
-
-                return BadRequest(result);
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, $"Internal server error: {e.Message}");
-            }
+            return CreatedAtAction(nameof(GetBrand), new { id = result.BrandId }, result); // 201 Created nếu tạo thành công.
         }
-        [HttpGet("test")]
-        public IActionResult TestException()
-        {
-            throw new ExceptionNotFound("This is a test exception!");
-        }
-
 
         [HttpPut("update-brand/{id}")]
-        public async Task<IActionResult> PutBrand(int id, AddBrandVm brandViewModel)
+        public async Task<IActionResult> PutBrand(int id, InputBrandVm brandVm)
         {
-            //if (id == null)
-            //{
-            //    return BadRequest("Invalid Brand ID.");
-            //}
+            var result = await _brandService.UpdateBrandAsync(id, brandVm);
+            if (result == null)
+            {
+                return NotFound(new { Message = $"Brand with ID {id} not found." }); // 404 Not Found nếu không tìm thấy.
+            }
 
-
-            //if (string.IsNullOrWhiteSpace(brandViewModel.Name))
-            //{
-            //    return BadRequest("Title and Description cannot be empty.");
-            //}
-            //try
-            //{
-            //    var result = await _brandService.UpdateBrandAsync(id, brandViewModel);
-
-            //    if (result != null)
-            //    {
-            //        return Ok(result);
-            //    }
-
-            //    return BadRequest(result);
-            //}
-            //catch (Exception e)
-            //{
-            //    return StatusCode(500, $"Internal server error: {e.Message}");
-            //}
-            var updatedBrand = await _brandService.UpdateBrandAsync(id, brandViewModel);
-            return Ok(updatedBrand);
+            return Ok(result); // 200 OK nếu cập nhật thành công.
         }
 
         [HttpDelete("delete-brand-by-id/{id}")]
         public async Task<IActionResult> DeleteBrand(int id)
         {
-            try
+            var result = await _brandService.DeleteBrandAsync(id);
+            if (result == null)
             {
-                var Brand = await _brandService.GetByIdAsync(id);
-                if (Brand == null)
-                {
-                    return BadRequest("Brand not found.");
-                }
-
-                await _brandService.DeleteAsync(Brand);
-
-                return Ok(Brand);
+                return NotFound(new { Message = $"Brand with ID {id} not found." }); // 404 Not Found nếu không tìm thấy.
             }
-            catch (Exception e)
-            {
-                return StatusCode(500, $"Internal server error: {e.Message}");
-            }
+
+            return NoContent(); // 204 No Content nếu xóa thành công.
         }
     }
 }

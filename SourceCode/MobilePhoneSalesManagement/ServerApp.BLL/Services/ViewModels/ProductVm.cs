@@ -7,29 +7,31 @@ using System.Threading.Tasks;
 
 namespace ServerApp.BLL.Services.ViewModels
 {
-    public class AddProductVm
+    public class InputProductVm
     {
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal Price { get; set; }
+        [SkipValidation]
         public decimal OldPrice { get; set; }
         public int StockQuantity { get; set; } = 0;
         public int? BrandId { get; set; }
+
+        [SkipValidation]
         public string ImageUrl { get; set; }
         public string Manufacturer { get; set; }
         public bool IsActive { get; set; } = true;
         public string Color { get; set; }
+        [SkipValidation]
         public int Discount { get; set; } = 0;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
         // Navigation properties
-        public virtual Brand Brand { get; set; }
+        public virtual InputBrandVm Brand { get; set; }
         //public virtual ICollection<Cart> Carts { get; set; }
         //public virtual ICollection<OrderItem> OrderItems { get; set; }
         //public virtual ICollection<WishList> WishLists { get; set; }
         //public virtual ICollection<Review> Reviews { get; set; }
-        public virtual ICollection<ProductSpecification> ProductSpecifications { get; set; }
+        public virtual ICollection<InputProductSpecificationVm> ProductSpecifications { get; set; }
     }
     public class ProductVm
     {
@@ -49,7 +51,7 @@ namespace ServerApp.BLL.Services.ViewModels
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
         // Navigation properties
-        public virtual Brand Brand { get; set; }
+        public virtual BrandVm Brand { get; set; }
         //public virtual ICollection<Cart> Carts { get; set; }
         //public virtual ICollection<OrderItem> OrderItems { get; set; }
         //public virtual ICollection<WishList> WishLists { get; set; }

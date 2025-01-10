@@ -7,10 +7,10 @@ namespace ServerApp.BLL.Services
 {
     public interface IBrandService : IBaseService<Brand>
     {
-        Task<ApiResponse<BrandVm>> AddBrandAsync(AddBrandVm brandVm);
-        Task<BrandVm> UpdateBrandAsync(int id, AddBrandVm brandVm);
+        Task<BrandVm> AddBrandAsync(InputBrandVm brandVm);
+        Task<BrandVm> UpdateBrandAsync(int id, InputBrandVm brandVm);
 
-        //bool DeleteByIdAsync(int id);
+        Task<BrandVm> DeleteBrandAsync(int id);
 
         Task<BrandVm?> GetByBrandIdAsync(int id);
 
@@ -25,8 +25,47 @@ namespace ServerApp.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ApiResponse<BrandVm>> AddBrandAsync(AddBrandVm brandVm)
+        public async Task<IEnumerable<BrandVm>> GetAllBrandAsync()
         {
+            var brands = await GetAllAsync(
+                includesProperties: "Products"
+            );
+
+            var BrandViewModels = brands.Select(brand => new BrandVm
+            {
+                BrandId = brand.BrandId,
+                Name = brand.Name,
+                IsActive = brand.IsActive,
+                CreatedAt= brand.CreatedAt,
+                UpdatedAt= brand.UpdatedAt
+            });
+
+            return BrandViewModels;
+        }
+
+        public async Task<BrandVm?> GetByBrandIdAsync(int id)
+        {
+            var brand = await GetByIdAsync(id);
+            if (brand == null)
+            {
+                throw new ExceptionNotFound("Brand not found");
+            }
+            var brandVm = new BrandVm
+            {
+                BrandId = brand.BrandId,
+                Name = brand.Name,
+                IsActive = brand.IsActive,
+                CreatedAt = brand.CreatedAt,
+                UpdatedAt = brand.UpdatedAt
+            };
+
+            return brandVm;
+
+        }
+        public async Task<BrandVm> AddBrandAsync(InputBrandVm brandVm)
+        {
+            ValidateModelPropertiesWithAttribute(brandVm);
+            
             var findBrand = await _unitOfWork.GenericRepository<Brand>().GetAsync(b =>
                 b.Name == brandVm.Name
             );
@@ -40,51 +79,72 @@ namespace ServerApp.BLL.Services
 
                 if (await AddAsync(brand) > 0)
                 {
-                    return new ApiResponse<BrandVm>
+                    return new BrandVm
                     {
-                        StatusCode = 200,
-                        Message = " Add success",
-                        Data = new BrandVm
-                        {
-                            BrandId = brand.BrandId,
-                            Name = brand.Name,
-                            IsActive = brand.IsActive
-                        }
+                        BrandId = brand.BrandId,
+                        Name = brand.Name,
+                        IsActive = brand.IsActive
                     };
                 }
+                throw new ArgumentException("Failed to update brand");
             }
-            return new ApiResponse<BrandVm>
-            {
-                StatusCode = 400,
-                Message = "Brand is empty"
-            };
+            throw new ExceptionBusinessLogic("Brand name is already in use.");
+
         }
 
-        public async Task<BrandVm> UpdateBrandAsync(int id, AddBrandVm brandVm)
+        public async Task<BrandVm> UpdateBrandAsync(int id, InputBrandVm brandVm)
         {
-
+            ValidateModelPropertiesWithAttribute(brandVm);
+            //Tìm brand
             var brand = await _unitOfWork.GenericRepository<Brand>().GetByIdAsync(id);
             if (brand == null)
             {
-                throw new ExceptionNotFound("Brand not found"); 
+                throw new ExceptionNotFound("Brand not found");
             }
 
-            if (brand.Name == brandVm.Name)
+            //Tìm brand có tên trùng với dữ liệu nhập vào (trừ brand tìm được phía trên)
+            var findBrand = await _unitOfWork.GenericRepository<Brand>().GetAsync(b =>
+                b.BrandId != id &&
+                b.Name == brandVm.Name
+             );
+            if (findBrand != null)
             {
-                throw new ExceptionBusinessLogic("Brand name is empty");
+                throw new ExceptionBusinessLogic("Brand name is already in use.");
             }
             brand.Name = brandVm.Name;
             brand.IsActive = brandVm.IsActive;
+            brand.UpdatedAt = DateTime.Now;
+            var result = await _unitOfWork.GenericRepository<Brand>().ModifyAsync(brand);
 
-            try
+            if (result <= 0)
             {
-                var result = await _unitOfWork.GenericRepository<Brand>().ModifyAsync(brand);
+                throw new ArgumentException("Failed to update brand");
+            }
 
-                if (result <= 0)
-                {
-                    throw new ArgumentException("Failed to update brand"); 
-                }
+            return new BrandVm
+            {
+                BrandId = brand.BrandId,
+                Name = brand.Name,
+                IsActive = brand.IsActive,
+                CreatedAt = brand.CreatedAt
+            };
+            
+        }
 
+        public async Task<BrandVm> DeleteBrandAsync(int id)
+        {
+            var brand = await _unitOfWork.GenericRepository<Brand>().GetByIdAsync(id);
+
+            if (brand == null)
+            {
+                throw new ExceptionNotFound("Brand not found");
+            }
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            _unitOfWork.GenericRepository<Brand>().Delete(id);
+
+            if (_unitOfWork.SaveChanges() > 0)
+            {
                 return new BrandVm
                 {
                     BrandId = brand.BrandId,
@@ -92,96 +152,10 @@ namespace ServerApp.BLL.Services
                     IsActive = brand.IsActive
                 };
             }
-            catch (Exception ex)
-            {
-                // Nếu lỗi xảy ra, ném ngoại lệ
-                throw new Exception($"Internal server error: {ex.Message}");
-            }
-        }
 
-        public async Task<ApiResponse<BrandVm>> DeleteByIdAsync(int id)
-        {
-
-            var entity = await _unitOfWork.GenericRepository<Brand>().GetByIdAsync(id);
-
-            if (entity == null)
-            {
-                // Trả về lỗi nếu không tìm thấy thương hiệu
-                return new ApiResponse<BrandVm>
-                {
-                    StatusCode = 404, // Mã trạng thái "Not Found"
-                    Message = "Brand not found",
-                    Data = null
-                };
-            }
-
-            try
-            {
-                // Lưu thay đổi vào cơ sở dữ liệu
-                _unitOfWork.GenericRepository<Brand>().Delete(id);
-
-                if (_unitOfWork.SaveChanges() > 0)
-                {
-                    return new ApiResponse<BrandVm>
-                    {
-                        StatusCode = 200, // Thành công
-                        Message = "Update success",
-                        Data = new BrandVm
-                        {
-                            BrandId = entity.BrandId,
-                            Name = entity.Name,
-                            IsActive = entity.IsActive
-                        }
-                    };
-                }
-
-                // Nếu lưu thất bại
-                return new ApiResponse<BrandVm>
-                {
-                    StatusCode = 500, // Lỗi server
-                    Message = "Failed to update brand",
-                    Data = null
-                };
-            }
-            catch (Exception ex)
-            {
-                // Xử lý lỗi khi cập nhật
-                return new ApiResponse<BrandVm>
-                {
-                    StatusCode = 500, // Lỗi server
-                    Message = $"Internal server error: {ex.Message}",
-                    Data = null
-                };
-            }
-        }
-
-        public async Task<BrandVm?> GetByBrandIdAsync(int id)
-        {
-            var brand = await GetByIdAsync(id);
-
-            var BrandViewModel = new BrandVm
-            {
-                BrandId = brand.BrandId,
-                Name = brand.Name,
-            };
-
-            return BrandViewModel;
-        }
-
-        public async Task<IEnumerable<BrandVm>> GetAllBrandAsync()
-        {
-            var Brands = await GetAllAsync(
-                    includesProperties: "Products"
-                );
-
-            var BrandViewModels = Brands.Select(c => new BrandVm
-            {
-                BrandId = c.BrandId,
-                Name = c.Name,
-                IsActive = c.IsActive
-            });
-
-            return BrandViewModels;
+            // Nếu lưu thất bại
+            throw new ArgumentException("Failed to delete brand");
+            
         }
 
     }
