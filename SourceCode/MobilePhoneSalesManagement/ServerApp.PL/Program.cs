@@ -131,7 +131,7 @@ namespace ServerApp.PL
                 context.Database.EnsureCreated();
 
                 //// Gọi seed data
-                //await SeedData.SeedAsync(context);
+                await SeedData.SeedAsync(context);
             }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
