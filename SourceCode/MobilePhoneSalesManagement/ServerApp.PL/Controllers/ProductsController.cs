@@ -36,6 +36,19 @@ namespace ServerApp.PL.Controllers
                 return StatusCode(500, $"Internal server error: {e.Message}");
             }
         }
+        [HttpPost("filter")]
+        public async Task<ActionResult<IEnumerable<ProductVm>>> FilterProducts([FromBody] FilterRequest filterRequest)
+        {
+            try
+            {
+                var filteredProducts = await _productService.FilterProductsAsync(filterRequest);
+                return Ok(filteredProducts);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Internal server error: {e.Message}");
+            }
+        }
 
 
 

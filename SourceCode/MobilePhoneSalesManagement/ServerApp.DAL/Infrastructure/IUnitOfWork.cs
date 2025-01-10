@@ -19,6 +19,7 @@ namespace ServerApp.DAL.Infrastructure
         IGenericRepository<OrderItem> OrderItemRepository { get; }
         IGenericRepository<WishList> WishListRepository { get; }
         IGenericRepository<Review> ReviewRepository { get; }
+        IGenericRepository<SpecificationType> SpecificationTypeRepository { get; }
 
         // Phương thức Generic Repository
         IGenericRepository<TEntity> GenericRepository<TEntity>() where TEntity : class;

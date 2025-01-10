@@ -18,6 +18,7 @@ namespace ServerApp.DAL.Infrastructure
         private IGenericRepository<OrderItem>? _orderItemRepository;
         private IGenericRepository<WishList>? _wishListRepository;
         private IGenericRepository<Review>? _reviewRepository;
+        private IGenericRepository<SpecificationType>? _specificationTypeRepository;
 
         public UnitOfWork(ShopDbContext context)
         {
@@ -53,6 +54,9 @@ namespace ServerApp.DAL.Infrastructure
 
         public IGenericRepository<Review> ReviewRepository =>
             _reviewRepository ??= new GenericRepository<Review>(_context);
+
+        public IGenericRepository<SpecificationType> SpecificationTypeRepository =>
+            _specificationTypeRepository ??= new GenericRepository<SpecificationType>(_context);
 
         // Phương thức Generic Repository
         public IGenericRepository<TEntity> GenericRepository<TEntity>() where TEntity : class
