@@ -44,6 +44,10 @@ namespace ServerApp.DAL.Data
                 .HasForeignKey(p => p.BrandId)
                 .OnDelete(DeleteBehavior.SetNull);
 
+
+            // Định nghĩa khóa chính cho bảng ProductSpecification
+            modelBuilder.Entity<ProductSpecification>()
+                .HasKey(ps => new { ps.ProductId, ps.SpecificationTypeId });
             // Product -> Specification (Cascade Delete)
             modelBuilder.Entity<ProductSpecification>()
                 .HasOne(ps => ps.Product)

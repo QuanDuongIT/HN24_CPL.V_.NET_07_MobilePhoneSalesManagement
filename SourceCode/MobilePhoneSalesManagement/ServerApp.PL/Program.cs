@@ -101,6 +101,7 @@ namespace ServerApp.PL
             builder.Services.AddScoped<IBrandService, BrandService>();
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ISpecificationTypeService, SpecificationTypeService>();
 
             var app = builder.Build();
             app.ConfigureBuildInExceptionHandler();
@@ -113,11 +114,11 @@ namespace ServerApp.PL
                 var context = services.GetRequiredService<ShopDbContext>();
 
                 //context.Database.EnsureDeleted();
-                // Áp dụng migrations nếu chưa có
+                //// Áp dụng migrations nếu chưa có
                 //context.Database.EnsureCreated();
 
-                // Gọi seed data
-                await SeedData.SeedAsync(context);
+                //// Gọi seed data
+                //await SeedData.SeedAsync(context);
             }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

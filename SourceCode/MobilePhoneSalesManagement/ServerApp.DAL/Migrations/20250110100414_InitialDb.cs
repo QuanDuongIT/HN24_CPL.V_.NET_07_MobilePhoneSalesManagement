@@ -65,7 +65,9 @@ namespace ServerApp.DAL.Migrations
                     BrandId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,7 +80,9 @@ namespace ServerApp.DAL.Migrations
                 {
                     SpecificationTypeId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -350,15 +354,15 @@ namespace ServerApp.DAL.Migrations
                 name: "ProductSpecifications",
                 columns: table => new
                 {
-                    ProductSpecificationId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     SpecificationTypeId = table.Column<int>(type: "int", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductSpecifications", x => x.ProductSpecificationId);
+                    table.PrimaryKey("PK_ProductSpecifications", x => new { x.ProductId, x.SpecificationTypeId });
                     table.ForeignKey(
                         name: "FK_ProductSpecifications_Products_ProductId",
                         column: x => x.ProductId,
@@ -484,11 +488,6 @@ namespace ServerApp.DAL.Migrations
                 name: "IX_Products_BrandId",
                 table: "Products",
                 column: "BrandId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductSpecifications_ProductId",
-                table: "ProductSpecifications",
-                column: "ProductId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductSpecifications_SpecificationTypeId",
