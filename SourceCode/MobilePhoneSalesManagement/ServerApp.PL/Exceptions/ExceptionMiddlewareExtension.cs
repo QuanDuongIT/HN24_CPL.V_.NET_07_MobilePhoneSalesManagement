@@ -46,7 +46,7 @@ namespace PresentationLayer.Exceptions
 
                             case InvalidOperationException:
                                 statusCode = (int)HttpStatusCode.BadRequest;
-                                message = "Invalid operation attempted.";
+                                message = exception.Message;
                                 break;
 
                             case SqlException:

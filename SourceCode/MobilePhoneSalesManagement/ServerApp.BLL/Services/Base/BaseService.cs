@@ -262,18 +262,73 @@ namespace ServerApp.BLL.Services.Base
                 // Kiểm tra nếu giá trị là null
                 if (value == null)
                 {
-                    throw new ArgumentException($"Property '{property.Name}' cannot be null.");
+                    throw new ArgumentException($"Property '{property.Name}' in model '{typeof(T).Name}' cannot be null.");
                 }
 
                 // Kiểm tra nếu là chuỗi rỗng hoặc chỉ chứa khoảng trắng
                 if (value is string strValue && string.IsNullOrWhiteSpace(strValue))
                 {
-                    throw new ArgumentException($"Property '{property.Name}' cannot be an empty string or whitespace.");
+                    throw new ArgumentException($"Property '{property.Name}' in model '{typeof(T).Name}' cannot be an empty string or whitespace.");
                 }
 
                 // Thêm các kiểm tra khác nếu cần
             }
         }
+        public async Task<(int countRemoved, int countUpdated)> DeleteMultipleAsync(
+     IEnumerable<int> ids,
+     Func<T, bool> condition,
+     Func<T?, Task> onConditionFailed)
+        {
+            // Bắt đầu transaction
+            await _unitOfWork.BeginTransactionAsync();
+
+            int countRemoved = 0;
+            int countUpdated = 0;
+
+            try
+            {
+                foreach (var id in ids)
+                {
+                    var entity = await _unitOfWork.GenericRepository<T>().GetByIdAsync(id);
+                    if(entity == null)
+                    {
+                        throw new ExceptionBusinessLogic($"'{typeof(T).Name}' not found.");
+                    }
+                    if (condition(entity))
+                    {
+                        // Xóa thực thể
+                        await _unitOfWork.GenericRepository<T>().DeleteAsync(id);
+                        countRemoved++;
+                    }
+                    else
+                    {
+                        // Gọi action khi không thỏa mãn điều kiện
+                        await onConditionFailed(entity);
+                        countUpdated++;
+                    }
+                }
+
+                // Lưu các thay đổi
+                await _unitOfWork.SaveChangesAsync();
+
+                // Commit transaction
+                await _unitOfWork.CommitTransactionAsync();
+
+                return (countRemoved, countUpdated);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                Console.WriteLine($"Error: {ex.Message}");
+
+                // Rollback transaction nếu có lỗi
+                await _unitOfWork.RollbackTransactionAsync();
+
+                // Ném lại ngoại lệ
+                throw new ArgumentException("Failed to delete entities. " + ex.Message, ex);
+            }
+        }
+
 
     }
 

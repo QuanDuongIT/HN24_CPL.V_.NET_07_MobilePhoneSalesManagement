@@ -49,6 +49,19 @@ namespace ServerApp.PL.Controllers
 
             return Ok(result); // 200 OK nếu tìm thấy.
         }
+
+        [HttpGet("get-specifications-by-product-id/{id}")]
+        public async Task<ActionResult<ProductVm>> GetProductSpecificationsByProductIdAsync(int id)
+        {
+            var result = await _productService.GetProductSpecificationsByProductIdAsync(id);
+
+            if (result == null)
+            {
+                return NotFound(new { Message = $"Product with ID {id} not found." }); 
+            }
+
+            return Ok(result); // 200 OK nếu tìm thấy.
+        }
         [HttpPost("add-new-product")]
         public async Task<ActionResult<ProductVm>> PostProduct(InputProductVm productVm)
         {
@@ -62,6 +75,18 @@ namespace ServerApp.PL.Controllers
             return CreatedAtAction(nameof(GetProduct), new { id = result.ProductId }, result); // 201 Created nếu tạo thành công.
         }
 
+        [HttpPut("update-product/{id}")]
+        public async Task<IActionResult> PutProduct(int id, InputProductVm productVm)
+        {
+            var result = await _productService.UpdateProductAsync(id, productVm);
+            if (result == null)
+            {
+                return NotFound(new { Message = $"Product with ID {id} not found." }); 
+            }
+
+            return Ok(result); 
+        }
+
         [HttpDelete("delete-product-by-id/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
@@ -73,5 +98,39 @@ namespace ServerApp.PL.Controllers
 
             return NoContent(); // 204 No Content nếu xóa thành công.
         }
+        // Phương thức xóa hàng loạt sản phẩm
+        [HttpDelete("delete-multiple-product")]
+        public async Task<IActionResult> DeleteMultiple([FromBody] List<int> productIds)
+        {
+            if (productIds == null || productIds.Count == 0)
+            {
+                return BadRequest("Product IDs must be provided.");
+            }
+
+            try
+            {
+                // Gọi phương thức xóa hàng loạt từ service
+                var (deletedCount, updateCount) = await _productService.DeleteMultipleAsync(
+                    productIds,
+                    product => product.IsActive == false,
+                    async product =>
+                    {
+                        product.IsActive = false;
+                        await _productService.UpdateProductAsync(product); 
+                    });
+
+                if (deletedCount + updateCount > 0)
+                {
+                    return Ok(new { Message = "Products deleted successfully.", DeletedCount = deletedCount, UpdateCount = updateCount });
+                }
+
+                return NotFound("No products were deleted.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
     }
 }

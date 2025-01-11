@@ -34,7 +34,7 @@ namespace ServerApp.PL.Controllers
 
             if (result == null)
             {
-                return NotFound(new { Message = $"SpecificationType with ID {id} not found." }); // 404 Not Found nếu không tìm thấy.
+                return NotFound(new { Message = $"SpecificationType with ID {id} not found." }); 
             }
 
             return Ok(result); // 200 OK nếu tìm thấy.
@@ -47,10 +47,10 @@ namespace ServerApp.PL.Controllers
 
             if (result == null)
             {
-                return BadRequest(new { Message = "Failed to create the specificationType." }); // 400 Bad Request nếu không tạo được.
+                return BadRequest(new { Message = "Failed to create the specificationType." }); 
             }
 
-            return CreatedAtAction(nameof(GetSpecificationType), new { id = result.SpecificationTypeId }, result); // 201 Created nếu tạo thành công.
+            return CreatedAtAction(nameof(GetSpecificationType), new { id = result.SpecificationTypeId }, result); 
         }
 
         [HttpPut("update-specificationType/{id}")]
@@ -59,10 +59,10 @@ namespace ServerApp.PL.Controllers
             var result = await _specificationTypeService.UpdateSpecificationTypeAsync(id, specificationTypeVm);
             if (result == null)
             {
-                return NotFound(new { Message = $"SpecificationType with ID {id} not found." }); // 404 Not Found nếu không tìm thấy.
+                return NotFound(new { Message = $"SpecificationType with ID {id} not found." }); 
             }
 
-            return Ok(result); // 200 OK nếu cập nhật thành công.
+            return Ok(result); 
         }
 
         [HttpDelete("delete-specificationType-by-id/{id}")]
@@ -71,10 +71,10 @@ namespace ServerApp.PL.Controllers
             var result = await _specificationTypeService.DeleteSpecificationTypeAsync(id);
             if (result == null)
             {
-                return NotFound(new { Message = $"SpecificationType with ID {id} not found." }); // 404 Not Found nếu không tìm thấy.
+                return NotFound(new { Message = $"SpecificationType with ID {id} not found." });
             }
 
-            return NoContent(); // 204 No Content nếu xóa thành công.
+            return NoContent(); 
         }
     }
 }

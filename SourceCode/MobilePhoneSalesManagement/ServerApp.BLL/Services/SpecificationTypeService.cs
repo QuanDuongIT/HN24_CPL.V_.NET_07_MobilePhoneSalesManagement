@@ -44,10 +44,7 @@ namespace ServerApp.BLL.Services
         public async Task<SpecificationTypeVm?> GetBySpecificationTypeIdAsync(int id)
         {
             var specificationType = await GetByIdAsync(id);
-            if (specificationType == null)
-            {
-                throw new ExceptionNotFound("SpecificationType not found");
-            }
+            if (specificationType == null) return null;
             var specificationTypeVm = new SpecificationTypeVm
             {
                 SpecificationTypeId = specificationType.SpecificationTypeId,
@@ -65,54 +62,57 @@ namespace ServerApp.BLL.Services
             var findSpecificationType = await _unitOfWork.GenericRepository<SpecificationType>().GetAsync(b =>
                 b.Name == specificationTypeVm.Name
             );
-            if (findSpecificationType == null)
+
+            if (findSpecificationType != null)
             {
-                var specificationType = new SpecificationType
-                {
-                    Name = specificationTypeVm.Name
-                };
-
-                if (await AddAsync(specificationType) > 0)
-                {
-                    return new SpecificationTypeVm
-                    {
-                        SpecificationTypeId = specificationType.SpecificationTypeId,
-                        Name = specificationType.Name
-                    };
-                }
-                throw new ArgumentException("Failed to update SpecificationType");
+                throw new ExceptionBusinessLogic("SpecificationType name is already in use.");
             }
-            throw new ExceptionBusinessLogic("SpecificationType name is already in use.");
 
+            var specificationType = new SpecificationType
+            {
+                Name = specificationTypeVm.Name
+            };
+
+            var result = await AddAsync(specificationType);
+            if (result <= 0)
+            {
+                throw new ArgumentException("Failed to add SpecificationType.");
+            }
+
+            return new SpecificationTypeVm
+            {
+                SpecificationTypeId = specificationType.SpecificationTypeId,
+                Name = specificationType.Name
+            };
         }
 
         public async Task<SpecificationTypeVm> UpdateSpecificationTypeAsync(int id, InputSpecificationTypeVm specificationTypeVm)
         {
             ValidateModelPropertiesWithAttribute(specificationTypeVm);
-            //Tìm SpecificationType
+
             var specificationType = await _unitOfWork.GenericRepository<SpecificationType>().GetByIdAsync(id);
             if (specificationType == null)
             {
-                throw new ExceptionNotFound("SpecificationType not found");
+                throw new ArgumentException("SpecificationType not found.");
             }
-            //Tìm specificationType có tên trùng với dữ liệu nhập vào (trừ specificationType tìm được phía trên)
-            var findspecificationType = await _unitOfWork.GenericRepository<SpecificationType>().GetAsync(b =>
-                b. SpecificationTypeId!= id &&
-                b.Name == specificationTypeVm.Name
-             );
 
-            if (findspecificationType != null)
+            var findSpecificationType = await _unitOfWork.GenericRepository<SpecificationType>().GetAsync(b =>
+                b.SpecificationTypeId != id &&
+                b.Name == specificationTypeVm.Name
+            );
+
+            if (findSpecificationType != null)
             {
                 throw new ExceptionBusinessLogic("SpecificationType name is already in use.");
             }
 
             specificationType.Name = specificationTypeVm.Name;
             specificationType.UpdatedAt = DateTime.Now;
-            var result = await _unitOfWork.GenericRepository<SpecificationType>().ModifyAsync(specificationType);
 
+            var result = await _unitOfWork.GenericRepository<SpecificationType>().ModifyAsync(specificationType);
             if (result <= 0)
             {
-                throw new ArgumentException("Failed to update SpecificationType");
+                throw new ArgumentException("Failed to update SpecificationType.");
             }
 
             return new SpecificationTypeVm
@@ -121,17 +121,13 @@ namespace ServerApp.BLL.Services
                 Name = specificationType.Name,
                 CreatedAt = specificationType.CreatedAt
             };
-
         }
 
         public async Task<SpecificationTypeVm> DeleteSpecificationTypeAsync(int id)
         {
             var specificationType = await _unitOfWork.GenericRepository<SpecificationType>().GetByIdAsync(id);
 
-            if (specificationType == null)
-            {
-                throw new ExceptionNotFound("SpecificationType not found");
-            }
+            if (specificationType == null) return null;
 
             // Lưu thay đổi vào cơ sở dữ liệu
             _unitOfWork.GenericRepository<SpecificationType>().Delete(id);

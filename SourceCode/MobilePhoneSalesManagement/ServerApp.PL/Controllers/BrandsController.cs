@@ -72,7 +72,7 @@ namespace ServerApp.PL.Controllers
                 return NotFound(new { Message = $"Brand with ID {id} not found." }); // 404 Not Found nếu không tìm thấy.
             }
 
-            return NoContent(); // 204 No Content nếu xóa thành công.
+            return NoContent(); 
         }
     }
 }

@@ -12,7 +12,7 @@ using ServerApp.DAL.Data;
 namespace ServerApp.DAL.Migrations
 {
     [DbContext(typeof(ShopDbContext))]
-    [Migration("20250110135800_InitialDb")]
+    [Migration("20250111073123_InitialDb")]
     partial class InitialDb
     {
         /// <inheritdoc />
@@ -204,6 +204,10 @@ namespace ServerApp.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -320,6 +324,9 @@ namespace ServerApp.DAL.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Discount")
+                        .HasColumnType("int");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()

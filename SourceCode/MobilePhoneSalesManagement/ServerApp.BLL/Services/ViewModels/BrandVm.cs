@@ -11,7 +11,7 @@ namespace ServerApp.BLL.Services.ViewModels
     {
         public int BrandId { get; set; }
         public string Name { get; set; }
-
+        public string? ImageUrl { get; set; }
         public bool IsActive { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
@@ -21,7 +21,8 @@ namespace ServerApp.BLL.Services.ViewModels
     public class InputBrandVm
     {
         public string Name { get; set; }
-        //[SkipValidation]
+        [SkipValidation]
+        public string? ImageUrl { get; set; }
         public bool IsActive { get; set; }
 
         //public virtual ICollection<Product> Products { get; set; }

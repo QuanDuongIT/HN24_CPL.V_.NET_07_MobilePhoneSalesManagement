@@ -36,5 +36,9 @@ namespace ServerApp.BLL.Services.Base
             string includesProperties = ""
         );
         void ValidateModelPropertiesWithAttribute<T>(T model);
+        Task<(int countRemoved, int countUpdated)> DeleteMultipleAsync(
+            IEnumerable<int> ids,
+            Func<T, bool> condition,
+            Func<T?, Task> onConditionFailed);
     }
 }

@@ -35,6 +35,7 @@ namespace ServerApp.BLL.Services
             {
                 BrandId = brand.BrandId,
                 Name = brand.Name,
+                ImageUrl=brand.ImageUrl,
                 IsActive = brand.IsActive,
                 CreatedAt= brand.CreatedAt,
                 UpdatedAt= brand.UpdatedAt
@@ -54,6 +55,7 @@ namespace ServerApp.BLL.Services
             {
                 BrandId = brand.BrandId,
                 Name = brand.Name,
+                ImageUrl=brand.ImageUrl,
                 IsActive = brand.IsActive,
                 CreatedAt = brand.CreatedAt,
                 UpdatedAt = brand.UpdatedAt
@@ -74,6 +76,7 @@ namespace ServerApp.BLL.Services
                 var brand = new Brand
                 {
                     Name = brandVm.Name,
+                    ImageUrl = brandVm.ImageUrl,
                     IsActive = brandVm.IsActive,
                 };
 
@@ -83,6 +86,7 @@ namespace ServerApp.BLL.Services
                     {
                         BrandId = brand.BrandId,
                         Name = brand.Name,
+                        ImageUrl=brand.ImageUrl,
                         IsActive = brand.IsActive
                     };
                 }
@@ -113,6 +117,7 @@ namespace ServerApp.BLL.Services
             }
             brand.Name = brandVm.Name;
             brand.IsActive = brandVm.IsActive;
+            brand.ImageUrl = brandVm.ImageUrl;
             brand.UpdatedAt = DateTime.Now;
             var result = await _unitOfWork.GenericRepository<Brand>().ModifyAsync(brand);
 
@@ -125,6 +130,7 @@ namespace ServerApp.BLL.Services
             {
                 BrandId = brand.BrandId,
                 Name = brand.Name,
+                ImageUrl=brand.ImageUrl,
                 IsActive = brand.IsActive,
                 CreatedAt = brand.CreatedAt
             };
@@ -149,6 +155,7 @@ namespace ServerApp.BLL.Services
                 {
                     BrandId = brand.BrandId,
                     Name = brand.Name,
+                    ImageUrl=brand.ImageUrl,
                     IsActive = brand.IsActive
                 };
             }
