@@ -1,1 +1,41 @@
-<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Impedit fuga, voluptatibus dignissimos veniam placeat aliquid est dicta eius quaerat quidem necessitatibus mollitia, molestias facere quos adipisci labore nulla, cumque iste?</p>
+<div class="container mt-4">
+    <!-- Banner -->
+    <div class="row">
+        <div class="col-12">
+            <img src="../../../../assets/images/Product/wallpaper.jpg" alt="Banner" class="img-fluid rounded" />
+        </div>
+    </div>
+
+    <!-- Brand Logos -->
+    <div class="row text-center mt-5">
+        <div class="col-3"
+            *ngFor="let brand of ['nexus_brand', 'iphone_brand', 'samsung_brand', 'htc_brand', 'alc_brand', 'pixel_brand', 'vivo_brand']"
+            [ngClass]="{ 'col-6': brand === 'iphone_brand' }">
+            <img [src]="'../../../../assets/images/Product/' + brand + '.png'" alt="{{ brand }}"
+                class="img-fluid mb-2" />
+        </div>
+    </div>
+
+    <!-- New Products -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="text-center">Sản phẩm mới nhất</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3" *ngFor="let product of newestProducts">
+            <div class="card mb-4 shadow-sm">
+                <img [src]="product.imageUrl" class="card-img-top" alt="{{ product.name }}" />
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted">{{ product.description }}</p>
+                    <p class="card-text text-danger">{{ product.price | currency: 'VND' }}</p>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-primary btn-sm">Thêm vào giỏ hàng</button>
+                        <button class="btn btn-outline-secondary btn-sm">Thêm vào Wishlist</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

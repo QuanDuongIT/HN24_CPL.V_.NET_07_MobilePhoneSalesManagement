@@ -6,6 +6,7 @@ import { UserManagementComponent } from './features/admin/user-management/user-m
 import { AdminLayoutComponent } from './features/admin/admin-layout/admin-layout.component';
 import { ClientLayoutComponent } from './features/client/client-layout/client-layout.component';
 import { HomeComponent } from './features/client/home/home.component';
+import { ProductListComponent } from './features/client/product/product-list/product-list.component';
 
 export const routes: Routes = [
   { path: 'admin', redirectTo: '/admin/user-management', pathMatch: 'full' },
@@ -24,7 +25,7 @@ export const routes: Routes = [
     component: ClientLayoutComponent, // Giao diện layout cho client
     children: [
       { path: 'home', component: HomeComponent }, // Trang chủ của client
-      // { path: 'products', component: ProductListComponent }, // Danh sách sản phẩm
+      { path: 'products', component: ProductListComponent }, // Danh sách sản phẩm
       // { path: 'product/:id', component: ProductDetailComponent }, // Chi tiết sản phẩm
       // { path: 'cart', component: CartComponent }, // Giỏ hàng
       // { path: 'checkout', component: CheckoutComponent }, // Thanh toán
