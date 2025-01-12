@@ -13,7 +13,6 @@ using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories;
 using ServerApp.DAL.Repositories.Generic;
-using ServerApp.DAL.Seed;
 using System.Text;
 
 namespace ServerApp.PL

@@ -16,6 +16,7 @@ namespace ServerApp.BLL.Services
     {
         Task<IActionResult> RegisterUserAsync(RegisterVm register);
         Task<IActionResult> LoginUserAsync(LoginVm loginVm);
+        Task<AuthResultVm> GenerateJwtToken(User user);
     }
 
     public class AuthenticationService : IAuthenticationService
@@ -62,9 +63,6 @@ namespace ServerApp.BLL.Services
             catch (Exception ex)
             {
                 // Log the exception for further investigation
-
-
-
                 return new BadRequestObjectResult(ex.Message);
             }
         }
@@ -82,7 +80,7 @@ namespace ServerApp.BLL.Services
             return new UnauthorizedResult();
         }
 
-        private async Task<AuthResultVm> GenerateJwtToken(User user)
+        public async Task<AuthResultVm> GenerateJwtToken(User user)
         {
             var authClaim = new List<Claim>()
             {
@@ -107,9 +105,9 @@ namespace ServerApp.BLL.Services
 
             return new AuthResultVm()
             {
-                Token = jwtToken
+                Token = jwtToken,
+                ExpiresAt = token.ValidTo
             };
         }
-
     }
 }

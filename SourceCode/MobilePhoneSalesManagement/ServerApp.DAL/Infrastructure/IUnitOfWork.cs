@@ -33,6 +33,8 @@ namespace ServerApp.DAL.Infrastructure
         Task BeginTransactionAsync();
         Task CommitTransactionAsync();
         Task RollbackTransactionAsync();
+        Task CommitAsync();
+        Task RollbackAsync();
     }
 
 }

@@ -1,4 +1,5 @@
-﻿using ServerApp.DAL.Data;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using ServerApp.DAL.Data;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories.Generic;
 
@@ -7,6 +8,7 @@ namespace ServerApp.DAL.Infrastructure
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ShopDbContext _context;
+        private IDbContextTransaction _currentTransaction;
 
         // Các repository cho từng thực thể
         private IGenericRepository<User>? _userRepository;
@@ -19,7 +21,7 @@ namespace ServerApp.DAL.Infrastructure
         private IGenericRepository<WishList>? _wishListRepository;
         private IGenericRepository<Review>? _reviewRepository;
         private IGenericRepository<SpecificationType>? _specificationTypeRepository;
-        private IGenericRepository<ProductSpecification>? _productSpecificationRepository; 
+        private IGenericRepository<ProductSpecification>? _productSpecificationRepository;
         public UnitOfWork(ShopDbContext context)
         {
             _context = context;
@@ -57,7 +59,7 @@ namespace ServerApp.DAL.Infrastructure
         public IGenericRepository<SpecificationType> SpecificationTypeRepository =>
             _specificationTypeRepository ??= new GenericRepository<SpecificationType>(_context);
         public IGenericRepository<ProductSpecification> ProductSpecificationRepository =>
-            _productSpecificationRepository ??= new GenericRepository<ProductSpecification>(_context); 
+            _productSpecificationRepository ??= new GenericRepository<ProductSpecification>(_context);
 
         // Phương thức Generic Repository
         public IGenericRepository<TEntity> GenericRepository<TEntity>() where TEntity : class
@@ -79,7 +81,10 @@ namespace ServerApp.DAL.Infrastructure
         // Quản lý transaction
         public async Task BeginTransactionAsync()
         {
-            await _context.Database.BeginTransactionAsync();
+            if (_currentTransaction != null)
+                throw new InvalidOperationException("A transaction is already in progress.");
+
+            _currentTransaction = await _context.Database.BeginTransactionAsync();
         }
 
         public async Task CommitTransactionAsync()
@@ -101,6 +106,36 @@ namespace ServerApp.DAL.Infrastructure
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();
+        }
+        public async Task CommitAsync()
+        {
+            if (_currentTransaction == null)
+                throw new InvalidOperationException("No transaction in progress.");
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                await _currentTransaction.CommitAsync();
+            }
+            catch
+            {
+                await RollbackAsync();
+                throw;
+            }
+            finally
+            {
+                await _currentTransaction.DisposeAsync();
+                _currentTransaction = null;
+            }
+        }
+        public async Task RollbackAsync()
+        {
+            if (_currentTransaction != null)
+            {
+                await _currentTransaction.RollbackAsync();
+                await _currentTransaction.DisposeAsync();
+                _currentTransaction = null;
+            }
         }
     }
 
