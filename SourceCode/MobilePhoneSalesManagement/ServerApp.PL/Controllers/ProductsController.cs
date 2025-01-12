@@ -131,6 +131,19 @@ namespace ServerApp.PL.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+        [HttpGet("get-newest-product")]
+        public async Task<ActionResult<IEnumerable<ProductVm>>> NewestProducts()
+        {
+            try
+            {
+                var newestProducts = await _productService.GetNewestProductsAsync();
+                return Ok(newestProducts);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Internal server error: {e.Message}");
+            }
+        }
 
     }
 }

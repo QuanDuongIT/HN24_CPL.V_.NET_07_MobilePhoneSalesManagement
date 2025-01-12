@@ -20,6 +20,7 @@ public interface IProductService : IBaseService<Product>
         Task<ProductVm?> GetByProductIdAsync(int id);
         Task<IEnumerable<ProductSpecificationVm>> GetProductSpecificationsByProductIdAsync(int productId);
         Task<bool> AddProductToCartAsync(int productId,CartVm cartVm);
+        Task<IEnumerable<ProductVm>> GetNewestProductsAsync();
 }
     public class ProductService : BaseService<Product>, IProductService
     {
@@ -713,6 +714,45 @@ public interface IProductService : IBaseService<Product>
                 return Enumerable.Empty<ProductVm>();
             }
         }
+    public async Task<IEnumerable<ProductVm>> GetNewestProductsAsync()
+    {
+        try
+        {
+            // Lấy danh sách sản phẩm bao gồm các thuộc tính cần thiết
+            var query = await GetAllAsync(includesProperties: "Brand,ProductSpecifications,ProductSpecifications.SpecificationType");
+
+            // Sắp xếp theo ngày tạo (CreatedAt) giảm dần và lấy 4 sản phẩm mới nhất
+            var newestProducts = query
+                .OrderByDescending(p => p.CreatedAt)
+                .Take(4)
+                .Select(p => new ProductVm
+                {
+                    ProductId = p.ProductId,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    OldPrice = p.OldPrice,
+                    StockQuantity = p.StockQuantity,
+                    BrandId = p.BrandId,
+                    ImageUrl = p.ImageUrl,
+                    Manufacturer = p.Manufacturer,
+                    IsActive = p.IsActive,
+                    Color = p.Color,
+                    Discount = p.Discount,
+                    CreatedAt = p.CreatedAt,
+                    UpdatedAt = p.UpdatedAt,
+                })
+                .ToList();
+
+            return newestProducts;
+        }
+        catch (Exception ex)
+        {
+            // Ghi log lỗi hoặc xử lý tùy theo yêu cầu dự án
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            return Enumerable.Empty<ProductVm>();
+        }
+    }
     public Task<bool> AddProductToCartAsync(int productId, CartVm cartVm)
     {
         throw new NotImplementedException();
