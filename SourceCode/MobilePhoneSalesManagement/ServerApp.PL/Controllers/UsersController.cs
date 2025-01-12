@@ -27,7 +27,7 @@ namespace ServerApp.PL.Controllers
             var users = await _userService.GetAllUserAsync(pageNumber, pageSize);
             if (users == null || !users.Items.Any())
             {
-                return NotFound("No users found.");
+                return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
             }
             // Trả về danh sách PagedResult UserVm
             return Ok(users);
@@ -41,7 +41,7 @@ namespace ServerApp.PL.Controllers
             var user = await _userService.GetByUserIdAsync(id);
             if (user == null)
             {
-                return NotFound($"User with ID {id} not found.");
+                return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
             }
 
             // Trả về UserVm
@@ -102,13 +102,13 @@ namespace ServerApp.PL.Controllers
             {
                 if (id == null)
                 {
-                    return BadRequest("Invalid User ID.");
+                    return BadRequest(new { success = false, message = "Mã người dùng không được trống." });
                 }
 
                 var user = await _userService.GetByIdAsync(id);
                 if (user == null)
                 {
-                    return NotFound("User not found.");
+                    return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
                 }
                 else
                 {
@@ -116,9 +116,9 @@ namespace ServerApp.PL.Controllers
 
                     if (result)
                     {
-                        return Ok("Update successful");
+                        return Ok(new { success = true, message = "Cập nhật thành công." });
                     }
-                    return BadRequest("Some error");
+                    return BadRequest(new { success = false, message = "Có lỗi trong quá trình cập nhật thông tin." });
                 }
             }
             catch (ExceptionBusinessLogic ex)
@@ -138,17 +138,17 @@ namespace ServerApp.PL.Controllers
             var deletedUser = await _userService.DeleteUserByIdAsync(id);
             if (!deletedUser)
             {
-                return NotFound($"User with ID {id} not found.");
+                return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
             }
 
-            return Ok("Delete success");
+            return Ok(new { success = true, message = "Xóa người dùng thành công." });
         }
         [HttpDelete("delete-users-by-id-list")]
         public async Task<IActionResult> DeleteUsersByIdList([FromBody] List<int> userIds)
         {
             if (userIds == null || userIds.Count == 0)
             {
-                return BadRequest("Danh sách UserId không hợp lệ.");
+                return BadRequest(new { success = false, message = "Danh sách UserId không hợp lệ." });
             }
 
             try
@@ -158,11 +158,11 @@ namespace ServerApp.PL.Controllers
 
                 if (result)
                 {
-                    return Ok("Xóa người dùng thành công.");
+                    return Ok(new { success = true, message = "Xóa nhiều người dùng thành công." });
                 }
                 else
                 {
-                    return BadRequest("Không tìm thấy người dùng để xóa.");
+                    return BadRequest(new { success = false, message = "Có lỗi khi xóa." });
                 }
             }
             catch (Exception ex)
@@ -177,7 +177,7 @@ namespace ServerApp.PL.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { success = false, message = "Mật khẩu xác nhận phải trùng với mật khẩu mới và có chiều dài từ 6 ký tự trở lên chứa ký tự hóa, thương và ký tự số." });
             }
 
             try
@@ -188,7 +188,7 @@ namespace ServerApp.PL.Controllers
                 // Nếu không có claim NameIdentifier, trả về lỗi yêu cầu người dùng đăng nhập
                 if (userIdClaim == null)
                 {
-                    return Unauthorized("User is not logged in.");
+                    return Unauthorized(new { success = false, message = "Vui lòng đăng nhập" });
                 }
 
                 var userId = int.Parse(userIdClaim.Value);
@@ -197,14 +197,15 @@ namespace ServerApp.PL.Controllers
 
                 if (result.Succeeded)
                 {
-                    return Ok("Password changed successfully.");
+                    return Ok(new { success = true, message = "Thay đổi mật khẩu thành công." });
                 }
 
-                return BadRequest("Failed to change password.");
+                return BadRequest(new { success = false, message = "Thay đổi mật khẩu thất bại." });
+
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { success = false, message = ex.Message });
             }
         }
 
@@ -213,14 +214,14 @@ namespace ServerApp.PL.Controllers
         {
             if (days < 0)
             {
-                return BadRequest("Days must be a non-negative integer.");
+                return NotFound(new { success = false, message = "Ngày hoạt động cuối cùng phải ở quá khứ." });
             }
 
             var filteredUsers = await _userService.FilterUsersAsync(null, days, null, null);
 
             if (filteredUsers == null || !filteredUsers.Items.Any())
             {
-                return NotFound($"No users found who were last active {days} or more days ago.");
+                return NotFound(new { success = false, message = "Không tìm thấy người dùng nào" });
             }
 
             return Ok(filteredUsers);
@@ -232,14 +233,14 @@ namespace ServerApp.PL.Controllers
             query = query.ToLower().Trim();
             if (query == "")
             {
-                return BadRequest("Key search cann't empty.");
+                return BadRequest(new { success = false, message = "Từ khóa không được để trống." });
             }
 
             var filteredUsers = await _userService.FilterUsersAsync(query, null, null, null);
 
             if (filteredUsers == null || !filteredUsers.Items.Any())
             {
-                return NotFound($"No users found");
+                return NotFound(new { success = false, message = "Không tìm thấy người dùng nào" });
             }
 
             return Ok(filteredUsers);
@@ -255,7 +256,7 @@ namespace ServerApp.PL.Controllers
             {
                 return Ok(new { success = true, message = "Cập nhật trạng thái người dùng thành công!" });
             }
-            return BadRequest("Không tìm thấy người dùng nào với các UserId đã cung cấp.");
+            return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
         }
         [HttpPost("toggle-block-users")]
         public async Task<IActionResult> ToggleBlockUsersAsync([FromBody] List<int> userIds)
@@ -266,7 +267,7 @@ namespace ServerApp.PL.Controllers
             {
                 return Ok(new { success = true, message = "Cập nhật trạng thái các người dùng thành công!" });
             }
-            return BadRequest("Không tìm thấy người dùng nào với các UserId đã cung cấp.");
+            return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
         }
     }
 

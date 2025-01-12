@@ -1,14 +1,15 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { UserService } from './services/user.service';
 import { CommonModule } from '@angular/common';
 import { UserAddComponent } from "./user-add/user-add.component";
 import { error } from 'jquery';
+import { UserEditComponent } from "./user-edit/user-edit.component";
 declare var $: any;
 
 
 @Component({
   selector: 'app-user-management',
-  imports: [CommonModule, UserAddComponent],
+  imports: [CommonModule, UserAddComponent, UserEditComponent],
   templateUrl: './user-management.component.html',
   styleUrl: './user-management.component.css',
 })
@@ -30,7 +31,8 @@ export class UserManagementComponent {
   // block, unblock modal
   isModalOpen = false; // Trạng thái mở modal
   selectedUser: any = null; // User được chọn
-  action: 'block' | 'unblock' = 'block'; // Hành động (block/unblock)
+  action: 'block' | 'unblock' | 'delete' = 'block'; // Hành động (block/unblock)
+  Object: any;
 
   constructor(private userService: UserService) {}
 
@@ -53,7 +55,7 @@ export class UserManagementComponent {
           this.users = this.users.filter(
             (user) =>
               user.email?.includes(this.searchKey) ||
-              user.phone?.includes(this.searchKey)
+              user.phoneNumber?.includes(this.searchKey)
           );
         }
 
@@ -67,8 +69,6 @@ export class UserManagementComponent {
         // Cập nhật phân trang
         this.totalCount = data.totalCount;
         this.totalPages = Math.ceil(this.totalCount / this.pageSize);
-        
-        
       },
       (error) => {
         console.error('Error loading users:', error);
@@ -152,6 +152,7 @@ export class UserManagementComponent {
 
   // Khi checkbox trong một hàng thay đổi
   toggleSelection(userId: number, event: Event): void {
+    event.stopPropagation();
     const checked = (event.target as HTMLInputElement).checked;
     if (checked) {
       this.selectedUserIds.push(userId);
@@ -170,21 +171,32 @@ export class UserManagementComponent {
     
   }
 
-  openModal(user: any, action: 'block' | 'unblock'): void {
+  // hiện modal confirm
+  openModal(user: any, action: 'block' | 'unblock' | 'delete', event: Event): void {
+    event.stopPropagation();
     this.selectedUser = user;
     this.action = action;
     this.isModalOpen = true;
   }
-
+  // ẩn modal confirm
   closeModal(): void {
     this.isModalOpen = false;
     this.selectedUser = null;
   }
-
-  confirmAction(): void {
+  // Xác nhận hành động
+  confirmAction() {
+    if (this.action === 'block' || this.action === 'unblock') {
+      this.toggleBlockUser();
+    } else if (this.action === 'delete') {
+      this.deleteSelectedUsers();
+    }
+    this.closeModal(); // Đóng modal sau khi thực hiện hành động
+  }
+  // block / unblock 1 người dùng
+  toggleBlockUser(): void {
     this.userService.toggleBlockUser(this.selectedUser.userId).subscribe(
       () => {
-        alert('User đã bị chặn thành công');
+        alert('Cập nhật trạng thái thành công');
         this.loadUsers();
       },
       (error) => {
@@ -192,9 +204,28 @@ export class UserManagementComponent {
         alert('Không thể chặn user. Vui lòng thử lại sau.');
       }
     );
-    this.closeModal();
   }
 
+  // delete nhiều user
+  deleteSelectedUsers(): void {
+    if (this.selectedUserIds.length === 0) {
+      alert('Vui lòng chọn ít nhất một user.');
+      return;
+    }
+    this.userService.deleteUsersByIdList(this.selectedUserIds).subscribe(
+      (res) => {
+        alert('Xóa danh sách người dùng thành công.');
+        this.loadUsers();
+      },
+      (error) => {
+        console.error(error);
+      }
+    )
+  }
+
+  exportFile(): void {
+
+  }
 
   // block, unblock nhiều user
   blockOrUnblockSelectedUsers(): void {
@@ -214,10 +245,12 @@ export class UserManagementComponent {
   }
 
   // Mở modal cho Add hoặc Edit
-  openUserModal(user: any = null) {
-    this.selectedUser = user ? { ...user } : {}; // Nếu chỉnh sửa thì copy dữ liệu, nếu thêm mới thì object rỗng
-    const modal: any = document.getElementById('userModal');
-    $(modal).modal('show');
+  openUserModal(user: any = null, event: MouseEvent) {
+    if ((event.target as HTMLElement).tagName !== 'INPUT') {
+      this.selectedUser = user ? { ...user } : null;
+      const modal: any = document.getElementById('userModal');
+      $(modal).modal('show');
+    }
   }
   closeUserModal() {
     const modal: any = document.getElementById('userModal');

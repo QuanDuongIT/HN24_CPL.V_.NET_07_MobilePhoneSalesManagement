@@ -26,8 +26,8 @@ export class UserService {
   }
 
   // Phương thức cập nhật thông tin người dùng
-  updateUser(userId: string, user: any): Observable<any> {
-    return this.http.put(`${BASE_URL_API}/users/${userId}`, user);
+  updateUser(id: number, user: any): Observable<any> {
+    return this.http.put(`${BASE_URL_API}/users/${id}`, user);
   }
 
   // Phương thức xóa người dùng

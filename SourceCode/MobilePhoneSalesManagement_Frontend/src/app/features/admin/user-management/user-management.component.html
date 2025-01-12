@@ -52,7 +52,7 @@
                       value="true"
                       data-placement="top"
                       title="Thêm người dùng"
-                      (click)="openUserModal()"
+                      (click)="openUserModal(null, $event)"
                     >
                       <i class="txt-center fas fa-plus"></i>
                     </button>
@@ -90,12 +90,18 @@
                     </tr>
                   </thead>
                   <tbody id="content-table">
-                    <tr *ngFor="let user of users">
+                    <tr
+                      *ngFor="let user of users"
+                      (click)="openUserModal(user, $event)"
+                    >
                       <td>
                         <input
                           type="checkbox"
                           [checked]="isChecked(user.userId)"
-                          (change)="toggleSelection(user.userId, $event)"
+                          (change)="
+                            toggleSelection(user.userId, $event);
+                            $event.stopPropagation()
+                          "
                         />
                       </td>
                       <td>{{ user.userId }}</td>
@@ -109,7 +115,7 @@
                           <button
                             *ngIf="user.status"
                             class="btn btn-danger sizeTh1"
-                            (click)="openModal(user, 'block')"
+                            (click)="openModal(user, 'block', $event)"
                             title="Block"
                           >
                             <i class="fas fa-lock"></i>
@@ -117,7 +123,7 @@
                           <button
                             *ngIf="!user.status"
                             class="btn btn-success sizeTh1"
-                            (click)="openModal(user, 'unblock')"
+                            (click)="openModal(user, 'unblock', $event)"
                             title="Unblock"
                           >
                             <i class="fas fa-unlock"></i>
@@ -129,8 +135,10 @@
                 </table>
 
                 <div class="action-container">
-                  <button class="btn btn-red">Xóa</button>
-                  <button class="btn btn-blue">
+                  <button class="btn btn-red" (click)="deleteSelectedUsers()">
+                    Xóa
+                  </button>
+                  <button class="btn btn-blue" (click)="exportFile()">
                     Xuất file
                     <i class="fas fa-file-excel"></i>
                   </button>
@@ -155,7 +163,7 @@
                   </div>
                 </div>
               </div>
-            </div> 
+            </div>
           </div>
         </div>
       </div>
@@ -178,7 +186,14 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">
-              Xác nhận {{ action === "block" ? "chặn" : "mở khóa" }}
+              Xác nhận
+              {{
+                action === "block"
+                  ? "chặn"
+                  : action === "delete"
+                  ? "xóa"
+                  : "mở khóa"
+              }}
             </h5>
             <button
               type="button"
@@ -191,7 +206,14 @@
           </div>
           <div class="modal-body">
             Bạn có muốn xác nhận
-            {{ action === "block" ? "chặn" : "mở khóa" }} user này không?
+            {{
+              action === "block"
+                ? "chặn"
+                : action === "delete"
+                ? "xóa"
+                : "mở khóa"
+            }}
+            user này không?
           </div>
           <div class="modal-footer">
             <button
@@ -216,12 +238,10 @@
     <!-- Add -->
     <!-- Modal Add, Edit người dùng -->
     <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog" style="width: 70%; max-width: unset;">
+      <div class="modal-dialog" style="width: 70%; max-width: unset">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">
-              {{ selectedUser ? "Chỉnh sửa" : "Thêm mới" }} người dùng
-            </h5>
+            <h5 class="modal-title">Quản lý người người dùng</h5>
             <button
               type="button"
               class="close"
@@ -233,12 +253,16 @@
             </button>
           </div>
           <div class="modal-body">
-            <app-user-add></app-user-add>
+            <ng-container *ngIf="selectedUser; else addUserTemplate">
+              <app-user-edit [user]="selectedUser"></app-user-edit>
+            </ng-container>
+            <ng-template #addUserTemplate>
+              <app-user-add></app-user-add>
+            </ng-template>
           </div>
         </div>
       </div>
     </div>
-
   </div>
   <!-- /#right-panel -->
 </div>

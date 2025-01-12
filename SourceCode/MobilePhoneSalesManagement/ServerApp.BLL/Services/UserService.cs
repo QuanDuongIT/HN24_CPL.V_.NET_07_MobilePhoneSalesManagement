@@ -77,12 +77,15 @@ namespace ServerApp.BLL.Services
             {
                 throw new ExceptionNotFound("User not found.");
             }
+            var itemExists = await GetUserByEmailAsync(userVm.Email);
+            if (itemExists != null && itemExists.UserId != id)
+                throw new ArgumentException("Email này đã tồn tại trên tài khoản khác");
             user.Email = userVm.Email;
             user.Status = userVm.Status;
             user.Role = userVm.Role;
             user.LastOnlineAt = userVm.LastOnlineAt;
             // Nếu mật khẩu mới được cung cấp, cập nhật mật khẩu
-            if (!string.IsNullOrEmpty(userVm.PasswordHash))
+            if (!string.IsNullOrEmpty(userVm.PasswordHash) && itemExists.PasswordHash != userVm.PasswordHash)
             {
                 // Xóa mật khẩu cũ
                 var removePasswordResult = await _userManager.RemovePasswordAsync(user);
