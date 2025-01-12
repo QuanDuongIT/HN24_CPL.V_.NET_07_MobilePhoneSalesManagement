@@ -1,0 +1,23 @@
+<div class="container">
+    <h1 class="mt-3">{{ model.name ? 'Update Brand' : 'Add Brand' }}</h1>
+    <form #form="ngForm" (ngSubmit)="onFormSubmit()">
+        <div class="mt-3">
+            <label for="brandName" class="form-label">Brand Name</label>
+            <input type="text" id="brandName" name="brandName" [(ngModel)]="model.name" class="form-control" required>
+        </div>
+
+        <div class="mt-3">
+            <label for="imageUrl" class="form-label">Image URL</label>
+            <input type="text" id="imageUrl" name="imageUrl" [(ngModel)]="model.imageUrl" class="form-control">
+        </div>
+
+        <div class="mt-3">
+            <input type="checkbox" id="isActive" name="isActive" [(ngModel)]="model.isActive" class="form-check-input">
+            <label for="isActive" class="form-check-label">Is Active</label>
+        </div>
+
+        <div class="mt-3">
+            <button class="btn btn-primary" type="submit" [disabled]="form.invalid">Save</button>
+        </div>
+    </form>
+</div>
