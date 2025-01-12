@@ -11,8 +11,7 @@ using System.Threading.Tasks;
 
 namespace ServerApp.BLL.Services.InterfaceServices
 {
-    public interface ICartService : IBaseService<Cart>;
-    public interface IGenericRepository<T> where T : class
+    public interface ICartService : IBaseService<Cart>
     {
 
         Task<int> AddCartAsync(CartVm cartVm);
@@ -24,7 +23,5 @@ namespace ServerApp.BLL.Services.InterfaceServices
         Task<Cart?> GetByCartIdAsync(int id);
 
         Task<IEnumerable<Cart>> GetAllCartAsync();
-        Task<T?> GetByIdAsync(object id);
-        Task<IEnumerable<T>> GetAllAsync();
     }
 }

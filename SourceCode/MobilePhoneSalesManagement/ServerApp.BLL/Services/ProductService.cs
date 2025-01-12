@@ -15,14 +15,12 @@ public interface IProductService : IBaseService<Product>
         Task<int> UpdateProductAsync(Product product);
 
         Task<ProductVm> DeleteProductAsync(int id);
-        Task<ProductDetailVm> GetProductDetailsAsync(int id);
+        Task<ProductDetailVm> GetProductDetailsAsync(int productId);
 
-
-      
-       Task<bool> AddProductToCartAsync(int productId, CartVm cartVm);
         Task<ProductVm?> GetByProductIdAsync(int id);
         Task<IEnumerable<ProductSpecificationVm>> GetProductSpecificationsByProductIdAsync(int productId);
-    }
+        Task<bool> AddProductToCartAsync(int productId,CartVm cartVm);
+}
     public class ProductService : BaseService<Product>, IProductService
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -33,7 +31,7 @@ public interface IProductService : IBaseService<Product>
         private readonly IGenericRepository<Brand> _brandRepository;
 
 
-    public OroductService(IUnitOfWork unitOfWork, ISpecificationTypeService specificationTypeService) : base(unitOfWork)
+    public ProductService(IUnitOfWork unitOfWork, ISpecificationTypeService specificationTypeService) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _specificationTypeService = specificationTypeService;
@@ -531,7 +529,7 @@ public interface IProductService : IBaseService<Product>
             
             return await _unitOfWork.GenericRepository<Product>().ModifyAsync(product);
         }
-    public async Task<ProductDetailVm> GetProductDetailAsync(int productId)
+    public async Task<ProductDetailVm> GetProductDetailsAsync(int productId)
     {
         // Lấy sản phẩm từ database
         var product = await _productRepository.GetByIdAsync(productId);
@@ -543,7 +541,7 @@ public interface IProductService : IBaseService<Product>
 
         // Lấy thông tin danh mục và thương hiệu (nếu cần)
        
-        var brand = await _brandRepository.GetByIdAsync(product.BrandId);
+        var brand = await _brandRepository.GetByIdAsync((int)product.BrandId);
 
         // Tạo đối tượng ProductDetailVm để trả về
         var productDetailVm = new ProductDetailVm
@@ -715,5 +713,9 @@ public interface IProductService : IBaseService<Product>
                 return Enumerable.Empty<ProductVm>();
             }
         }
+    public Task<bool> AddProductToCartAsync(int productId, CartVm cartVm)
+    {
+        throw new NotImplementedException();
     }
+}
 

@@ -13,6 +13,7 @@ using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories;
 using ServerApp.DAL.Repositories.Generic;
+using ServerApp.DAL.Seed;
 using System.Text;
 
 namespace ServerApp.PL
@@ -109,7 +110,7 @@ namespace ServerApp.PL
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IBrandService, BrandService>();
             builder.Services.AddScoped<ICartService, CartService>();
-            builder.Services.AddScoped<IProductService, IProductService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IUserDetailsService, UserDetailsService>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddSingleton<IEmailService, EmailService>();
