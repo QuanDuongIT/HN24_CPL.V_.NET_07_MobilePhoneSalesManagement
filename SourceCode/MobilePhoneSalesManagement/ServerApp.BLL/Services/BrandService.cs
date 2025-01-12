@@ -156,24 +156,29 @@ namespace ServerApp.BLL.Services
             {
                 throw new ExceptionNotFound("Brand not found");
             }
+            var isdelete = 0;
+            if (brand.IsActive == true)
+            {
+                brand.IsActive = false;
+                isdelete = await UpdateBrandAsync(brand);
+            }
+            else
+            {
+                _unitOfWork.GenericRepository<Brand>().Delete(id);
+                isdelete = _unitOfWork.SaveChanges();
+            }
 
-            // Lưu thay đổi vào cơ sở dữ liệu
-            _unitOfWork.GenericRepository<Brand>().Delete(id);
-
-            if (_unitOfWork.SaveChanges() > 0)
+            if (isdelete > 0)
             {
                 return new BrandVm
                 {
                     BrandId = brand.BrandId,
                     Name = brand.Name,
-                    ImageUrl=brand.ImageUrl,
+                    ImageUrl = brand.ImageUrl,
                     IsActive = brand.IsActive
                 };
             }
-
-            // Nếu lưu thất bại
             throw new ArgumentException("Failed to delete brand");
-            
         }
 
     }

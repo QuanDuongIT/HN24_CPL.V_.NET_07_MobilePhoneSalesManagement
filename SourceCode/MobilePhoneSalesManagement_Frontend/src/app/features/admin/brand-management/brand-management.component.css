@@ -1,0 +1,62 @@
+/* Overlay để tối phần còn lại */
+.overlay {
+    position: fixed;
+    /* Giữ overlay cố định trên màn hình */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Màu tối với độ mờ */
+    z-index: 999;
+    /* Đảm bảo overlay nằm trên các thành phần khác */
+}
+
+/* Container bao quanh app-add-brand để kiểm tra sự kiện click */
+.modal-container {
+    position: fixed;
+    /* Để component này nổi */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* Đưa nó vào giữa màn hình */
+    z-index: 1000;
+    /* Đảm bảo nó xuất hiện trên overlay */
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: 400px;
+}
+
+/* Style cho nút Update */
+.link-update {
+    color: #28a745;
+    /* Màu xanh cho Update */
+    text-decoration: none;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.link-update:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+/* Style cho nút Delete */
+.link-delete {
+    color: #dc3545;
+    /* Màu đỏ cho Delete */
+    text-decoration: none;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.link-delete:hover {
+    background-color: #dc3545;
+    color: white;
+}
