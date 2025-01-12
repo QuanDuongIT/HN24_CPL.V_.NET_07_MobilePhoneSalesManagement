@@ -31,7 +31,7 @@ export class UserService {
   }
 
   // Phương thức xóa người dùng
-  deleteUser(userId: string): Observable<any> {
+  deleteUserById(userId: number): Observable<any> {
     return this.http.delete(`${BASE_URL_API}/users/${userId}`);
   }
   // Xóa người dùng theo danh sách ID

@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { UserService } from './services/user.service';
 import { CommonModule } from '@angular/common';
-import { UserAddComponent } from "./user-add/user-add.component";
+import { UserAddComponent } from './user-add/user-add.component';
 import { error } from 'jquery';
-import { UserEditComponent } from "./user-edit/user-edit.component";
+import { UserEditComponent } from './user-edit/user-edit.component';
+import { ExcelService } from '../../../core/services/excel-service/excel.service';
 declare var $: any;
-
 
 @Component({
   selector: 'app-user-management',
@@ -14,17 +14,16 @@ declare var $: any;
   styleUrl: './user-management.component.css',
 })
 export class UserManagementComponent {
-
   currentPage: number = 1;
-  totalPages: number = 1; 
-  pageSize: number = 10;   
-  totalCount: number = 0;  
-  users: any[] = [];       
-  pages: number[] = [];    
-  searchKey: string = ''; 
+  totalPages: number = 1;
+  pageSize: number = 10;
+  totalCount: number = 0;
+  users: any[] = [];
+  pages: number[] = [];
+  searchKey: string = '';
   lastActiveDays: number = 0;
   selectedUserIds: number[] = []; // Danh sách các userId đã chọn
-  allSelected: boolean = false;   // Biến kiểm tra "Check all"
+  allSelected: boolean = false; // Biến kiểm tra "Check all"
   // pagination
   showEllipsisBefore: boolean = false;
   showEllipsisAfter: boolean = false;
@@ -34,7 +33,10 @@ export class UserManagementComponent {
   action: 'block' | 'unblock' | 'delete' = 'block'; // Hành động (block/unblock)
   Object: any;
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private excelService: ExcelService
+  ) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -47,7 +49,6 @@ export class UserManagementComponent {
     // Gọi API để lấy dữ liệu phân trang
     this.userService.getUsers(this.currentPage, this.pageSize).subscribe(
       (data: any) => {
-        
         this.users = data.items || [];
 
         // Lọc dữ liệu nếu có tìm kiếm
@@ -87,8 +88,8 @@ export class UserManagementComponent {
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.updatePagination();  // Cập nhật lại phân trang
-      this.loadUsers();  // Gọi lại phương thức tải dữ liệu (nếu cần)
+      this.updatePagination(); // Cập nhật lại phân trang
+      this.loadUsers(); // Gọi lại phương thức tải dữ liệu (nếu cần)
     }
   }
 
@@ -96,8 +97,8 @@ export class UserManagementComponent {
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.updatePagination();  // Cập nhật lại phân trang
-      this.loadUsers();  // Gọi lại phương thức tải dữ liệu (nếu cần)
+      this.updatePagination(); // Cập nhật lại phân trang
+      this.loadUsers(); // Gọi lại phương thức tải dữ liệu (nếu cần)
     }
   }
 
@@ -127,10 +128,10 @@ export class UserManagementComponent {
 
   // Kiểm tra ngày hoạt động gần đây
   checkLastActive(lastActiveDate: string, days: number): boolean {
-    const lastActive = new Date(lastActiveDate);    
+    const lastActive = new Date(lastActiveDate);
     const diff = new Date().getTime() - lastActive.getTime();
     const daysDifference = diff / (1000 * 3600 * 24); // Tính số ngày
-    
+
     console.log(daysDifference);
     return daysDifference >= days;
   }
@@ -139,7 +140,7 @@ export class UserManagementComponent {
   selectAll(event: Event): void {
     this.allSelected = (event.target as HTMLInputElement).checked;
     if (this.allSelected) {
-      this.selectedUserIds = this.users.map(user => user.userId);
+      this.selectedUserIds = this.users.map((user) => user.userId);
     } else {
       this.selectedUserIds = [];
     }
@@ -163,16 +164,23 @@ export class UserManagementComponent {
       }
     }
     this.allSelected = this.selectedUserIds.length === this.users.length;
-    
+
     // Nếu có một item bị bỏ chọn, đánh dấu "Check all" là không chọn
     if (!this.allSelected) {
       this.allSelected = false;
     }
-    
   }
 
   // hiện modal confirm
-  openModal(user: any, action: 'block' | 'unblock' | 'delete', event: Event): void {
+  openModal(
+    user: any,
+    action: 'block' | 'unblock' | 'delete',
+    event: Event
+  ): void {
+    if (this.selectedUserIds.length === 0 && action === 'delete') {
+      alert('Vui lòng chọn ít nhất một user.');
+      return;
+    }
     event.stopPropagation();
     this.selectedUser = user;
     this.action = action;
@@ -208,10 +216,6 @@ export class UserManagementComponent {
 
   // delete nhiều user
   deleteSelectedUsers(): void {
-    if (this.selectedUserIds.length === 0) {
-      alert('Vui lòng chọn ít nhất một user.');
-      return;
-    }
     this.userService.deleteUsersByIdList(this.selectedUserIds).subscribe(
       (res) => {
         alert('Xóa danh sách người dùng thành công.');
@@ -220,11 +224,11 @@ export class UserManagementComponent {
       (error) => {
         console.error(error);
       }
-    )
+    );
   }
 
   exportFile(): void {
-
+    this.excelService.exportToExcel(this.users, 'UserData');
   }
 
   // block, unblock nhiều user
@@ -241,7 +245,7 @@ export class UserManagementComponent {
       (error) => {
         console.error(error);
       }
-    )
+    );
   }
 
   // Mở modal cho Add hoặc Edit
