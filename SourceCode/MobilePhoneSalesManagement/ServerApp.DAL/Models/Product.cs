@@ -24,5 +24,8 @@
         public virtual ICollection<WishList> WishLists { get; set; } // Liên kết với bảng WishList
         public virtual ICollection<Review> Reviews { get; set; } // Liên kết với bảng Review
         public virtual ICollection<ProductSpecification> ProductSpecifications { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; }
+        public int? CategoryId { get; set; }
     }
 }

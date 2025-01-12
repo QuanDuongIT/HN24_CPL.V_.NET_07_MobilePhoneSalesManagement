@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ServerApp.BLL.Services.ViewModels
 {
+
     public class InputProductVm
     {
         public string Name { get; set; }
