@@ -74,5 +74,39 @@ namespace ServerApp.PL.Controllers
 
             return NoContent(); 
         }
+        // Phương thức xóa hàng loạt sản phẩm
+        [HttpDelete("delete-multiple-brand")]
+        public async Task<IActionResult> DeleteMultiple([FromBody] List<int> brandIds)
+        {
+            if (brandIds == null || brandIds.Count == 0)
+            {
+                return BadRequest("Brand IDs must be provided.");
+            }
+
+            try
+            {
+                // Gọi phương thức xóa hàng loạt từ service
+                var (deletedCount, updateCount) = await _brandService.DeleteMultipleAsync(
+                    brandIds,
+                    brand => brand.IsActive == false,
+                    async brand =>
+                    {
+                        brand.IsActive = false;
+                        await _brandService.UpdateBrandAsync(brand);
+                    });
+
+                if (deletedCount + updateCount > 0)
+                {
+                    return Ok(new { Message = "Brands deleted successfully.", DeletedCount = deletedCount, UpdateCount = updateCount });
+                }
+
+                return NotFound("No brands were deleted.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
     }
 }

@@ -15,6 +15,7 @@ namespace ServerApp.BLL.Services
         Task<BrandVm?> GetByBrandIdAsync(int id);
 
         Task<IEnumerable<BrandVm>> GetAllBrandAsync();
+        Task<int> UpdateBrandAsync(Brand brand);
     }
     public class BrandService : BaseService<Brand>, IBrandService
     {
@@ -136,7 +137,17 @@ namespace ServerApp.BLL.Services
             };
             
         }
+        public async Task<int> UpdateBrandAsync(Brand brand)
+        {
+            // Cập nhật thông tin Brand
+            brand.Name = brand.Name;
+            brand.ImageUrl = brand.ImageUrl;
+            brand.IsActive = brand.IsActive;
+            brand.UpdatedAt = DateTime.Now;
 
+            // Cập nhật Brand vào cơ sở dữ liệu
+            return await _unitOfWork.GenericRepository<Brand>().ModifyAsync(brand);
+        }
         public async Task<BrandVm> DeleteBrandAsync(int id)
         {
             var brand = await _unitOfWork.GenericRepository<Brand>().GetByIdAsync(id);
