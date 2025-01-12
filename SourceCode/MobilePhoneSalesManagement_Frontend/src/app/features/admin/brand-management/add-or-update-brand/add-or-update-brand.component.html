@@ -1,5 +1,5 @@
 <div class="container">
-    <h1 class="mt-3">{{ model.name ? 'Update Brand' : 'Add Brand' }}</h1>
+    <h1 class="mt-3">{{ brandToUpdate ? 'Update Brand' : 'Add Brand' }}</h1>
     <form #form="ngForm" (ngSubmit)="onFormSubmit()">
         <div class="mt-3">
             <label for="brandName" class="form-label">Brand Name</label>

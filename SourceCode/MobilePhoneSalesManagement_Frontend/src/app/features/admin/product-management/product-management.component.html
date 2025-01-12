@@ -1,1 +1,75 @@
-<p>product-management works!</p>
+<div class="container">
+    <h1 class="mt-3">Product List</h1>
+
+    <div class="d-flex align-items-center mb-3">
+        <button class="btn btn-primary me-3" (click)="showAddProduct()">Add Brand</button>
+
+        <!-- Input để cấu hình số lượng brand hiển thị trên mỗi trang -->
+        <label for="itemsPerPage" class="me-2">Items per page:</label>
+        <input id="itemsPerPage" type="number" [(ngModel)]="itemsPerPage" class="form-control" style="width: 100px;"
+            min="1" max="100" (change)="onItemsPerPageChange()" />
+    </div>
+
+    <div class="mt-3">
+        <ng-container *ngIf="products$ | async as products">
+            <table class="table table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Product Name</th>
+                        <th>ImageUrl</th>
+                        <th>Is Active</th>
+                        <th>brand</th>
+                        <th>Specifications</th>
+                        <th>CreatedAt</th>
+                        <th>UpdatedAt</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let product of products | paginate: { itemsPerPage: itemsPerPage, currentPage: page }">
+                        <td>B0{{ product.productId }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>
+                            <img [src]="product.imageUrl" alt="Product Image" style="width: 50px; height: auto;">
+                        </td>
+                        <td>
+                            <span [class.text-success]="product.isActive" [class.text-danger]="!product.isActive">
+                                {{ product.isActive ? 'Active' : 'Inactive' }}
+                            </span>
+                        </td>
+                        <td>
+                            {{ product.brand.name || 'N/A' }}
+                        </td>
+                        <td>
+                            <ul>
+                                <li *ngFor="let spec of product.productSpecifications">
+                                    {{ spec.specificationType.name }}: {{ spec.value }}
+                                </li>
+                            </ul>
+                        </td>
+                        <td>{{ product.createdAt | date:'short' }}</td>
+                        <td>{{ product.updatedAt | date:'short' }}</td>
+                        <td>
+                            <a (click)="updateProduct(product.productId)" class="link-update">Update</a>
+                            <a (click)="onDeleteProduct(product.productId, product.isActive)"
+                                class="link-delete">Delete</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Pagination Controls -->
+            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+        </ng-container>
+
+    </div>
+
+    <div *ngIf="isAddProductVisible" class="overlay" (click)="hideAddProduct()"></div>
+
+    <div *ngIf="isAddProductVisible" class="modal-container">
+        <app-add-or-update-product [productToUpdate]="productToUpdate" (close)="hideAddProduct()"
+            (add)="onAddProduct($event)">
+        </app-add-or-update-product>
+    </div>
+</div>

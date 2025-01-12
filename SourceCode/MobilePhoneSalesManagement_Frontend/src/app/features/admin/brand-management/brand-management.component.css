@@ -26,7 +26,11 @@
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
-    width: 400px;
+    width: 800px;
+    max-width: 90%;
+    min-width: 800px;
+    overflow-y: auto;
+    max-height: 90vh;
 }
 
 /* Style cho nút Update */

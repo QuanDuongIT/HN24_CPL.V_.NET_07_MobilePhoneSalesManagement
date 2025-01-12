@@ -445,7 +445,7 @@ public interface IProductService : IBaseService<Product>
                 existingProduct.IsActive = productVm.IsActive;
                 existingProduct.Color = productVm.Color;
                 existingProduct.Discount = productVm.Discount;
-
+                existingProduct.UpdatedAt= DateTime.Now;
                 // Cập nhật Product vào cơ sở dữ liệu
                 _unitOfWork.GenericRepository<Product>().Update(existingProduct);
                 await _unitOfWork.SaveChangesAsync();
