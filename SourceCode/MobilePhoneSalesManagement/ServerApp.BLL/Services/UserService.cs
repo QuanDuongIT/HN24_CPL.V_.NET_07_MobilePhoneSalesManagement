@@ -12,14 +12,18 @@ namespace ServerApp.BLL.Services
         Task<int> AddUserAsync(UserVm userVm);
         Task<bool> UpdateUserAsync(int id, UserVm userVm);
 
-        Task<bool> DeleteByIdAsync(int id);
+        Task<bool> DeleteUserByIdAsync(int id);
+        Task<bool> DeleteUsersByIdAsync(List<int> userIds);
 
         Task<UserVm?> GetByUserIdAsync(int id);
 
-        Task<IEnumerable<UserVm>> GetAllUserAsync();
+        Task<PagedResult<UserVm>> GetAllUserAsync(int? pageNumber, int? pageSize);
         Task<User?> GetUserByEmailAsync(string email);
-        Task<IEnumerable<UserVm>> FilterUsersByLastActiveAsync(int days);
+        Task<PagedResult<UserVm>> FilterUsersAsync(string? searchTerm, int? days, int? pageNumber, int? pageSize);
         Task<IdentityResult> ChangePasswordAsync(int userId, ChangePasswordVm model);
+        Task<bool> ToggleBlockUserAsync(int userId);
+        Task<bool> ToggleBlockUsersAsync(List<int> userIds);
+
     }
     public class UserService : BaseService<User>, IUserService
     {
@@ -38,15 +42,31 @@ namespace ServerApp.BLL.Services
         {
             var user = new User()
             {
-                UserName = userVm.UserName,
                 Email = userVm.Email,
-                PasswordHash = userVm.PasswordHash,
                 Status = userVm.Status,
                 Role = userVm.Role,
+                UserName = userVm.Email
             };
-            await AddAsync(user);
-            await _unitOfWork.SaveChangesAsync();
-            return user.UserId;
+
+            var result = await _userManager.CreateAsync(user, userVm.PasswordHash);
+            if (result.Succeeded)
+            {
+                await _unitOfWork.SaveChangesAsync();
+                await _userDetailsService.AddUserDetailsAsync(user.UserId, userVm);
+                return user.UserId;
+            }
+            var passwordErrorMessages = result.Errors
+                .Where(e => e.Code.Contains("Password"))
+                .Select(e => e.Description)
+                .ToList();
+
+            if (passwordErrorMessages.Any())
+            {
+                // Nếu có lỗi liên quan đến mật khẩu, ném ra lỗi "Passwords không đủ mạnh"
+                throw new ExceptionBusinessLogic("Mật khẩu phải bao gồm: 6 ký tự trở lên chứa chữ hoa, chữ thường và ký tự số");
+            }
+            throw new ExceptionBusinessLogic(string.Join(", ", result.Errors.Select(e => e.Description)));
+
         }
 
 
@@ -55,30 +75,89 @@ namespace ServerApp.BLL.Services
             var user = await GetByIdAsync(id);
             if (user == null)
             {
-                throw new ArgumentException("User not found.");
+                throw new ExceptionNotFound("User not found.");
             }
-            user.UserName = userVm.UserName;
             user.Email = userVm.Email;
-            user.PasswordHash = userVm.PasswordHash;
             user.Status = userVm.Status;
             user.Role = userVm.Role;
             user.LastOnlineAt = userVm.LastOnlineAt;
+            // Nếu mật khẩu mới được cung cấp, cập nhật mật khẩu
+            if (!string.IsNullOrEmpty(userVm.PasswordHash))
+            {
+                // Xóa mật khẩu cũ
+                var removePasswordResult = await _userManager.RemovePasswordAsync(user);
+                if (!removePasswordResult.Succeeded)
+                {
+                    throw new ExceptionBusinessLogic("Lỗi trong quá trình đổi mật khẩu.");
+                }
+
+                // Đặt mật khẩu mới
+                var addPasswordResult = await _userManager.AddPasswordAsync(user, userVm.PasswordHash);
+                if (!addPasswordResult.Succeeded)
+                {
+                    var passwordErrorMessages = addPasswordResult.Errors
+                        .Where(e => e.Code.Contains("Password"))
+                        .Select(e => e.Description)
+                        .ToList();
+
+                    if (passwordErrorMessages.Any())
+                    {
+                        // Nếu có lỗi liên quan đến mật khẩu, ném ra lỗi "Passwords không đủ mạnh"
+                        throw new ExceptionBusinessLogic("Mật khẩu phải bao gồm: 6 ký tự trở lên chứa chữ hoa, chữ thường và ký tự số.");
+                    }
+                    throw new ExceptionBusinessLogic(string.Join(", ", addPasswordResult.Errors.Select(e => e.Description)));
+                }
+            }
 
             await UpdateAsync(user);
+            await _userDetailsService.UpdateUserDetailsAsync(id, userVm);
             _unitOfWork.Context.Entry(user).State = EntityState.Modified;
             return await _unitOfWork.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> DeleteByIdAsync(int id)
+        public async Task<bool> DeleteUserByIdAsync(int id)
         {
             var entity = await GetByIdAsync(id);
             if (entity != null)
             {
+                await _userDetailsService.DeleteUserDetailsByUserIdAsync(id);
                 await DeleteAsync(id);
                 await _unitOfWork.SaveChangesAsync();
                 return true;
             }
             return false;
+        }
+        public async Task<bool> DeleteUsersByIdAsync(List<int> userIds)
+        {
+            if (userIds == null || !userIds.Any())
+                throw new ArgumentException("Danh sách UserId cần xóa không được để trống.", nameof(userIds));
+
+            // Lấy danh sách người dùng cần xóa
+            var users = await _unitOfWork.UserRepository.GetAllAsync();
+
+            var usersToDelete = users.Where(user => userIds.Contains(user.UserId)).ToList();
+
+            if (!usersToDelete.Any())
+                throw new ExceptionNotFound("Không tìm thấy người dùng nào với các UserId đã cung cấp.");
+
+            // Xóa từng người dùng
+            await _unitOfWork.BeginTransactionAsync();  // Gọi phương thức BeginTransactionAsync mà không cần gán
+            try
+            {
+                foreach (var user in usersToDelete)
+                {
+                    await _userDetailsService.DeleteUserDetailsByUserIdAsync(user.UserId);
+                    await DeleteAsync(user.UserId);
+                }
+
+                await _unitOfWork.CommitTransactionAsync();
+                return true;
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
         }
 
         public async Task<UserVm?> GetByUserIdAsync(int id)
@@ -96,7 +175,6 @@ namespace ServerApp.BLL.Services
             var result = new UserVm
             {
                 UserId = user.UserId,
-                UserName = user.UserName,
                 Email = user.Email,
                 Role = user.Role,
                 PasswordHash = user.PasswordHash,
@@ -112,25 +190,27 @@ namespace ServerApp.BLL.Services
             return result;
         }
 
-        public async Task<IEnumerable<UserVm>> GetAllUserAsync()
+        public async Task<PagedResult<UserVm>> GetAllUserAsync(int? pageNumber, int? pageSize)
         {
-            // Lấy dữ liệu từ repository
-            var users = await _unitOfWork.UserRepository.GetAllAsync(
+            // Xác định các giá trị mặc định cho pageNumber và pageSize nếu chúng null
+            int currentPage = pageNumber ?? 1; // Mặc định trang đầu tiên
+            int currentPageSize = pageSize ?? 10; // Mặc định 10 bản ghi mỗi trang
+
+            var query = await _unitOfWork.UserRepository.GetAllAsync(
                 filter: null,
-                include: query => query.Include(u => u.UserDetails)
+                include: q => q.Include(u => u.UserDetails)
             );
 
-            // Kiểm tra dữ liệu null và trả về danh sách rỗng nếu không có user nào
-            if (users == null || !users.Any())
-            {
-                return Enumerable.Empty<UserVm>();
-            }
+            var totalCount = query.Count();
+            var paginatedUsers = query
+                .OrderBy(u => u.UserId)
+                .Skip((currentPage - 1) * currentPageSize)
+                .Take(currentPageSize)
+                .ToList();
 
-            // Ánh xạ sang UserVm
-            var result = users.Select(user => new UserVm
+            var userVms = paginatedUsers.Select(user => new UserVm
             {
                 UserId = user.UserId,
-                UserName = user.UserName,
                 Email = user.Email,
                 Role = user.Role,
                 PasswordHash = user.PasswordHash,
@@ -143,8 +223,16 @@ namespace ServerApp.BLL.Services
                 PhoneNumber = user.UserDetails?.PhoneNumber
             });
 
-            return result;
+            return new PagedResult<UserVm>
+            {
+                CurrentPage = currentPage,
+                PageSize = currentPageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling((double)totalCount / currentPageSize),
+                Items = userVms
+            };
         }
+
 
         public async Task<User?> GetUserByEmailAsync(string email)
         {
@@ -176,19 +264,42 @@ namespace ServerApp.BLL.Services
             return result;
         }
 
-        public async Task<IEnumerable<UserVm>> FilterUsersByLastActiveAsync(int days)
+        public async Task<PagedResult<UserVm>> FilterUsersAsync(string? searchTerm, int? days, int? pageNumber, int? pageSize)
         {
-            // Xác định thời điểm cần so sánh
-            var cutoffDate = DateTime.Now.AddDays(-days);
+            // Xác định các giá trị mặc định cho pageNumber và pageSize nếu chúng null
+            int currentPage = pageNumber ?? 1; // Mặc định trang đầu tiên
+            int currentPageSize = pageSize ?? 10; // Mặc định 10 bản ghi mỗi trang
 
-            var filteredUsers = await _unitOfWork.UserRepository.GetAllAsync(
-                filter: user => user.LastOnlineAt >= cutoffDate,
-                include: query => query.Include(u => u.UserDetails)
+            // Xác định thời điểm cần so sánh (nếu days có giá trị)
+            DateTime? cutoffDate = days.HasValue ? DateTime.Now.AddDays(-days.Value) : null;
+
+            // Loại bỏ khoảng trắng và chuyển về chữ thường để tìm kiếm không phân biệt hoa thường
+            searchTerm = searchTerm?.Trim()?.ToLower();
+
+            // Lọc dữ liệu
+            var query = await _unitOfWork.UserRepository.GetAllAsync(
+                filter: user =>
+                    (string.IsNullOrEmpty(searchTerm) || // Nếu searchTerm trống thì bỏ qua tìm kiếm
+                    user.Email.ToLower().Contains(searchTerm) || // Tìm kiếm theo email
+                    user.UserDetails.FullName.ToLower().Contains(searchTerm)) // Tìm kiếm theo họ tên
+                    && (!cutoffDate.HasValue || user.LastOnlineAt >= cutoffDate), // Lọc theo ngày hoạt động cuối nếu có
+                include: query => query.Include(u => u.UserDetails) // Bao gồm thông tin chi tiết người dùng
             );
-            var result = filteredUsers.Select(user => new UserVm
+
+            // Tổng số bản ghi sau khi lọc
+            var totalCount = query.Count();
+
+            // Áp dụng phân trang
+            var paginatedUsers = query
+                .OrderBy(user => user.UserId) // Sắp xếp theo UserId
+                .Skip((currentPage - 1) * currentPageSize) // Bỏ qua các bản ghi trước đó
+                .Take(currentPageSize) // Lấy số bản ghi cần hiển thị
+                .ToList();
+
+            // Chuyển đổi sang ViewModel
+            var userVms = paginatedUsers.Select(user => new UserVm
             {
                 UserId = user.UserId,
-                UserName = user.UserName,
                 Email = user.Email,
                 Role = user.Role,
                 PasswordHash = user.PasswordHash,
@@ -201,10 +312,58 @@ namespace ServerApp.BLL.Services
                 PhoneNumber = user.UserDetails.PhoneNumber
             });
 
-            return result;
+            // Trả về kết quả phân trang
+            return new PagedResult<UserVm>
+            {
+                CurrentPage = currentPage,
+                PageSize = currentPageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling((double)totalCount / currentPageSize),
+                Items = userVms
+            };
         }
 
+        public async Task<bool> ToggleBlockUserAsync(int userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
 
+            if (user == null)
+            {
+                throw new ArgumentException("User not found.");
+            }
+
+            user.Status = !user.Status;
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            await _unitOfWork.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> ToggleBlockUsersAsync(List<int> userIds)
+        {
+            try
+            {
+                foreach (var userId in userIds)
+                {
+                    var user = await _unitOfWork.UserRepository.GetByIdAsync(userId);
+
+                    if (user == null)
+                    {
+                        throw new ArgumentException("User not found.");
+                    }
+                    user.Status = !user.Status;
+                }
+                // Lưu thay đổi vào cơ sở dữ liệu
+                await _unitOfWork.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException("UserIds is empty");
+            }
+        }
     }
 
 }

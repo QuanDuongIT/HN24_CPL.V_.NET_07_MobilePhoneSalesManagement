@@ -48,7 +48,8 @@ namespace ServerApp.BLL.Services
             var detailsExists = await GetByUserIdAsync(userId);
             if (detailsExists == null)
             {
-                return true;
+                var newUserDetailsId = await AddUserDetailsAsync(userId, userVm);
+                return newUserDetailsId > 0;
             }
 
             detailsExists.FullName = userVm.FullName;

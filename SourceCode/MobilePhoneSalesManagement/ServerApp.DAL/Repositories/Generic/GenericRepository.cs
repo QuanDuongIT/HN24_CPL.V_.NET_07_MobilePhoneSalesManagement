@@ -202,7 +202,7 @@ namespace ServerApp.DAL.Repositories.Generic
                 query = include(query);
             }
 
-            return await query.ToListAsync();
+            return query;
         }
     }
 
