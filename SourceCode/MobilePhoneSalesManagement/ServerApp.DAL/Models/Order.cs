@@ -11,5 +11,6 @@
 
         public virtual User User { get; set; }
         public virtual ICollection<OrderItem> OrderItems { get; set; }
+        public string PaymentStatus { get; set; }
     }
 }

@@ -43,5 +43,7 @@ namespace ServerApp.DAL.Repositories.Generic
             Expression<Func<T, bool>>? filter = null,
             Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null
         );
+        Task<string> GetByIdAsync(int? brandId);
+        Task<string> GetByIdAsync(object categoryId);
     }
 }

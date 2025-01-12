@@ -3,30 +3,38 @@ using ServerApp.BLL.Services.Base;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
+using ServerApp.DAL.Repositories.Generic;
 
-namespace ServerApp.BLL.Services
-{
-    public interface IProductService : IBaseService<Product>
+namespace ServerApp.BLL.Services;
+public interface IProductService : IBaseService<Product>
     {
         Task<IEnumerable<ProductVm>> GetAllProductAsync();
         Task<IEnumerable<ProductVm>> FilterProductsAsync(FilterRequest filterRequest);
         Task<ProductVm> AddProductAsync(InputProductVm brandVm);
         Task<ProductVm> UpdateProductAsync(int id, InputProductVm brandVm);
+        Task<ProductDetailVm> GetProductDetailsAsync(int id);
+       Task<ProductVm> DeleteProductAsync(int id);
 
-        Task<ProductVm> DeleteProductAsync(int id);
-
-        Task<ProductVm?> GetByProductIdAsync(int id);
-    }
-    public class ProductService : BaseService<Product>, IProductService
+       Task<ProductVm?> GetByProductIdAsync(int id);
+      
+       Task<bool> AddProductToCartAsync(int productId, CartVm cartVm);
+}
+    public class OroductService : BaseService<Product>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ISpecificationTypeService _specificationTypeService;
+    
+        private readonly IGenericRepository<Product> _productRepository;
+        private readonly IGenericRepository<Category> _categoryRepository;
+        private readonly IGenericRepository<Brand> _brandRepository;
 
-        public ProductService(IUnitOfWork unitOfWork, ISpecificationTypeService specificationTypeService) : base(unitOfWork)
+
+    public OroductService(IUnitOfWork unitOfWork, ISpecificationTypeService specificationTypeService) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _specificationTypeService = specificationTypeService;
-        }
+            _brandRepository = unitOfWork.GenericRepository<Brand>();
+    }
 
         public async Task<ProductVm> AddProductAsync(InputProductVm productVm)
         {
@@ -51,6 +59,7 @@ namespace ServerApp.BLL.Services
                     Manufacturer = productVm.Manufacturer,
                     IsActive = productVm.IsActive,
                     Color = productVm.Color
+
                 };
 
 
@@ -117,6 +126,7 @@ namespace ServerApp.BLL.Services
             }
             throw new ExceptionBusinessLogic("Product name is already in use.");
         }
+
 
         public async Task<ProductVm> DeleteProductAsync(int id)
         {
@@ -260,8 +270,39 @@ namespace ServerApp.BLL.Services
         {
             throw new NotImplementedException();
         }
+    public async Task<ProductDetailVm> GetProductDetailAsync(int productId)
+    {
+        // Lấy sản phẩm từ database
+        var product = await _productRepository.GetByIdAsync(productId);
 
-        public async Task<IEnumerable<ProductVm>> FilterProductsAsync(FilterRequest filterRequest)
+        if (product == null)
+        {
+            return null;  // Trả về null nếu không tìm thấy sản phẩm
+        }
+
+        // Lấy thông tin danh mục và thương hiệu (nếu cần)
+       
+        var brand = await _brandRepository.GetByIdAsync(product.BrandId);
+
+        // Tạo đối tượng ProductDetailVm để trả về
+        var productDetailVm = new ProductDetailVm
+        {
+            ProductId = product.ProductId,
+            ProductName = product.Name,
+            Description = product.Description,
+            Price = product.Price,
+            ImageUrl = product.ImageUrl,
+    
+               // Lấy tên thương hiệu từ Brand
+            CreatedDate = product.CreatedDate,
+            UpdatedDate = product.UpdatedDate
+        };
+
+        return productDetailVm;
+    }
+
+
+    public async Task<IEnumerable<ProductVm>> FilterProductsAsync(FilterRequest filterRequest)
         {
             try
             {
@@ -413,4 +454,4 @@ namespace ServerApp.BLL.Services
             }
         }
     }
-}
+
