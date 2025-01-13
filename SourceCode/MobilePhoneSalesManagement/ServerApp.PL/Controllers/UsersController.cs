@@ -21,10 +21,10 @@ namespace ServerApp.PL.Controllers
 
         // Lấy tất cả người dùng
         [HttpGet]
-        public async Task<ActionResult<PagedResult<UserVm>>> GetAllUsers(int? pageNumber, int? pageSize)
+        public async Task<ActionResult<PagedResult<UserVm>>> GetAllUsers(int? pageNumber, int? pageSize, string? keySearch, int? days)
         {
             // Lấy danh sách người dùng từ dịch vụ User
-            var users = await _userService.GetAllUserAsync(pageNumber, pageSize);
+            var users = await _userService.FilterUsersAsync(keySearch, days, pageNumber, pageSize);
             if (users == null || !users.Items.Any())
             {
                 return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
@@ -32,6 +32,18 @@ namespace ServerApp.PL.Controllers
             // Trả về danh sách PagedResult UserVm
             return Ok(users);
         }
+
+        //public async Task<ActionResult<PagedResult<UserVm>>> GetAllUsers(int? pageNumber, int? pageSize)
+        //{
+        //    // Lấy danh sách người dùng từ dịch vụ User
+        //    var users = await _userService.GetAllUserAsync(pageNumber, pageSize);
+        //    if (users == null || !users.Items.Any())
+        //    {
+        //        return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
+        //    }
+        //    // Trả về danh sách PagedResult UserVm
+        //    return Ok(users);
+        //}
 
         // Lấy người dùng theo ID
         [HttpGet("{id}")]

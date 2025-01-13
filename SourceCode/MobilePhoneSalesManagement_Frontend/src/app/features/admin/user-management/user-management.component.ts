@@ -44,29 +44,13 @@ export class UserManagementComponent {
     this.updatePagination();
   }
 
+  // chưa fix xong filter
   // Gọi API để load danh sách người dùng
   loadUsers(): void {
     // Gọi API để lấy dữ liệu phân trang
-    this.userService.getUsers(this.currentPage, this.pageSize).subscribe(
+    this.userService.getUsers(this.currentPage, this.pageSize, this.searchKey, this.lastActiveDays).subscribe(
       (data: any) => {
         this.users = data.items || [];
-
-        // Lọc dữ liệu nếu có tìm kiếm
-        if (this.searchKey) {
-          this.users = this.users.filter(
-            (user) =>
-              user.email?.includes(this.searchKey) ||
-              user.phoneNumber?.includes(this.searchKey)
-          );
-        }
-
-        // Lọc theo ngày hoạt động gần đây nếu có
-        if (this.lastActiveDays > 0) {
-          this.users = this.users.filter((user) =>
-            this.checkLastActive(user.lastOnlineAt, this.lastActiveDays)
-          );
-        }
-
         // Cập nhật phân trang
         this.totalCount = data.totalCount;
         this.totalPages = Math.ceil(this.totalCount / this.pageSize);

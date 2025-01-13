@@ -7,6 +7,10 @@ import { AdminLayoutComponent } from './features/admin/admin-layout/admin-layout
 import { ClientLayoutComponent } from './features/client/client-layout/client-layout.component';
 import { HomeComponent } from './features/client/home/home.component';
 import { ProductListComponent } from './features/client/product/product-list/product-list.component';
+import { LoginComponent } from './features/auth/login/login.component';
+import { RegisterComponent } from './features/auth/register/register.component';
+import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password.component';
+import { UserInfoComponent } from './features/client/user/user-info/user-info.component';
 
 export const routes: Routes = [
   { path: 'admin', redirectTo: '/admin/user-management', pathMatch: 'full' },
@@ -20,6 +24,7 @@ export const routes: Routes = [
       { path: 'order-management', component: OrderManagementComponent },
     ],
   },
+  { path: '', redirectTo: '/register', pathMatch: 'full' },
   {
     path: '',
     component: ClientLayoutComponent, // Giao diện layout cho client
@@ -29,6 +34,14 @@ export const routes: Routes = [
       // { path: 'product/:id', component: ProductDetailComponent }, // Chi tiết sản phẩm
       // { path: 'cart', component: CartComponent }, // Giỏ hàng
       // { path: 'checkout', component: CheckoutComponent }, // Thanh toán
+
+      // auth
+      { path: 'login', component: LoginComponent },
+      { path: 'register', component: RegisterComponent },
+      { path: 'forgot-password', component: ForgotPasswordComponent },
+      // user
+      { path: 'account', component: UserInfoComponent },
+      { path: 'verify-email', component: RegisterComponent}
     ]
   }
 ];

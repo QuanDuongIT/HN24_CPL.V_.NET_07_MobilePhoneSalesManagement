@@ -62,3 +62,9 @@ For more information on using the Angular CLI, including detailed command refere
 ## lệnh setup
 npm install xlsx file-saver
 npm install file-saver --save
+npm install ngx-cookie-service --save
+npm install jwt-decode --save
+
+### Toast
+npm i ngx-toastr
+npm install @angular/animations --save

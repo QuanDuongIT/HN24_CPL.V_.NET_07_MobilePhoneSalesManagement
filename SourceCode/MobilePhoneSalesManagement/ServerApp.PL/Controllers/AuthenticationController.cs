@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServerApp.BLL.Services;
-using ServerApp.BLL.ViewModels.Authentication;
+using ServerApp.BLL.Services.ViewModels;
 using ServerApp.PL.ViewModels.Authentication;
 
 namespace ServerApp.PL.Controllers
@@ -17,7 +17,7 @@ namespace ServerApp.PL.Controllers
         }
 
         [HttpPost("register-user")]
-        public async Task<IActionResult> Register([FromBody] RegisterVm register)
+        public async Task<ServiceResult> Register([FromBody] UserVm register)
         {
             return await _authenticationService.RegisterUserAsync(register);
         }
@@ -26,6 +26,13 @@ namespace ServerApp.PL.Controllers
         public async Task<IActionResult> Login([FromBody] LoginVm loginVm)
         {
             return await _authenticationService.LoginUserAsync(loginVm);
+        }
+
+        [HttpGet("verify-email")]
+        public async Task<ServiceResult> VerifyUserRegister([FromQuery] string email, [FromQuery] string code)
+        {
+            // Gọi service để xác minh mã xác nhận
+            return await _authenticationService.VerifyEmail(email, code);
         }
     }
 }
