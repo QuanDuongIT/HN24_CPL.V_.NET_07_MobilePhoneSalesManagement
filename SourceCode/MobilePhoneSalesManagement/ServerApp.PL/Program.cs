@@ -13,7 +13,6 @@ using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories;
 using ServerApp.DAL.Repositories.Generic;
-using ServerApp.DAL.Seed;
 using System.Text;
 
 namespace ServerApp.PL
@@ -101,7 +100,8 @@ namespace ServerApp.PL
                 };
             });
 
-
+            // đăng ký cache
+            builder.Services.AddMemoryCache();
 
             // Đăng ký services
             builder.Services.AddScoped<IGenericRepository<User>, UserRepository>();
@@ -110,11 +110,14 @@ namespace ServerApp.PL
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IBrandService, BrandService>();
             builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<ICacheService, CacheService>();
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IUserDetailsService, UserDetailsService>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddSingleton<IEmailService, EmailService>();
             builder.Services.AddScoped<ISpecificationTypeService, SpecificationTypeService>();
+
+            builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
             app.ConfigureBuildInExceptionHandler();
@@ -126,12 +129,12 @@ namespace ServerApp.PL
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<ShopDbContext>();
 
-                context.Database.EnsureDeleted();
+                //context.Database.EnsureDeleted();
                 // Áp dụng migrations nếu chưa có
-                context.Database.EnsureCreated();
+                //context.Database.EnsureCreated();
 
                 // Gọi seed data
-                await SeedData.SeedAsync(context);
+                //await SeedData.SeedAsync(context);
             }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

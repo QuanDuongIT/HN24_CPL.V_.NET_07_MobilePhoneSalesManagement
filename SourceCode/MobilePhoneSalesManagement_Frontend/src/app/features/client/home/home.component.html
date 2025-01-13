@@ -8,9 +8,9 @@
 
     <!-- Brand Logos -->
     <div class="row text-center mt-5">
-        <div class="col-3"
+        <div class="col-md-3"
             *ngFor="let brand of ['nexus_brand', 'iphone_brand', 'samsung_brand', 'htc_brand', 'alc_brand', 'pixel_brand', 'vivo_brand']"
-            [ngClass]="{ 'col-6': brand === 'iphone_brand' }">
+            [ngClass]="{ 'col-md-6': brand === 'iphone_brand' }">
             <img [src]="'../../../../assets/images/Product/' + brand + '.png'" alt="{{ brand }}"
                 class="img-fluid mb-2" />
         </div>

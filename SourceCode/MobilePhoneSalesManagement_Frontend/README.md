@@ -57,3 +57,14 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+## lệnh setup
+npm install xlsx file-saver
+npm install file-saver --save
+npm install ngx-cookie-service --save
+npm install jwt-decode --save
+
+### Toast
+npm i ngx-toastr
+npm install @angular/animations --save

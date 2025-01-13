@@ -365,6 +365,10 @@ a img.aligncenter {
   transition: all 0.3s;
   word-wrap: break-word;
   white-space: normal !important;
+  outline: none;
+}
+.btn:focus {
+  outline: none;
 }
 .btn-primary {
   background-color: #fb730f;
@@ -378,6 +382,7 @@ a img.aligncenter {
 .btn-primary:focus {
   background-color: #ed6908;
   color: #fff;
+
 }
 .btn-default {
   background-color: #0cafe5;

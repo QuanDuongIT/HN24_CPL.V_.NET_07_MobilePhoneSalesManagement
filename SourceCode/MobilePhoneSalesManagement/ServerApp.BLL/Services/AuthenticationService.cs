@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using ServerApp.BLL.Services.ViewModels;
 using ServerApp.BLL.ViewModels.Authentication;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
@@ -14,9 +16,10 @@ namespace ServerApp.BLL.Services
 {
     public interface IAuthenticationService
     {
-        Task<IActionResult> RegisterUserAsync(RegisterVm register);
+        Task<ServiceResult> RegisterUserAsync(UserVm register);
         Task<IActionResult> LoginUserAsync(LoginVm loginVm);
         Task<AuthResultVm> GenerateJwtToken(User user);
+        Task<ServiceResult> VerifyEmail(string email, string code);
     }
 
     public class AuthenticationService : IAuthenticationService
@@ -25,45 +28,113 @@ namespace ServerApp.BLL.Services
         private readonly SignInManager<User> _signInManager;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
+        private readonly ICacheService _cacheService;
+        private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
+        private readonly IUserDetailsService _userDetailsService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthenticationService(UserManager<User> userManager, SignInManager<User> signInManager, IUnitOfWork unitOfWork, IConfiguration configuration)
+        public AuthenticationService(UserManager<User> userManager, SignInManager<User> signInManager, IUnitOfWork unitOfWork, IConfiguration configuration,
+            ICacheService cacheService, IUserService userService, IEmailService emailService, IUserDetailsService userDetailsService, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _unitOfWork = unitOfWork;
             _configuration = configuration;
+            _cacheService = cacheService;
+            _userService = userService;
+            _emailService = emailService;
+            _userDetailsService = userDetailsService;
+            _httpContextAccessor = httpContextAccessor;
+        }
+        public string GetCurrentBaseUrl()
+        {
+            var request = _httpContextAccessor.HttpContext?.Request;
+            if (request == null)
+            {
+                throw new InvalidOperationException("HttpContext is not available.");
+            }
+
+            return "http://localhost:4200";
+            //return $"{request.Scheme}://{request.Host}";
         }
 
-        public async Task<IActionResult> RegisterUserAsync(RegisterVm register)
+        public async Task<ServiceResult> RegisterUserAsync(UserVm register)
         {
+            var baseUrl = GetCurrentBaseUrl();
             try
             {
                 var userExists = await _userManager.FindByEmailAsync(register.Email);
 
                 if (userExists != null)
                 {
-                    return new BadRequestObjectResult($"User {register.Email} already exists!");
+                    return new ServiceResult
+                    {
+                        Success = false,
+                        Message = "Email đã tồn tại."
+                    };
                 }
 
                 var newUser = new User()
                 {
                     Email = register.Email,
                     UserName = register.Email,
+                    Status = false,
                 };
 
-                var result = await _userManager.CreateAsync(newUser, register.Password);
+                var result = await _userManager.CreateAsync(newUser, register.PasswordHash);
 
                 if (result.Succeeded)
                 {
-                    return new OkObjectResult(register);
+                    await _unitOfWork.BeginTransactionAsync();
+                    try
+                    {
+                        var confirmationCode = GenerateConfirmationCode();
+                        // Thêm thông tin chi tiết người dùng
+                        await _userDetailsService.AddUserDetailsAsync(newUser.UserId, register);
+
+                        await _cacheService.SetAsync($"EmailVerification:{register.Email}", confirmationCode, TimeSpan.FromMinutes(15));
+
+                        // Gửi email xác nhận
+                        var verificationUrl = $"{baseUrl}/verify-email?email={register.Email}&code={confirmationCode}";
+                        await _emailService.SendAsync(register.Email, "Verify your email", $"Click <a href='{verificationUrl}'>here</a> to verify your email.");
+
+                        // Commit transaction nếu tất cả thao tác thành công
+                        await _unitOfWork.CommitAsync();
+
+                        return new ServiceResult
+                        {
+                            Success = true,
+                            Message = "Đã gửi mã về email."
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        // Rollback transaction nếu có lỗi
+                        await _unitOfWork.RollbackAsync();
+
+                        return new ServiceResult
+                        {
+                            Success = false,
+                            Message = "Có lỗi xảy ra trong quá trình xử lý: " + ex.Message
+                        };
+                    }
                 }
 
-                return new BadRequestObjectResult("User could not created!");
+                return new ServiceResult
+                {
+                    Success = false,
+                    Message = "Tạo tài khoản thất bại."
+                };
             }
             catch (Exception ex)
             {
                 // Log the exception for further investigation
-                return new BadRequestObjectResult(ex.Message);
+                return new ServiceResult
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
             }
         }
 
@@ -109,5 +180,57 @@ namespace ServerApp.BLL.Services
                 ExpiresAt = token.ValidTo
             };
         }
+
+        private string GenerateConfirmationCode()
+        {
+            var random = new Random();
+            var code = random.Next(100000, 999999); // Tạo mã 6 chữ số
+            return code.ToString();
+        }
+
+
+        public async Task<ServiceResult> VerifyEmail(string email, string code)
+        {
+            try
+            {
+                // Kiểm tra mã xác minh trong cache
+                var cachedCode = await _cacheService.GetAsync<string>($"EmailVerification:{email}");
+                if (cachedCode == null || cachedCode != code)
+                {
+                    return new ServiceResult
+                    {
+                        Success = false,
+                        Message = "Xác minh tài khoản thất bại."
+                    };
+                }
+
+                // Xác minh thành công
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user != null)
+                {
+                    user.Status = true;
+                    await _userManager.UpdateAsync(user);
+                }
+
+                // Xóa mã khỏi cache
+                await _cacheService.RemoveAsync($"EmailVerification:{email}");
+
+                // Chuyển hướng đến trang login với domain hiện tại
+                return new ServiceResult
+                {
+                    Success = true,
+                    Message = "Xác minh tài khoản thành công."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+        }
+
     }
 }

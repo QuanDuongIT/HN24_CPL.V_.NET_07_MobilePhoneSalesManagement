@@ -11,8 +11,24 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   // Phương thức lấy danh sách người dùng
-  getUsers(page: number, pageSize: number): Observable<any> {
-    return this.http.get<any>(`${BASE_URL_API}/users?pageNumber=${page}&pageSize=${pageSize}`);
+  getUsers(currentPage: number, pageSize: number, searchKey?: string, lastActiveDays?: number): Observable<any> {
+    const params: any = {
+      page: currentPage,
+      pageSize: pageSize,
+    };
+  
+    // Thêm tham số tìm kiếm nếu có
+    if (searchKey) {
+      params.keySearch = searchKey;
+    }
+  
+    // Thêm tham số ngày hoạt động nếu có
+    if (lastActiveDays) {
+      params.days = lastActiveDays;
+    }
+  
+    // Gửi yêu cầu HTTP với các tham số
+    return this.http.get(`${BASE_URL_API}/users`, { params });
   }
 
   // Phương thức lấy thông tin một người dùng theo ID
@@ -26,12 +42,12 @@ export class UserService {
   }
 
   // Phương thức cập nhật thông tin người dùng
-  updateUser(userId: string, user: any): Observable<any> {
-    return this.http.put(`${BASE_URL_API}/users/${userId}`, user);
+  updateUser(id: number, user: any): Observable<any> {
+    return this.http.put(`${BASE_URL_API}/users/${id}`, user);
   }
 
   // Phương thức xóa người dùng
-  deleteUser(userId: string): Observable<any> {
+  deleteUserById(userId: number): Observable<any> {
     return this.http.delete(`${BASE_URL_API}/users/${userId}`);
   }
   // Xóa người dùng theo danh sách ID

@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { UserService } from '../services/user.service';
-import { FormsModule, NgModel } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-user-add',
