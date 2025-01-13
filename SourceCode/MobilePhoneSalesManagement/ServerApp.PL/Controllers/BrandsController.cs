@@ -25,6 +25,13 @@ namespace ServerApp.PL.Controllers
             return Ok(result); // 200 OK nếu có dữ liệu.
         }
 
+        [HttpGet("get-all-brands-by-page")]
+        public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize);
+            return Ok(result); // 200 OK nếu có dữ liệu.
+        }
+
         [HttpGet("get-brand-by-id/{id}")]
         public async Task<ActionResult<BrandVm>> GetBrand(int id)
         {

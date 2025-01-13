@@ -2,26 +2,25 @@ import { Component } from '@angular/core';
 import { BrandService } from './services/brand.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Brand } from './models/brand.model';
-import { Observable, Subscription } from 'rxjs';
+import { Brand, PagedResult } from './models/brand.model';
+import { Observable } from 'rxjs';
 import { AddOrUpdateBrandComponent } from "./add-or-update-brand/add-or-update-brand.component";
-import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-brand-management',
-  imports: [CommonModule, FormsModule, AddOrUpdateBrandComponent, NgxPaginationModule],
+  imports: [CommonModule, FormsModule, AddOrUpdateBrandComponent],
   templateUrl: './brand-management.component.html',
   styleUrls: ['./brand-management.component.css'],
   standalone: true
 })
 export class BrandManagementComponent {
-  brandSubscription?: Subscription;
-  brands$?: Observable<Brand[]>;
+  page$?: Observable<PagedResult<Brand>>;
   isAddBrandVisible = false;
   brandToUpdate?: Brand;
-  brandName: string = '';
-  page: number = 1; // Trang hiện tại
-  itemsPerPage: number = 5; // Số lượng thương hiệu trên mỗi trang (mặc định là 5)
+  page: number = 1;
+  pageSize: number = 1;
+  totalPages: number = 1;
+  isLoading: boolean = false;
 
   constructor(private brandService: BrandService) { }
 
@@ -30,48 +29,80 @@ export class BrandManagementComponent {
   }
 
   loadBrands(): void {
-    this.brands$ = this.brandService.getBrands();
+    this.isLoading = true;
+    // Gọi API lấy danh sách brand với phân trang
+    this.page$ = this.brandService.getBrandsbyPage(this.page, this.pageSize);
+    this.page$.subscribe(res => {
+      this.pageSize = res.pageSize;
+      this.totalPages = res.totalPages;
+    }
+    );
+    this.isLoading = false;
   }
 
   onItemsPerPageChange(): void {
-    // Reset về trang đầu tiên khi số lượng hiển thị trên mỗi trang thay đổi
     this.page = 1;
-    console.log(`Items per page updated to: ${this.itemsPerPage}`);
+    this.loadBrands();
   }
 
-  showAddBrand() {
+  showAddBrand(): void {
     this.isAddBrandVisible = true;
   }
 
-  hideAddBrand() {
+  hideAddBrand(): void {
     this.brandToUpdate = undefined;
     this.isAddBrandVisible = false;
   }
 
-  onAddBrand(newBrandName: string) {
+  onAddBrand(newBrandName: string): void {
     console.log('New Brand Added:', newBrandName);
     this.loadBrands(); // Tải lại danh sách thương hiệu sau khi thêm thành công
   }
 
-  onDeleteBrand(brandId: any, isActive: boolean) {
+  onDeleteBrand(brandId: any, isActive: boolean): void {
     const confirmMessage = isActive
       ? 'Bạn chắc chắn muốn chuyển brand này vào thùng rác?'
       : 'Bạn chắc chắn muốn xóa brand này?';
 
     if (confirm(confirmMessage)) {
-      this.brandSubscription = this.brandService.deleteBrand(brandId).subscribe({
+      this.brandService.deleteBrand(brandId).subscribe({
         next: () => {
-          this.brands$ = this.brandService.getBrands();
+          this.loadBrands(); // Tải lại danh sách sau khi xóa thành công
         },
-        error: (err) => console.log(err),
+        error: (err) => console.error(err),
       });
     }
   }
 
-  updateBrand(brandId: string) {
+  updateBrand(brandId: string): void {
     this.isAddBrandVisible = true;
     this.brandService.getBrandById(brandId).subscribe((brand: Brand) => {
       this.brandToUpdate = brand;
     });
+  }
+
+  // Điều hướng tới trang tiếp theo
+  nextPage(): void {
+    console.log("fdsfs", this.totalPages)
+    if (this.page < this.totalPages) {
+      this.page++;
+      this.loadBrands();
+      this.page$?.subscribe(res =>
+
+        console.log(res)
+      )
+    }
+  }
+
+  // Điều hướng tới trang trước
+  previousPage(): void {
+    if (this.page > 1) {
+      this.page--;
+      this.loadBrands();
+    }
+  }
+  // trackBy để tránh render lại toàn bộ bảng
+  trackByBrandId(index: number, brand: Brand): string {
+    return brand.brandId;
   }
 }

@@ -23,6 +23,15 @@ namespace ServerApp.PL.Controllers
             var result = await _productService.GetAllProductAsync();
             return Ok(result); // 200 OK nếu có dữ liệu.
         }
+
+
+        [HttpGet("get-all-products-by-page")]
+        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize);
+            return Ok(result); 
+        }
+
         [HttpPost("filter")]
         public async Task<ActionResult<IEnumerable<ProductVm>>> FilterProducts([FromBody] FilterRequest filterRequest)
         {

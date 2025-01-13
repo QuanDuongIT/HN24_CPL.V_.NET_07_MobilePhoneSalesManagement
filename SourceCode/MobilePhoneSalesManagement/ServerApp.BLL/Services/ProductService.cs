@@ -21,6 +21,7 @@ public interface IProductService : IBaseService<Product>
         Task<IEnumerable<ProductSpecificationVm>> GetProductSpecificationsByProductIdAsync(int productId);
         Task<bool> AddProductToCartAsync(int productId,CartVm cartVm);
         Task<IEnumerable<ProductVm>> GetNewestProductsAsync();
+        Task<PagedResult<ProductVm>> GetAllProductAsync(int? pageNumber, int? pageSize);
 }
     public class ProductService : BaseService<Product>, IProductService
     {
@@ -335,7 +336,31 @@ public interface IProductService : IBaseService<Product>
 
             return productViewModels;
         }
-        public async Task<IEnumerable<ProductSpecificationVm>> GetProductSpecificationsByProductIdAsync(int productId)
+        public async Task<PagedResult<ProductVm>> GetAllProductAsync(int? pageNumber, int? pageSize)
+        {
+            int currentPage = pageNumber ?? 1;
+            int currentPageSize = pageSize ?? 10;
+
+            var query = await GetAllProductAsync();
+
+            var totalCount = query.Count();
+            var paginatedProducts = query
+                .OrderBy(u => u.ProductId)
+                .Skip((currentPage - 1) * currentPageSize)
+                .Take(currentPageSize)
+                .ToList();
+            
+            return new PagedResult<ProductVm>
+            {
+                CurrentPage = currentPage,
+                PageSize = currentPageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling((double)totalCount / currentPageSize),
+                Items = paginatedProducts
+            };
+        }
+
+    public async Task<IEnumerable<ProductSpecificationVm>> GetProductSpecificationsByProductIdAsync(int productId)
         {
             // Lấy sản phẩm với ProductId và bao gồm ProductSpecifications cùng với SpecificationType
             var product = await GetByProductIdAsync(productId);
@@ -360,8 +385,6 @@ public interface IProductService : IBaseService<Product>
 
             return productSpecificationViewModels;
         }
-
-
 
         public async Task<ProductVm?> GetByProductIdAsync(int id)
         {

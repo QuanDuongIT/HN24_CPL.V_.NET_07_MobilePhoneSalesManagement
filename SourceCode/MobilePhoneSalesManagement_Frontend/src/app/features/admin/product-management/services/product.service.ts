@@ -10,8 +10,8 @@ export class ProductService {
 
   constructor(private http: HttpClient) { }
 
-  getProducts(): Observable<any> {
-    return this.http.get<any>(`${BASE_URL_API}/Products/get-all-products`);
+  getProducts(pageNumber: number, pageSize: number): Observable<any> {
+    return this.http.get<any>(`${BASE_URL_API}/Products/get-all-products-by-page?pageNumber=${pageNumber}&pageSize=${pageSize}`);
   }
 
   getProductById(productId: string): Observable<any> {

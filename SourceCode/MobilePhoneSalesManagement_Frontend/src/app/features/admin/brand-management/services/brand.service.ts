@@ -13,7 +13,9 @@ export class BrandService {
   getBrands(): Observable<any> {
     return this.http.get<any>(`${BASE_URL_API}/Brands/get-all-brands`);
   }
-
+  getBrandsbyPage(pageNumber: number, pageSize: number): Observable<any> {
+    return this.http.get<any>(`${BASE_URL_API}/Brands/get-all-brands-by-page?pageNumber=${pageNumber}&pageSize=${pageSize}`);
+  }
   getBrandById(brandId: string): Observable<any> {
     return this.http.get(`${BASE_URL_API}/Brands/get-brand-by-id/${brandId}`);
   }

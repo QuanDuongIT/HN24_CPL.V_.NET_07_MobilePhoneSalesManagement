@@ -1,17 +1,52 @@
-/* Overlay để tối phần còn lại */
+/* Hiệu ứng fade-in cho bảng sản phẩm */
+.table {
+    width: 100%;
+    opacity: 0;
+    animation: fadeIn 1.5s forwards;
+    /* Thời gian hiệu ứng tăng lên 1.5s */
+}
+
+/* Hiệu ứng khi bảng hoàn thành tải */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Hiệu ứng khi bảng đang tải */
+.table.loading {
+    opacity: 0.5;
+    /* Làm mờ bảng khi đang tải */
+}
+
+/* Hiệu ứng loading */
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 20px;
+    color: #007bff;
+    animation: fadeIn 1s ease-out;
+}
+
+/* Overlay khi hiển thị modal */
 .overlay {
     position: fixed;
-    /* Giữ overlay cố định trên màn hình */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    /* Màu tối với độ mờ */
     z-index: 999;
-    /* Đảm bảo overlay nằm trên các thành phần khác */
 }
 
+/* Modal container khi thêm hoặc cập nhật sản phẩm */
 .modal-container {
     position: fixed;
     top: 50%;
@@ -32,7 +67,6 @@
 /* Style cho nút Update */
 .link-update {
     color: #28a745;
-    /* Màu xanh cho Update */
     text-decoration: none;
     font-weight: 500;
     padding: 4px 8px;
@@ -48,7 +82,6 @@
 /* Style cho nút Delete */
 .link-delete {
     color: #dc3545;
-    /* Màu đỏ cho Delete */
     text-decoration: none;
     font-weight: 500;
     padding: 4px 8px;
