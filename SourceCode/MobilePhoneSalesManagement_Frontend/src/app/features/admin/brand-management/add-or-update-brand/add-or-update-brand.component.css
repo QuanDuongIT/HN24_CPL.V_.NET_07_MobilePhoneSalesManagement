@@ -1,0 +1,33 @@
+.container {
+    max-width: 492px;
+    /* Giới hạn chiều rộng của container */
+    margin: 0 auto;
+    padding: 20px;
+    overflow-y: auto;
+    /* Thêm thanh cuộn dọc nếu form quá dài */
+}
+
+.form-control {
+    width: 100%;
+    /* Đảm bảo trường input chiếm đầy chiều rộng của cột */
+}
+
+.img-thumbnail {
+    max-width: 792px;
+    /* Giới hạn chiều rộng tối đa của ảnh */
+    max-height: 737px;
+    /* Giới hạn chiều cao tối đa của ảnh */
+    width: 100%;
+    /* Đảm bảo ảnh không vượt quá chiều rộng container */
+    height: auto;
+    /* Giữ tỉ lệ ảnh */
+}
+
+.text-center {
+    text-align: center;
+    /* Căn giữa nội dung */
+}
+
+.btn-primary {
+    min-width: 229px;
+}

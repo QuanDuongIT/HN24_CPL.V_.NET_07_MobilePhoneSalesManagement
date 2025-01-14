@@ -4,13 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { AddOrUpdateProductComponent } from './add-or-update-product/add-or-update-product.component';
-import { NgxPaginationModule } from 'ngx-pagination';
 import { Product } from './models/product';
 import { PagedResult } from '../brand-management/models/brand.model';
 
 @Component({
   selector: 'app-product-management',
-  imports: [CommonModule, FormsModule, AddOrUpdateProductComponent, NgxPaginationModule],
+  imports: [CommonModule, FormsModule, AddOrUpdateProductComponent],
   templateUrl: './product-management.component.html',
   styleUrls: ['./product-management.component.css'],
   standalone: true,

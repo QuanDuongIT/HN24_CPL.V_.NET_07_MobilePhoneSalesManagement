@@ -14,7 +14,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AddOrUpdateBrandComponent {
   @Output() close = new EventEmitter<void>();
-  @Output() add = new EventEmitter<string>(); // Sự kiện thông báo thêm thương hiệu mới
+  @Output() add = new EventEmitter<string>();
   @Input() brandToUpdate?: Brand;
 
   model: RequestBrand;

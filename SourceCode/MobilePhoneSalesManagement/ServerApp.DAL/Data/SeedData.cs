@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServerApp.DAL.Data;
 using ServerApp.DAL.Models;
+using System;
 
 namespace ServerApp.DAL.Seed
 {
@@ -18,7 +19,7 @@ namespace ServerApp.DAL.Seed
                 if (!context.Brands.Any())
                 {
                     context.Brands.AddRange(
-                        new Brand { 
+                    new Brand { 
                             Name = "Samsung",
                             ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
                             IsActive = true 
@@ -29,6 +30,15 @@ namespace ServerApp.DAL.Seed
                             IsActive = true 
                         }
                     );
+                    for (int i = 1; i <= 20; i++)
+                    {
+                        context.Brands.Add(new Brand
+                        {
+                            Name = $"Brand {i}",
+                            ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
+                            IsActive = true
+                        });
+                    }
                     await context.SaveChangesAsync();  // Đảm bảo đã lưu Brands trước khi thêm Products
                 }
 
@@ -165,6 +175,26 @@ namespace ServerApp.DAL.Seed
                             UpdatedAt = DateTime.Now
                         }
                     );
+                    Random random = new Random();
+                    for (int i = 1; i <= 20; i++)
+                    {
+                        context.Products.Add(new Product
+                        {
+                            Name = $"Product {i}",
+                            Description = $"Description for Product {i}",
+                            Price = 10000000,
+                            OldPrice = 10500000,
+                            StockQuantity = 50,
+                            BrandId = random.Next(1, 10),
+                            ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
+                            Manufacturer = "Manufacturer 8",
+                            IsActive = true,
+                            Color = "Purple",
+                            Discount = 12,
+                            CreatedAt = DateTime.Now,
+                            UpdatedAt = DateTime.Now
+                        });
+                    }
                     await context.SaveChangesAsync();
                 }
 

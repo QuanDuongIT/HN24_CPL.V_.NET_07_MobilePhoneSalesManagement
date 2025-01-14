@@ -52,7 +52,7 @@ namespace ServerApp.BLL.Services.ViewModels
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
         // Navigation properties
-        public virtual BrandVm Brand { get; set; }
+        public virtual BrandVm? Brand { get; set; }
         //public virtual ICollection<Cart> Carts { get; set; }
         //public virtual ICollection<OrderItem> OrderItems { get; set; }
         //public virtual ICollection<WishList> WishLists { get; set; }

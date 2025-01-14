@@ -22,8 +22,8 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/assets",
-              "src/admin_assets",      
-              "src/assets/vendor/bootstrap/css" ,
+              "src/admin_assets",
+              "src/assets/vendor/bootstrap/css",
               {
                 "glob": "**/*",
                 "input": "src/assets/vendor/bootstrap/",
@@ -36,11 +36,10 @@
               }
             ],
             "styles": [
-              "node_modules/ngx-toastr/toastr.css"
+              "node_modules/ngx-toastr/toastr.css",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css"
             ],
-            "scripts": [
-              
-            ]
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -96,7 +95,8 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css"
             ],
             "scripts": []
           }

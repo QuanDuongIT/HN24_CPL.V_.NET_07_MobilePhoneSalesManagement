@@ -19,6 +19,8 @@ namespace ServerApp.BLL.Services
         Task<IEnumerable<BrandVm>> GetAllBrandAsync();
         Task<int> UpdateBrandAsync(Brand brand);
         Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize);
+        Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, bool filter = true);
+        Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, string search = "");
     }
     public class BrandService : BaseService<Brand>, IBrandService
     {
@@ -41,6 +43,7 @@ namespace ServerApp.BLL.Services
                 Name = brand.Name,
                 ImageUrl=brand.ImageUrl,
                 IsActive = brand.IsActive,
+                ProductCount=brand.Products.Count,
                 CreatedAt= brand.CreatedAt,
                 UpdatedAt= brand.UpdatedAt
             });
@@ -68,6 +71,7 @@ namespace ServerApp.BLL.Services
                 Name = brand.Name,
                 ImageUrl = brand.ImageUrl,
                 IsActive = brand.IsActive,
+                ProductCount = brand.Products?.Count ?? 0, 
                 CreatedAt = brand.CreatedAt,
                 UpdatedAt = brand.UpdatedAt
             });
@@ -97,12 +101,88 @@ namespace ServerApp.BLL.Services
                 Name = brand.Name,
                 ImageUrl=brand.ImageUrl,
                 IsActive = brand.IsActive,
+                ProductCount = brand.Products?.Count ?? 0, 
                 CreatedAt = brand.CreatedAt,
                 UpdatedAt = brand.UpdatedAt
             };
 
             return brandVm;
 
+        }
+        
+        public async Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize,bool filter= true)
+        {
+            int currentPage = pageNumber ?? 1;
+            int currentPageSize = pageSize ?? 10;
+
+            var query = await GetAllAsync(b=>
+            b.IsActive== filter&&b.BrandId!=0,
+                includesProperties: "Products"
+            );
+
+            var totalCount = query.Count();
+            var paginatedBrands = query
+                .OrderBy(u => u.BrandId)
+                .Skip((currentPage - 1) * currentPageSize)
+                .Take(currentPageSize)
+                .ToList();
+            var brandVms = paginatedBrands.Select(brand => new BrandVm
+            {
+                BrandId = brand.BrandId,
+                Name = brand.Name,
+                ImageUrl = brand.ImageUrl,
+                IsActive = brand.IsActive,
+                ProductCount = brand.Products?.Count ?? 0, 
+                CreatedAt = brand.CreatedAt,
+                UpdatedAt = brand.UpdatedAt
+            });
+
+
+            return new PagedResult<BrandVm>
+            {
+                CurrentPage = currentPage,
+                PageSize = currentPageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling((double)totalCount / currentPageSize),
+                Items = brandVms
+            };
+        }
+        public async Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, string search)
+        {
+            int currentPage = pageNumber ?? 1;
+            int currentPageSize = pageSize ?? 10;
+
+            var query = await GetAllAsync(b =>
+                b.Name.Contains(search),
+                includesProperties: "Products"
+            );
+
+            var totalCount = query.Count();
+            var paginatedBrands = query
+                .OrderBy(u => u.BrandId)
+                .Skip((currentPage - 1) * currentPageSize)
+                .Take(currentPageSize)
+                .ToList();
+            var brandVms = paginatedBrands.Select(brand => new BrandVm
+            {
+                BrandId = brand.BrandId,
+                Name = brand.Name,
+                ImageUrl = brand.ImageUrl,
+                IsActive = brand.IsActive,
+                ProductCount = brand.Products?.Count ?? 0, 
+                CreatedAt = brand.CreatedAt,
+                UpdatedAt = brand.UpdatedAt
+            });
+
+
+            return new PagedResult<BrandVm>
+            {
+                CurrentPage = currentPage,
+                PageSize = currentPageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling((double)totalCount / currentPageSize),
+                Items = brandVms
+            };
         }
         public async Task<BrandVm> AddBrandAsync(InputBrandVm brandVm)
         {
@@ -171,6 +251,7 @@ namespace ServerApp.BLL.Services
                 BrandId = brand.BrandId,
                 Name = brand.Name,
                 ImageUrl=brand.ImageUrl,
+                ProductCount = brand.Products?.Count ?? 0, 
                 IsActive = brand.IsActive,
                 CreatedAt = brand.CreatedAt
             };
@@ -213,6 +294,7 @@ namespace ServerApp.BLL.Services
                 {
                     BrandId = brand.BrandId,
                     Name = brand.Name,
+                    ProductCount = brand.Products?.Count ?? 0, 
                     ImageUrl = brand.ImageUrl,
                     IsActive = brand.IsActive
                 };

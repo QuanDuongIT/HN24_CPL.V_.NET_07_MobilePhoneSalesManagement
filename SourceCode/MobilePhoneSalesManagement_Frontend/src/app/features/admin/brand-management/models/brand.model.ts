@@ -3,6 +3,7 @@ export interface Brand {
     name: string;
     imageUrl: string;
     isActive: boolean;
+    productCount: number;
     createdAt: Date;
     updatedAt: Date;
 }

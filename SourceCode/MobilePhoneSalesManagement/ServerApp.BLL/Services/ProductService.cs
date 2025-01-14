@@ -4,6 +4,7 @@ using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories.Generic;
+using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 
 namespace ServerApp.BLL.Services;
 public interface IProductService : IBaseService<Product>
@@ -245,7 +246,7 @@ public interface IProductService : IBaseService<Product>
         {
             var product = await _unitOfWork.GenericRepository<Product>().GetByIdAsync(id);
 
-            if (product == null)
+            if (product == null )
             {
                 throw new ExceptionNotFound("Product not found");
             }
@@ -308,15 +309,16 @@ public interface IProductService : IBaseService<Product>
                 Discount = product.Discount,
                 CreatedAt = product.CreatedAt,
                 UpdatedAt = product.UpdatedAt,
-                Brand = new BrandVm
+                Brand = product.Brand != null ? new BrandVm
                 {
                     BrandId = product.Brand.BrandId,
                     Name = product.Brand.Name,
                     IsActive = product.Brand.IsActive,
                     ImageUrl = product.Brand.ImageUrl,
+                    ProductCount = product.Brand.Products.Count,
                     CreatedAt = product.CreatedAt,
                     UpdatedAt = product.Brand.UpdatedAt
-                }, // Bao gồm dữ liệu liên kết Brand
+                }:null, // Bao gồm dữ liệu liên kết Brand
                 ProductSpecifications = product.ProductSpecifications.Select(ps => new ProductSpecificationVm
                 {
                     ProductId = ps.ProductId,
@@ -413,15 +415,16 @@ public interface IProductService : IBaseService<Product>
                 Discount = product.Discount, // Gán mặc định hoặc tính toán tùy theo logic
                 CreatedAt = product.CreatedAt,
                 UpdatedAt = product.UpdatedAt,
-                Brand = new BrandVm
+                Brand = product.Brand != null ? new BrandVm
                 {
                     BrandId = product.Brand.BrandId,
                     Name = product.Brand.Name,
                     IsActive = product.Brand.IsActive,
                     ImageUrl = product.Brand.ImageUrl,
+                    ProductCount = product.Brand.Products.Count,
                     CreatedAt = product.CreatedAt,
                     UpdatedAt = product.Brand.UpdatedAt
-                }, // Bao gồm dữ liệu liên kết Brand
+                }:null, // Bao gồm dữ liệu liên kết Brand
                 ProductSpecifications = product.ProductSpecifications.Select(ps => new ProductSpecificationVm
                 {
                     ProductId = ps.ProductId,

@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Linq;
 using BusinessLogic;
 using ServerApp.BLL.Services.ViewModels;
+using ServerApp.DAL.Models;
 
 namespace ServerApp.BLL.Services.Base
 {
@@ -290,7 +291,7 @@ namespace ServerApp.BLL.Services.Base
                 foreach (var id in ids)
                 {
                     var entity = await _unitOfWork.GenericRepository<T>().GetByIdAsync(id);
-                    if(entity == null)
+                    if(entity == null||id==0)
                     {
                         throw new ExceptionBusinessLogic($"'{typeof(T).Name}' not found.");
                     }
@@ -315,6 +316,50 @@ namespace ServerApp.BLL.Services.Base
                 await _unitOfWork.CommitTransactionAsync();
 
                 return (countRemoved, countUpdated);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                Console.WriteLine($"Error: {ex.Message}");
+
+                // Rollback transaction nếu có lỗi
+                await _unitOfWork.RollbackTransactionAsync();
+
+                // Ném lại ngoại lệ
+                throw new ArgumentException("Failed to delete entities. " + ex.Message, ex);
+            }
+        }
+        public async Task<int> RestoreMultipleAsync(
+     IEnumerable<int> ids,
+     Func<T, bool> condition,
+     Func<T?, Task> onCondition)
+        {
+            // Bắt đầu transaction
+            await _unitOfWork.BeginTransactionAsync();
+
+            int countUpdated = 0;
+
+            try
+            {
+                foreach (var id in ids)
+                {
+                    var entity = await _unitOfWork.GenericRepository<T>().GetByIdAsync(id);
+                    if(entity == null)
+                    {
+                        throw new ExceptionBusinessLogic($"'{typeof(T).Name}' not found.");
+                    }
+                    if (condition(entity))
+                    {
+                        await onCondition(entity);
+                        countUpdated++;
+                    }
+                }
+
+
+                // Commit transaction
+                await _unitOfWork.CommitTransactionAsync();
+
+                return countUpdated;
             }
             catch (Exception ex)
             {

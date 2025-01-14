@@ -31,7 +31,18 @@ namespace ServerApp.PL.Controllers
             var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize);
             return Ok(result); // 200 OK nếu có dữ liệu.
         }
-
+        [HttpGet("search-brands-by-page")]
+        public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string search="")
+        {
+            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize,search);
+            return Ok(result); // 200 OK nếu có dữ liệu.
+        }
+        [HttpGet("filter-brands-by-page")]
+        public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] bool filter = true)
+        {
+            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize, filter);
+            return Ok(result); // 200 OK nếu có dữ liệu.
+        }
         [HttpGet("get-brand-by-id/{id}")]
         public async Task<ActionResult<BrandVm>> GetBrand(int id)
         {
@@ -114,6 +125,38 @@ namespace ServerApp.PL.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
+        // Phương thức xóa hàng loạt sản phẩm
+        [HttpPut("restore-multiple-brand")]
+        public async Task<IActionResult> UpdateMultiple([FromBody] List<int> brandIds)
+        {
+            if (brandIds == null || brandIds.Count == 0)
+            {
+                return BadRequest("Brand IDs must be provided.");
+            }
 
+            try
+            {
+                // Gọi phương thức xóa hàng loạt từ service
+                var updateCount = await _brandService.RestoreMultipleAsync(
+                    brandIds,
+                    brand => brand.IsActive == false,
+                    async brand =>
+                    {
+                        brand.IsActive = true;
+                        await _brandService.UpdateBrandAsync(brand);
+                    });
+
+                if (updateCount > 0)
+                {
+                    return Ok(new { Message = "Brands restore successfully.",  UpdateCount = updateCount });
+                }
+
+                return NotFound("No brands were restore.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
     }
 }

@@ -40,5 +40,9 @@ namespace ServerApp.BLL.Services.Base
             IEnumerable<int> ids,
             Func<T, bool> condition,
             Func<T?, Task> onConditionFailed);
+        Task<int> RestoreMultipleAsync(
+         IEnumerable<int> ids,
+         Func<T, bool> condition,
+         Func<T?, Task> onCondition);
     }
 }

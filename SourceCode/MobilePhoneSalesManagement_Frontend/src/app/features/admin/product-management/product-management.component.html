@@ -39,7 +39,8 @@
                                 {{ product.isActive ? 'Active' : 'Inactive' }}
                             </span>
                         </td>
-                        <td>{{ product.brand.name || 'N/A' }}</td>
+                        <td *ngIf="product.brand !== null">{{ product.brand.name || 'N/A' }}</td>
+                        <td *ngIf="product.brand === null">KHông có thương hiệu</td>
                         <td>
                             <ul>
                                 <li *ngFor="let spec of product.productSpecifications">
