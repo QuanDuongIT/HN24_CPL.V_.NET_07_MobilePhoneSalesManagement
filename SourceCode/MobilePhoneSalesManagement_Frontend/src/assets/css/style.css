@@ -382,7 +382,6 @@ a img.aligncenter {
 .btn-primary:focus {
   background-color: #ed6908;
   color: #fff;
-
 }
 .btn-default {
   background-color: #0cafe5;
@@ -682,8 +681,8 @@ a img.aligncenter {
   background-color: #fff;
 }
 
-.text-blue{
-  color:rgb(88,176,229);
+.text-blue {
+  color: rgb(88, 176, 229);
 }
 
 .section-title {
@@ -720,8 +719,8 @@ a img.aligncenter {
 .text-secondary {
   color: #848687;
 }
-.text-red{
-  color: rgb(231,61,75);
+.text-red {
+  color: rgb(231, 61, 75);
 }
 
 .well-block {
@@ -747,7 +746,7 @@ a img.aligncenter {
 
 /*--- Feature left  class ---*/
 .feature-left {
-  margin-bottom: 20px;
+  margin-bottom: 33px;
   border-bottom: 1px solid #f4f7f9;
 }
 .feature-left:last-child {
@@ -778,7 +777,6 @@ a img.aligncenter {
 
 /*--- Feature center class ---*/
 
-
 /*--------------------------------
 4.6 Bullet/arrow
 ----------------------------------*/
@@ -803,7 +801,6 @@ a img.aligncenter {
 /*--------------------------------
 4.7 Call to actions 
 ----------------------------------*/
-
 
 /*--------------------------------
  4.8 Image Hover Effect 
@@ -913,6 +910,7 @@ img {
   right: 0px;
   padding: 11px 22px;
   bottom: 0;
+  height: 100%;
 }
 .account-section {
   line-height: 63px;
@@ -2588,57 +2586,57 @@ h3 {
 
 /*==============cart page================*/
 
-.cart-content{
+.cart-content {
   background-color: white;
   padding: 50px 80px;
 }
 
-.cart-content .title-header{
+.cart-content .title-header {
   text-align: center;
 }
 
-.cart-content .checkboxStyle{
+.cart-content .checkboxStyle {
   width: 20px;
   height: 20px;
 }
-.cart-content table{
+.cart-content table {
   border: 1px solid rgb(177, 177, 177);
   /* max-width: 70%; */
   width: 100%;
 }
 
-.cart-content table th{
+.cart-content table th {
   text-align: center;
 }
-.cart-content table tbody img{
+.cart-content table tbody img {
   width: 100px;
 }
 
-.cart-content .item-center{
+.cart-content .item-center {
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.cart-content .item-center i{
+.cart-content .item-center i {
   cursor: pointer;
   font-size: 20px;
 }
 
-.cart-content .product-title{
-  text-align:left;
+.cart-content .product-title {
+  text-align: left;
   justify-content: left;
 }
 
-.cart-content table .quantity{
+.cart-content table .quantity {
   display: flex;
 }
 
-.cart-content table .quantity .btn-quantity{
+.cart-content table .quantity .btn-quantity {
   background: rgba(240, 240, 240, 0.719);
   border: 1px solid rgb(207, 207, 207);
-  padding:0px 5px;
+  padding: 0px 5px;
   height: 35px;
   width: 35px;
   margin: 0;
@@ -2667,26 +2665,25 @@ h3 {
   border-left: none;
   outline: 0;
 }
-.cart-content .prices-summary{
+.cart-content .prices-summary {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
 }
 
-.cart-content .prices-summary .left-content{
+.cart-content .prices-summary .left-content {
   vertical-align: bottom;
 }
-.cart-content .total-receipt{
+.cart-content .total-receipt {
   border: 1px solid rgb(185, 185, 185);
   width: 320px;
   box-sizing: border-box;
- 
 }
-.cart-content .total-receipt .promotion-code{
+.cart-content .total-receipt .promotion-code {
   border-bottom: 1px solid rgb(185, 185, 185);
 }
 
-.cart-content .total-receipt .promotion-code input{
+.cart-content .total-receipt .promotion-code input {
   width: 200px;
   outline: 0;
   padding: 3px 5px;
@@ -2695,7 +2692,7 @@ h3 {
   border: 1px solid rgb(185, 185, 185);
 }
 
-.cart-content .total-receipt .promotion-code button{
+.cart-content .total-receipt .promotion-code button {
   width: 70px;
   outline: 0;
   border: none;
@@ -2704,29 +2701,26 @@ h3 {
   box-sizing: border-box;
 }
 
-
-.cart-content .total-receipt .prices .prices-item{
+.cart-content .total-receipt .prices .prices-item {
   display: flex;
   justify-content: space-between;
   color: rgb(83, 83, 83);
 }
 
-.cart-content .total-receipt .prices-total{
+.cart-content .total-receipt .prices-total {
   display: flex;
   justify-content: space-between;
   border-top: 1px solid rgb(185, 185, 185);
   color: rgb(83, 83, 83);
 }
 
-.cart-content .total-receipt .prices-total .prices-final{
+.cart-content .total-receipt .prices-total .prices-final {
   font-size: 22px;
- 
 }
-.cart-content .prices-summary{
- 
+.cart-content .prices-summary {
 }
 
-.cart-content .btn-checkout{
+.cart-content .btn-checkout {
   width: 320px;
   display: block;
   text-align: center;
@@ -2889,13 +2883,13 @@ Login Form
 .login-icon {
   display: inline-block;
   position: relative;
-  bottom: 51px;
+  bottom: 45px;
   left: 18px;
   font-size: 14px;
 }
 .eye-icon {
   position: absolute;
-  bottom: 52px;
+  bottom: 45px;
   right: 18px;
   font-size: 14px;
 }
@@ -3513,19 +3507,19 @@ Class----------------
   border-radius: 50px;
   margin-right: 8px;
 }
- 
-.row-account .left-container .side-bar-content li{
+
+.row-account .left-container .side-bar-content li {
   height: 40px;
   box-sizing: border-box;
   padding: 5px 0;
 }
 
-.row-account .left-container .side-bar-content li:hover{
+.row-account .left-container .side-bar-content li:hover {
   cursor: pointer;
   background: rgb(214, 214, 214);
 }
 
-.row-account .left-container .side-bar-content li.active{
+.row-account .left-container .side-bar-content li.active {
   background: rgb(214, 214, 214);
 }
 
@@ -3538,34 +3532,34 @@ Class----------------
   width: 74%;
 }
 
-.row-account .right-container .title-content{
+.row-account .right-container .title-content {
   font-weight: 300;
   margin-top: 20px;
 }
-.row-account .right-container .account-infor{
+.row-account .right-container .account-infor {
   height: 510px;
   width: 100%;
   background: white;
   border-radius: 5px;
   padding: 40px;
 }
-.row-account .right-container .account-infor form{
+.row-account .right-container .account-infor form {
   /* margin: 0 auto; */
   width: 700px;
 }
-.row-account .right-container .account-infor .form-control{
+.row-account .right-container .account-infor .form-control {
   border: none;
   display: flex;
   align-items: center;
 }
 
-.row-account .right-container .account-infor .form-control .input-label{
+.row-account .right-container .account-infor .form-control .input-label {
   width: 25%;
   font-weight: 400;
   margin: 0;
 }
 
-.row-account .right-container .account-infor .form-control .input-field{
+.row-account .right-container .account-infor .form-control .input-field {
   width: 600px;
   height: 40px;
   border: 1px solid gray;
@@ -3576,15 +3570,15 @@ Class----------------
   border-radius: 3px;
 }
 
-.row-account .right-container .account-infor .form-control .input-radio{
-  width:50px;
+.row-account .right-container .account-infor .form-control .input-radio {
+  width: 50px;
   margin: 0;
   /* text-align: left; */
 }
 
-.row-account .right-container .account-infor .btn-update{
+.row-account .right-container .account-infor .btn-update {
   width: 120px;
-  background: rgb(88,176,229);
+  background: rgb(88, 176, 229);
   color: white;
   border: none;
   height: 35px;
@@ -3593,30 +3587,29 @@ Class----------------
   border-radius: 3px;
 }
 
-
 /* =========== reset password page ====================*/
-.reset-password-content{ 
-  height: 350px;
+.reset-password-content {
+  height: 400px;
   width: 100%;
   background: white;
   border-radius: 5px;
   padding: 40px 20px;
 }
-.reset-password-content form{
+.reset-password-content form {
   margin: 0 auto;
   width: 540px;
 }
 
-.reset-password-content .form-control{
+.reset-password-content .form-control {
   border: none;
 }
 
-.reset-password-content .form-control .input-label{
+.reset-password-content .form-control .input-label {
   width: 27%;
   font-weight: 400;
 }
 
-.reset-password-content .form-control .input-field{
+.reset-password-content .form-control .input-field {
   width: 350px;
   height: 35px;
   border: 1px solid gray;
@@ -3627,11 +3620,11 @@ Class----------------
   border-radius: 3px;
 }
 
-.reset-password-content .btn-update-password{
+.reset-password-content .btn-update-password {
   display: block;
   margin: 30px auto;
   width: 120px;
-  background: rgb(88,176,229);
+  background: rgb(88, 176, 229);
   color: white;
   border: none;
   height: 35px;
@@ -3640,26 +3633,26 @@ Class----------------
 
 /*=========== address deliver =========*/
 
-.address-content{
+.address-content {
   height: 600px;
   width: 100%;
   background: white;
   border-radius: 5px;
   padding: 40px 20px;
 }
-.address-content form{
+.address-content form {
   width: 600px;
 }
-.address-content .form-control{
+.address-content .form-control {
   border: none;
   align-items: center;
   height: auto;
 }
 
-.address-content .form-control .input-label{
+.address-content .form-control .input-label {
   width: 24%;
 }
-.address-content .form-control .input-field{
+.address-content .form-control .input-field {
   width: 400px;
   height: 35px;
   border: 1px solid gray;
@@ -3671,7 +3664,7 @@ Class----------------
 }
 
 /*=================profile-receipt-page--===========*/
-.receipt-infor{
+.receipt-infor {
   height: 300px;
   width: 100%;
   background: white;
@@ -3679,60 +3672,58 @@ Class----------------
   padding: 40px 20px;
 }
 
-.receipt-infor .table{
+.receipt-infor .table {
   border: 1px solid rgb(177, 177, 177);
 }
 
-.receipt-infor .table .thead-light{
+.receipt-infor .table .thead-light {
   background: #e9ecef;
 }
 
-.receipt-infor .table th,td{
+.receipt-infor .table th,
+td {
   text-align: center;
   height: 45px;
 }
 
-.receipt-infor .table th{
+.receipt-infor .table th {
   font-weight: 600;
   color: rgb(90, 90, 90);
 }
-.receipt-infor .table td{
+.receipt-infor .table td {
   color: rgb(80, 78, 78);
   padding: 10px;
 }
 
-.receipt-infor .table a{
-  color: rgb(88,176,229);
+.receipt-infor .table a {
+  color: rgb(88, 176, 229);
 }
 
-
 /*=========== receipt-details-page=============*/
-.receipt-infor-details{
+.receipt-infor-details {
   height: auto;
   width: 100%;
   background: white;
   border-radius: 5px;
   padding: 40px 20px;
-
 }
 
-.receipt-infor-details .title-receipt{
+.receipt-infor-details .title-receipt {
   display: flex;
 }
 
-.receipt-infor-details .title-receipt .left-content{
+.receipt-infor-details .title-receipt .left-content {
   width: 40%;
   margin-right: 10px;
 }
-.receipt-infor-details .title-receipt .right-content{
-
+.receipt-infor-details .title-receipt .right-content {
 }
-.receipt-infor-details .title-receipt .content{
+.receipt-infor-details .title-receipt .content {
   border: 1px solid rgb(165, 165, 165);
   padding: 10px;
 }
 
-.receipt-infor-details .title-receipt .content p{
+.receipt-infor-details .title-receipt .content p {
   margin-bottom: 10px;
   color: rgb(75, 75, 75);
 }
@@ -3742,49 +3733,49 @@ Class----------------
   margin-top: 10px;
 }
 
-.receipt-infor-details .table th{
+.receipt-infor-details .table th {
   color: rgb(88, 88, 88);
   font-weight: 600;
   text-align: center;
 }
 
-.receipt-infor-details .table td .item-center{
+.receipt-infor-details .table td .item-center {
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   /* padding-top: 50px; */
 }
-.receipt-infor-details .table .product-title{
+.receipt-infor-details .table .product-title {
   display: flex;
   text-align: left;
   align-items: center;
 }
 
-.receipt-infor-details .table .product-title img{
+.receipt-infor-details .table .product-title img {
   width: 100px;
 }
-.receipt-infor-details .table .product-title p{
+.receipt-infor-details .table .product-title p {
   margin-bottom: 5px;
   font-weight: 600;
   color: rgb(61, 61, 61);
 }
 
-.receipt-infor-details .table tfoot td{
+.receipt-infor-details .table tfoot td {
   text-align: right;
 }
-.receipt-infor-details .table tfoot p{
+.receipt-infor-details .table tfoot p {
   margin-bottom: 5px;
 }
 
-.receipt-infor-details .redirect-to-receipt{
+.receipt-infor-details .redirect-to-receipt {
   display: block;
   text-align: center;
 }
 
 /*===============forgot-password-page===================*/
 
-.forgot-container{
+.forgot-container {
   width: 450px;
   margin: 0 auto;
   padding: 40px 40px;
@@ -3795,12 +3786,12 @@ Class----------------
   border-radius: 5px;
 }
 
-.forgot-container img{
+.forgot-container img {
   width: 60px;
   margin-bottom: 15px;
 }
 
-.forgot-container form input{
+.forgot-container form input {
   width: 100%;
   height: 45px;
   box-sizing: border-box;
@@ -3813,17 +3804,27 @@ Class----------------
   color: black;
 }
 
-.forgot-container form button{
+.forgot-container form button {
   width: 100%;
-  background: rgb(98,170,223);
+  background: rgb(98, 170, 223);
   color: white;
   border-radius: 5px;
   border: none;
   outline: 0;
   height: 45px;
 }
-
-
+.forgot-container form button:hover {
+  background: rgba(58, 148, 213, 0.68);
+}
+.forgot-container .text-danger {
+  position: relative;
+  left: 0;
+  top: -22px;
+  text-align: left;
+}
+input:read-only {
+  background: #e9e9e9;
+}
 /*==========  Non-Mobile First Method  ==========*/
 
 /* Large Devices, Wide Screens */
@@ -3892,7 +3893,6 @@ Class----------------
   .support-icon {
     float: initial;
   }
-
 }
 
 /* Extra Small Devices, Phones */
@@ -4112,3 +4112,7 @@ Class----------------
     right: auto;
   }
 }
+
+
+
+

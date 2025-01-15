@@ -68,3 +68,6 @@ npm install jwt-decode --save
 ### Toast
 npm i ngx-toastr
 npm install @angular/animations --save
+
+## day format
+npm install dayjs --save

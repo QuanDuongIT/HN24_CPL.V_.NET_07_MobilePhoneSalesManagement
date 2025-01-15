@@ -23,6 +23,8 @@ namespace ServerApp.BLL.Services
         Task<IdentityResult> ChangePasswordAsync(int userId, ChangePasswordVm model);
         Task<bool> ToggleBlockUserAsync(int userId);
         Task<bool> ToggleBlockUsersAsync(List<int> userIds);
+        Task<UserVm> GetCurrentUserAsync(string userId);
+        Task<bool> UpdateCurrentUserAsync(string userId, UserClientVm userVm);
 
     }
     public class UserService : BaseService<User>, IUserService
@@ -80,6 +82,7 @@ namespace ServerApp.BLL.Services
             var itemExists = await GetUserByEmailAsync(userVm.Email);
             if (itemExists != null && itemExists.UserId != id)
                 throw new ArgumentException("Email này đã tồn tại trên tài khoản khác");
+
             user.Email = userVm.Email;
             user.Status = userVm.Status;
             user.Role = userVm.Role;
@@ -184,7 +187,7 @@ namespace ServerApp.BLL.Services
                 Status = user.Status,
                 LastOnlineAt = user.LastOnlineAt,
                 FullName = user.UserDetails?.FullName,
-                DateOfBirth = user.UserDetails?.DateOfBirth,
+                DateOfBirth = user.UserDetails.DateOfBirth,
                 Gender = user.UserDetails?.Gender,
                 Address = user.UserDetails?.Address,
                 PhoneNumber = user.UserDetails?.PhoneNumber
@@ -220,7 +223,7 @@ namespace ServerApp.BLL.Services
                 Status = user.Status,
                 LastOnlineAt = user.LastOnlineAt,
                 FullName = user.UserDetails?.FullName,
-                DateOfBirth = user.UserDetails?.DateOfBirth,
+                DateOfBirth = user.UserDetails.DateOfBirth,
                 Gender = user.UserDetails?.Gender,
                 Address = user.UserDetails?.Address,
                 PhoneNumber = user.UserDetails?.PhoneNumber
@@ -250,7 +253,7 @@ namespace ServerApp.BLL.Services
 
             if (user == null)
             {
-                throw new KeyNotFoundException("User not found.");
+                throw new KeyNotFoundException("Không tìm thấy tài khoản.");
             }
 
             // Kiểm tra mật khẩu cũ
@@ -258,7 +261,7 @@ namespace ServerApp.BLL.Services
 
             if (!isCorrectPassword)
             {
-                throw new UnauthorizedAccessException("The current password is incorrect.");
+                throw new UnauthorizedAccessException("Mật khẩu hiện tại không chính xác.");
             }
 
             // Đổi mật khẩu
@@ -366,6 +369,73 @@ namespace ServerApp.BLL.Services
             {
                 throw new ArgumentException("UserIds is empty");
             }
+        }
+
+        public async Task<UserVm> GetCurrentUserAsync(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+
+            var user = await GetByUserIdAsync(int.Parse(userId));
+            if (user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            return new UserVm
+            {
+                FullName = user.FullName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Address = user.Address,
+                DateOfBirth = user.DateOfBirth,
+                Gender = user.Gender
+            };
+        }
+
+        public async Task<bool> UpdateCurrentUserAsync(string userId, UserClientVm userVm)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+
+            var updateRs = await UpdateClientUserAsync(int.Parse(userId), userVm);
+            return updateRs;
+        }
+        private async Task<bool> UpdateClientUserAsync(int id, UserClientVm userVm)
+        {
+            var user = await GetByIdAsync(id);
+            if (user == null)
+            {
+                throw new ExceptionNotFound("User not found.");
+            }
+            var itemExists = await GetUserByEmailAsync(userVm.Email);
+            if (itemExists != null && itemExists.UserId != id)
+                throw new ArgumentException("Email này đã tồn tại trên tài khoản khác");
+
+            user.Email = userVm.Email;
+            await UpdateAsync(user);
+
+            await _userDetailsService.UpdateUserDetailsAsync(id, new UserVm
+            {
+                Address = userVm.Address,
+                DateOfBirth = userVm.DateOfBirth,
+                Email = userVm.Email,
+                FullName = userVm.FullName,
+                Gender = userVm.Gender,
+                PhoneNumber = userVm.PhoneNumber,
+                LastOnlineAt = DateTime.Now,
+                Role = user.Role,
+                PasswordHash = "",
+                UserId = user.UserId,
+                Status = user.Status
+            });
+
+            _unitOfWork.Context.Entry(user).State = EntityState.Modified;
+            return await _unitOfWork.SaveChangesAsync() > 0;
         }
     }
 

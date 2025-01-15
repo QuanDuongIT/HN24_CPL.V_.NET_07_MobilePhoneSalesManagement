@@ -1,14 +1,16 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { BASE_URL_API } from '../../../../app.config';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+  private token: string | null = null;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   // Phương thức lấy danh sách người dùng
   getUsers(currentPage: number, pageSize: number, searchKey?: string, lastActiveDays?: number): Observable<any> {
@@ -43,7 +45,12 @@ export class UserService {
 
   // Phương thức cập nhật thông tin người dùng
   updateUser(id: number, user: any): Observable<any> {
-    return this.http.put(`${BASE_URL_API}/users/${id}`, user);
+    return this.http.put(`${BASE_URL_API}/users/${id}`, user).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Validation Errors:', error.error.errors);
+        return throwError(() => error);
+      })
+    );
   }
 
   // Phương thức xóa người dùng
@@ -72,5 +79,30 @@ export class UserService {
   }
   toggleBlockUsers(userIds: number[]): Observable<any> {
     return this.http.post(`${BASE_URL_API}/users/toggle-block-users`, userIds);
+  }
+
+  // client
+  getCurrentUser(): Observable<any> {
+    const token = this.authService.getCookie('Authentication');
+    const headers = new HttpHeaders({
+      'Authorization': `${token}`
+    });
+    return this.http.get(`${BASE_URL_API}/users/me`, { headers, withCredentials: true });
+  }
+  updateCurrentUser(user: any): Observable<any> {
+    const token = this.authService.getCookie('Authentication');
+    const headers = new HttpHeaders({
+      'Authorization': `${token}`
+    });
+    
+    return this.http.put(`${BASE_URL_API}/users/update-me`, user, { headers, withCredentials: true });
+  }
+  changePassword(model: any): Observable<any> {
+    const token = this.authService.getCookie('Authentication');
+    const headers = new HttpHeaders({
+      'Authorization': `${token}`
+    });
+    
+    return this.http.post(`${BASE_URL_API}/users/change-password`, model, { headers, withCredentials: true });
   }
 }

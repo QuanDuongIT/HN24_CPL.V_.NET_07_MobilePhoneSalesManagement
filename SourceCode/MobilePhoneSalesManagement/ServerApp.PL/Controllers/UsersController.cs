@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ServerApp.BLL.Services;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Models;
@@ -108,7 +109,7 @@ namespace ServerApp.PL.Controllers
 
         // Cập nhật thông tin người dùng
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, UserVm userVm)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserVm userVm)
         {
             try
             {
@@ -280,6 +281,90 @@ namespace ServerApp.PL.Controllers
                 return Ok(new { success = true, message = "Cập nhật trạng thái các người dùng thành công!" });
             }
             return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
+        }
+
+        // client
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var currentUser = await _userService.GetCurrentUserAsync(userId);
+                return Ok(new
+                {
+                    success = true,
+                    data = currentUser
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    message = "Người dùng chưa được xác thực."
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Đã xảy ra lỗi.",
+                    error = ex.Message
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpPut("update-me")]
+        public async Task<IActionResult> UpdateCurrentUser([FromBody] UserClientVm userVm)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var updateRs = await _userService.UpdateCurrentUserAsync(userId, userVm);
+                return Ok(new
+                {
+                    success = true,
+                    message = "Cập nhật thông tin thành công"
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    message = "Người dùng chưa được xác thực."
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Đã xảy ra lỗi.",
+                    error = ex.Message
+                });
+            }
+
         }
     }
 
