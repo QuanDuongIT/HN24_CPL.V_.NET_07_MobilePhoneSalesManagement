@@ -19,6 +19,7 @@ export class ProductManagementComponent {
 
 
   page$?: Observable<PagedResult<Product>>;
+  orderBy = false;
   isAddProductVisible = false;
   productToUpdate?: Product;
   page: number = 1;
@@ -39,7 +40,7 @@ export class ProductManagementComponent {
 
   loadProducts(): void {
     this.isLoading = true;
-    this.page$ = this.productService.getProducts(this.page, this.pageSize);
+    this.page$ = this.productService.getProducts(this.page, this.pageSize, this.orderBy);
     this.page$.subscribe(res => {
       if (this.totalPages > res.totalPages) this.page = 1;
       this.pageSize = res.pageSize;
@@ -52,7 +53,7 @@ export class ProductManagementComponent {
   }
   loadProductsFilter(filter: boolean): void {
     this.isLoading = true;
-    this.page$ = this.productService.filterProductsbyPage(this.page, this.pageSize, filter);
+    this.page$ = this.productService.filterProductsbyPage(this.page, this.pageSize, filter, this.orderBy);
     this.page$.subscribe(res => {
       this.totalCount = res.totalCount;
       if (res.items.length == 0 && res.totalCount > 0) {
@@ -110,7 +111,7 @@ export class ProductManagementComponent {
   onSearchKeyChange($event: Event) {
     const target = $event.target as HTMLSelectElement;
     this.isLoading = true;
-    this.page$ = this.productService.searchProductsbyPage(this.page, this.pageSize, target.value);
+    this.page$ = this.productService.searchProductsbyPage(this.page, this.pageSize, target.value, this.orderBy);
     this.page$.subscribe(res => {
       this.pageSize = res.pageSize;
       this.totalPages = res.totalPages;

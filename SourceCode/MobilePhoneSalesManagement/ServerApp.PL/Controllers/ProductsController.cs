@@ -157,14 +157,14 @@ namespace ServerApp.PL.Controllers
         public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, 
             [FromQuery] int pageSize = 10, [FromQuery] string search = "", [FromQuery] bool orderBy = true)
         {
-            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, p=>p.Name.Contains(search),orderBy: orderBy);
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, p=>p.Name.Contains(search),orderBy: false);
             return Ok(result); 
         }
         [HttpGet("filter-products-by-page")]
         public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, 
             [FromQuery] int pageSize = 10, [FromQuery] bool filter = true, [FromQuery] bool orderBy = true)
         {
-            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, p=>p.IsActive==filter, orderBy: orderBy);
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, p=>p.IsActive==filter, orderBy: false);
             return Ok(result); 
         }
         [HttpPut("restore-multiple-product")]
