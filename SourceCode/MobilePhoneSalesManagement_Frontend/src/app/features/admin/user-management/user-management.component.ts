@@ -5,6 +5,7 @@ import { UserAddComponent } from './user-add/user-add.component';
 import { error } from 'jquery';
 import { UserEditComponent } from './user-edit/user-edit.component';
 import { ExcelService } from '../../../core/services/excel-service/excel.service';
+import { ToastService } from '../../../core/services/toast-service/toast.service';
 declare var $: any;
 
 @Component({
@@ -35,7 +36,8 @@ export class UserManagementComponent {
 
   constructor(
     private userService: UserService,
-    private excelService: ExcelService
+    private excelService: ExcelService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -162,7 +164,7 @@ export class UserManagementComponent {
     event: Event
   ): void {
     if (this.selectedUserIds.length === 0 && action === 'delete') {
-      alert('Vui lòng chọn ít nhất một user.');
+      this.toastService.showError('Vui lòng chọn ít nhất một user')
       return;
     }
     event.stopPropagation();
@@ -188,12 +190,11 @@ export class UserManagementComponent {
   toggleBlockUser(): void {
     this.userService.toggleBlockUser(this.selectedUser.userId).subscribe(
       () => {
-        alert('Cập nhật trạng thái thành công');
+        this.toastService.showSuccess('Cập nhật trạng thái thành công')
         this.loadUsers();
       },
       (error) => {
-        console.error('Lỗi khi chặn user:', error);
-        alert('Không thể chặn user. Vui lòng thử lại sau.');
+        this.toastService.showError('Vui lòng thử lại sau')
       }
     );
   }
@@ -202,7 +203,7 @@ export class UserManagementComponent {
   deleteSelectedUsers(): void {
     this.userService.deleteUsersByIdList(this.selectedUserIds).subscribe(
       (res) => {
-        alert('Xóa danh sách người dùng thành công.');
+        this.toastService.showSuccess('Xóa thành công!');
         this.loadUsers();
       },
       (error) => {
@@ -218,12 +219,12 @@ export class UserManagementComponent {
   // block, unblock nhiều user
   blockOrUnblockSelectedUsers(): void {
     if (this.selectedUserIds.length === 0) {
-      alert('Vui lòng chọn ít nhất một user.');
+      this.toastService.showError('Vui lòng chọn ít nhất một user.');
       return;
     }
     this.userService.toggleBlockUsers(this.selectedUserIds).subscribe(
       (res) => {
-        alert('Cập nhật trạng thái thành công');
+        this.toastService.showSuccess('Cập nhật trạng thái thành công');
         this.loadUsers();
       },
       (error) => {
@@ -234,6 +235,7 @@ export class UserManagementComponent {
 
   // Mở modal cho Add hoặc Edit
   openUserModal(user: any = null, event: MouseEvent) {
+    
     if ((event.target as HTMLElement).tagName !== 'INPUT') {
       this.selectedUser = user ? { ...user } : null;
       const modal: any = document.getElementById('userModal');

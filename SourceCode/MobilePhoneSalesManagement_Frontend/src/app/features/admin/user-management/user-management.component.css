@@ -23,3 +23,10 @@
 .table tbody td {
   vertical-align: middle;
 }
+#show, .input_serach {
+  height: 30px !important;
+}
+.sizeTh1 {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}

@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -101,19 +102,42 @@ namespace ServerApp.PL
                 };
             });
 
+
+            // Cấu hình Cookie Authentication
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "MobileSalePhoneCookie";
+                    options.Cookie.SameSite = SameSiteMode.None; // Cho phép cookie gửi qua cross-origin
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Chỉ gửi cookies qua HTTPS
+                    options.LoginPath = "/login";  // Đường dẫn khi người dùng chưa đăng nhập
+                    options.LogoutPath = "/logout";  // Đường dẫn khi người dùng đăng xuất
+                });
+
+            // Cấu hình CORS cho phép gửi cookies từ frontend
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200") // Nguồn gốc của frontend
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
+            });
+
             // đăng ký cache
             builder.Services.AddMemoryCache();
 
             // Đăng ký services
             builder.Services.AddScoped<IGenericRepository<User>, UserRepository>();
-
+            builder.Services.AddScoped<IUserDetailsService, UserDetailsService>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IBrandService, BrandService>();
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<ICacheService, CacheService>();
             builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<IUserDetailsService, UserDetailsService>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddSingleton<IEmailService, EmailService>();
             builder.Services.AddScoped<ISpecificationTypeService, SpecificationTypeService>();
@@ -145,14 +169,9 @@ namespace ServerApp.PL
             }
 
             app.UseHttpsRedirection();
-            app.UseCors(o =>
-            {
-                o.AllowAnyHeader();
-                o.AllowAnyMethod();
-                o.AllowAnyOrigin();
-            });
 
-
+            app.UseCors("AllowSpecificOrigin");
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
