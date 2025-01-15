@@ -10,13 +10,18 @@ import { ProductListComponent } from './features/client/product/product-list/pro
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
 import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password.component';
-import { UserInfoComponent } from './features/client/user/user-info/user-info.component';
+import { VerifyEmailComponent } from './features/auth/verify-email/verify-email.component';
+import { ResetPasswordComponent } from './features/auth/reset-password/reset-password.component';
+import { AccountComponent } from './features/client/user/account/account.component';
+import { authGuard } from './features/auth/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: 'admin', redirectTo: '/admin/user-management', pathMatch: 'full' },
+  // { path: 'admin', redirectTo: '/admin/user-management', pathMatch: 'full' },
   {
     path: 'admin',
     component: AdminLayoutComponent,
+    canActivate: [authGuard],
+    data: { role: 'admin' },
     children: [
       { path: 'user-management', component: UserManagementComponent },
       { path: 'brand-management', component: BrandManagementComponent },
@@ -24,7 +29,7 @@ export const routes: Routes = [
       { path: 'order-management', component: OrderManagementComponent },
     ],
   },
-  { path: '', redirectTo: '/register', pathMatch: 'full' },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
   {
     path: '',
     component: ClientLayoutComponent, // Giao diện layout cho client
@@ -39,9 +44,10 @@ export const routes: Routes = [
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       { path: 'forgot-password', component: ForgotPasswordComponent },
+      { path: 'reset-password', component: ResetPasswordComponent },
       // user
-      { path: 'account', component: UserInfoComponent },
-      { path: 'verify-email', component: RegisterComponent}
+      { path: 'account', component: AccountComponent },
+      { path: 'verify-email', component: VerifyEmailComponent },
     ]
   }
 ];

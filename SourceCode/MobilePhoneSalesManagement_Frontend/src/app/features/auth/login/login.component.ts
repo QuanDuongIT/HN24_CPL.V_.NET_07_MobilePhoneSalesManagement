@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { LoginRequest } from '../models/login-request.model';
 import { AuthService } from '../services/auth.service';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ToastService } from '../../../core/services/toast-service/toast.service';
+import { error } from 'jquery';
+import { log } from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
 
 @Component({
   selector: 'app-login',
@@ -13,40 +16,79 @@ import { CommonModule } from '@angular/common';
   styleUrl: './login.component.css',
 })
 export class LoginComponent {
-  message: string = '';
-  isSuccess: boolean = false;
+  loginData: any;
 
-  model: LoginRequest;
   constructor(
     private authService: AuthService,
     private cookieService: CookieService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastService
   ) {
-    this.model = {
+    this.loginData = {
       email: '',
       password: '',
     };
   }
 
-  onFormSubmit(): void {
-    this.authService.login(this.model).subscribe({
-      next: (res) => {
-        this.cookieService.set(
-          'Authentication',
-          `Bearer ${res.token}`,
-          undefined,
-          '/',
-          undefined,
-          true,
-          'Strict'
-        );
-        this.authService.setUser({ email: this.model.email });
-        this.router.navigateByUrl('/');
-      },
-      error: (err) => {
-        this.isSuccess = false;
-        this.message = 'Thông tin tài khoản không hợp lệ!';
-      },
-    });
+
+  matchValidForm(form: NgForm) {
+    const email = form.controls['email']?.value;
+
+    // Kiểm tra email hợp lệ
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if ((email && !emailPattern.test(email)) || email === '') {
+      form.controls['email']?.setErrors({ invalidEmail: true });
+    } else {
+      form.controls['email']?.setErrors(null);
+    }
+  }
+
+  onSubmit(form: NgForm): void {
+    this.matchValidForm(form);
+
+    if (!form.invalid) {
+      this.authService.login(this.loginData).subscribe({
+        next: (res) => {
+          this.cookieService.set(
+            'Authentication',
+            `Bearer ${res.token}`,
+            undefined,
+            '/',
+            undefined,
+            true,
+            'Strict'
+          );
+          this.cookieService.set(
+            'RefreshToken', 
+            res.refreshToken,
+            undefined, 
+            '/',       
+            undefined, 
+            true, 
+            'Strict'
+          );
+          this.authService.setUser({ email: this.loginData.email });
+          this.router.navigateByUrl('/');
+        },
+        error: (err) => {
+          if (!err.error.success && err.error.message) {
+            this.toastr.showError(err.error.message)
+          } else {
+            console.log(err.error)
+            this.toastr.showError('Lỗi kết nối server');
+          }
+        },
+      });
+    } else {
+      this.toastr.showError('Vui lòng nhập đủ thông tin');
+    }
+  }
+
+  // Trạng thái hiển thị mật khẩu
+  showPassword = false;
+
+  // Hàm toggle trạng thái
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
   }
 }

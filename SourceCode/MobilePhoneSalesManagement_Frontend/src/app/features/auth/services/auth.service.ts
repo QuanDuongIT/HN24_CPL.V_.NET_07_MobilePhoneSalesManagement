@@ -13,17 +13,21 @@ import { RegisterModel } from '../models/register-model';
 })
 export class AuthService {
   $user = new BehaviorSubject<User | undefined>(undefined);
+  private _isAuthenticated = new BehaviorSubject<boolean>(false);
+  private token: any;
+
   constructor(private http: HttpClient,
     private cookieService: CookieService
-  ) { }
-
-  login(request: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${BASE_URL_API}/authentication/login-user`, request);
+  ) {
+    this.token = this.cookieService.get('Authentication');
+    this._isAuthenticated.next(!!this.token);
   }
+
 
   setUser(user: User): void {
     this.$user.next(user);
     localStorage.setItem('user-email', user.email);
+    this._isAuthenticated.next(true);
   }
 
   user(): Observable<User | undefined> {
@@ -41,12 +45,35 @@ export class AuthService {
 
     return undefined;
   }
+  refreshToken(refreshToken: string): Observable<any> {
+    return this.http.post<any>(`${BASE_URL_API}/authentication/refresh-token`, { refreshToken });
+  }
+  // Phương thức để lấy giá trị cookie theo tên
+  getCookie(name: string): string | null {
+    return this.cookieService.get(name);  // Trả về giá trị cookie hoặc null nếu không tìm thấy
+  }
+
+  // Phương thức kiểm tra cookie có tồn tại hay không
+  hasCookie(name: string): boolean {
+    return this.cookieService.check(name);  // Trả về true nếu cookie tồn tại
+  }
+
+  // Phương thức xóa cookie
+  deleteCookie(name: string): void {
+    this.cookieService.delete(name);  // Xóa cookie với tên tương ứng
+  }
+  
+  login(request: any): Observable<any> {
+    return this.http.post(`${BASE_URL_API}/authentication/login-user`, request);
+  }
 
   logout(): void {
     //localStorage.removeItem("user-email");
     localStorage.clear();
-    this.cookieService.delete("Authentication", "/");
+    this.cookieService.delete('Authentication', '/');
+    this.cookieService.delete('RefreshToken', '/');
     this.$user.next(undefined);
+    this._isAuthenticated.next(false);
   }
 
   register(model: any): Observable<any> {
@@ -67,9 +94,19 @@ export class AuthService {
       );
   }
 
+  resetPassword(model: any): Observable<any> {
+    return this.http.post(`${BASE_URL_API}/authentication/reset-password`, model);
+  }
+
+  get isAuthenticated(): Observable<boolean> {
+    return this._isAuthenticated.asObservable();
+  }
+  
+  forgotPassword(email: string): Observable<any> {
+    return this.http.get(`${BASE_URL_API}/authentication/forgot-password?email=${email}`);
+  }
+  // xác thực mã code khi register
   verifyEmail(email: string, code: string ): Observable<any> {
-    console.log('heheheh');
-    
     return this.http.get(`${BASE_URL_API}/authentication/verify-email?email=${email}&code=${code}`);
   }
   
