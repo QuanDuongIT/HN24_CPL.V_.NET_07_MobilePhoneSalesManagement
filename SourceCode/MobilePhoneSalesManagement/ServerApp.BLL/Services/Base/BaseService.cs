@@ -291,7 +291,7 @@ namespace ServerApp.BLL.Services.Base
                 foreach (var id in ids)
                 {
                     var entity = await _unitOfWork.GenericRepository<T>().GetByIdAsync(id);
-                    if(entity == null||id==0)
+                    if(entity == null)
                     {
                         throw new ExceptionBusinessLogic($"'{typeof(T).Name}' not found.");
                     }

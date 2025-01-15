@@ -92,7 +92,6 @@ namespace ServerApp.PL.Controllers
 
             return NoContent(); 
         }
-        // Phương thức xóa hàng loạt sản phẩm
         [HttpDelete("delete-multiple-brand")]
         public async Task<IActionResult> DeleteMultiple([FromBody] List<int> brandIds)
         {
@@ -125,7 +124,6 @@ namespace ServerApp.PL.Controllers
                 return BadRequest(new { Message = ex.Message });
             }
         }
-        // Phương thức xóa hàng loạt sản phẩm
         [HttpPut("restore-multiple-brand")]
         public async Task<IActionResult> UpdateMultiple([FromBody] List<int> brandIds)
         {

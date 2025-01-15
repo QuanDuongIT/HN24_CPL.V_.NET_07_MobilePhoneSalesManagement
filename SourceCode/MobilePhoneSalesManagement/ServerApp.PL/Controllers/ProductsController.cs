@@ -26,9 +26,9 @@ namespace ServerApp.PL.Controllers
 
 
         [HttpGet("get-all-products-by-page")]
-        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] bool? orderBy=false)
         {
-            var result = await _productService.GetAllProductAsync(pageNumber, pageSize);
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize,orderBy: orderBy);
             return Ok(result); 
         }
 
@@ -153,6 +153,51 @@ namespace ServerApp.PL.Controllers
                 return StatusCode(500, $"Internal server error: {e.Message}");
             }
         }
+        [HttpGet("search-products-by-page")]
+        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, 
+            [FromQuery] int pageSize = 10, [FromQuery] string search = "", [FromQuery] bool orderBy = true)
+        {
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, p=>p.Name.Contains(search),orderBy: orderBy);
+            return Ok(result); 
+        }
+        [HttpGet("filter-products-by-page")]
+        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, 
+            [FromQuery] int pageSize = 10, [FromQuery] bool filter = true, [FromQuery] bool orderBy = true)
+        {
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, p=>p.IsActive==filter, orderBy: orderBy);
+            return Ok(result); 
+        }
+        [HttpPut("restore-multiple-product")]
+        public async Task<IActionResult> UpdateMultiple([FromBody] List<int> productIds)
+        {
+            if (productIds == null || productIds.Count == 0)
+            {
+                return BadRequest("Product IDs must be provided.");
+            }
 
+            try
+            {
+                // Gọi phương thức xóa hàng loạt từ service
+                var updateCount = await _productService.RestoreMultipleAsync(
+                    productIds,
+                    product => product.IsActive == false,
+                    async product =>
+                    {
+                        product.IsActive = true;
+                        await _productService.UpdateProductAsync(product);
+                    });
+
+                if (updateCount > 0)
+                {
+                    return Ok(new { Message = "Products restore successfully.", UpdateCount = updateCount });
+                }
+
+                return NotFound("No products were restore.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
     }
 }

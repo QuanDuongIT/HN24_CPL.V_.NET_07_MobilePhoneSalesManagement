@@ -33,4 +33,22 @@ export class ProductService {
   getSpecificationTypes(): Observable<import("../models/specificationType").specificationType[]> {
     return this.http.get<any>(`${BASE_URL_API}/SpecificationTypes/get-all-specificationTypes`);
   }
+
+  searchProductsbyPage(pageNumber: number, pageSize: number, search: string): Observable<any> {
+    return this.http.get<any>
+      (`${BASE_URL_API}/Products/search-products-by-page?pageNumber=${pageNumber}&pageSize=${pageSize}&search=${search}`);
+  }
+  filterProductsbyPage(pageNumber: number, pageSize: number, filter: boolean): Observable<any> {
+    return this.http.get<any>
+      (`${BASE_URL_API}/Products/filter-products-by-page?pageNumber=${pageNumber}&pageSize=${pageSize}&filter=${filter}`);
+  }
+  deleteMultipleProducts(productIds: string[]): Observable<any> {
+    return this.http.delete(`${BASE_URL_API}/Products/delete-multiple-product`, {
+      body: productIds  // Gửi danh sách productIds trong body của request
+    });
+  }
+
+  restoreProducts(productIds: string[]): Observable<any> {
+    return this.http.put(`${BASE_URL_API}/Products/restore-multiple-product`, productIds);
+  }
 }
