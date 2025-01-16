@@ -57,7 +57,7 @@ namespace ServerApp.DAL.Seed
                             ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
                             Manufacturer = "Manufacturer 1",
                             IsActive = true,
-                            Color = "Black",
+                            Colors  = "Black",
                             Discount=10,
                             CreatedAt = DateTime.Now,
                             UpdatedAt = DateTime.Now
@@ -73,7 +73,7 @@ namespace ServerApp.DAL.Seed
                             ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
                             Manufacturer = "Manufacturer 2",
                             IsActive = true,
-                            Color = "White",
+                             Colors  = "White",
                             Discount=20,
                             CreatedAt = DateTime.Now,
                             UpdatedAt = DateTime.Now
@@ -89,7 +89,7 @@ namespace ServerApp.DAL.Seed
                             ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
                             Manufacturer = "Manufacturer 3",
                             IsActive = false,
-                            Color = "Blue",
+                             Colors  = "Blue",
                             Discount = 15,
                             CreatedAt = DateTime.Now,
                             UpdatedAt = DateTime.Now
@@ -105,7 +105,7 @@ namespace ServerApp.DAL.Seed
                             ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
                             Manufacturer = "Manufacturer 4",
                             IsActive = false,
-                            Color = "Red",
+                             Colors  = "Red",
                             Discount = 10,
                             CreatedAt = DateTime.Now,
                             UpdatedAt = DateTime.Now
@@ -121,7 +121,7 @@ namespace ServerApp.DAL.Seed
                             ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
                             Manufacturer = "Manufacturer 5",
                             IsActive = true,
-                            Color = "Green",
+                             Colors  = "Green",
                             Discount = 5,
                             CreatedAt = DateTime.Now,
                             UpdatedAt = DateTime.Now
@@ -137,7 +137,7 @@ namespace ServerApp.DAL.Seed
                             ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
                             Manufacturer = "Manufacturer 6",
                             IsActive = true,
-                            Color = "Yellow",
+                             Colors  = "Yellow",
                             Discount = 25,
                             CreatedAt = DateTime.Now,
                             UpdatedAt = DateTime.Now
@@ -153,7 +153,7 @@ namespace ServerApp.DAL.Seed
                             ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
                             Manufacturer = "Manufacturer 7",
                             IsActive = false,
-                            Color = "Pink",
+                             Colors  = "Pink",
                             Discount = 30,
                             CreatedAt = DateTime.Now,
                             UpdatedAt = DateTime.Now
@@ -169,7 +169,7 @@ namespace ServerApp.DAL.Seed
                             ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
                             Manufacturer = "Manufacturer 8",
                             IsActive = true,
-                            Color = "Purple",
+                             Colors  = "Purple",
                             Discount = 12,
                             CreatedAt = DateTime.Now,
                             UpdatedAt = DateTime.Now
@@ -189,7 +189,7 @@ namespace ServerApp.DAL.Seed
                             ImageUrl = "https://images2.thanhnien.vn/528068263637045248/2024/1/25/c3c8177f2e6142e8c4885dbff89eb92a-65a11aeea03da880-1706156293184503262817.jpg",
                             Manufacturer = "Manufacturer 8",
                             IsActive = true,
-                            Color = "Purple",
+                             Colors  = "Purple",
                             Discount = 12,
                             CreatedAt = DateTime.Now,
                             UpdatedAt = DateTime.Now
@@ -202,7 +202,7 @@ namespace ServerApp.DAL.Seed
                 if (!context.SpecificationTypes.Any())
                 {
                     context.SpecificationTypes.AddRange(
-                        new SpecificationType { Name = "Color" },
+                        new SpecificationType { Name = " Colors " },
                         new SpecificationType { Name = "ScreenSize" },
                         new SpecificationType { Name = "RAM" },
                         new SpecificationType { Name = "Storage" }

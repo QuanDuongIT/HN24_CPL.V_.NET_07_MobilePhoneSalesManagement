@@ -12,7 +12,7 @@
         public string ImageUrl { get; set; } // Đường dẫn URL của hình ảnh sản phẩm
         public string Manufacturer { get; set; } // Nhà sản xuất
         public bool IsActive { get; set; } = true; // Trạng thái hoạt động
-        public string Color { get; set; } // Màu sắc sản phẩm
+        public string Colors { get; set; } // Màu sắc sản phẩm
         public int Discount { get; set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.Now; // Thời điểm tạo
         public DateTime UpdatedAt { get; set; } = DateTime.Now; // Thời điểm cập nhật

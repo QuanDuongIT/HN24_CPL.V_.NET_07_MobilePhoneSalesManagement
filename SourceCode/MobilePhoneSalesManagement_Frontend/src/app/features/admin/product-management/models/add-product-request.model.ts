@@ -1,4 +1,4 @@
-import { RequestProductSpecifications } from "./add-specificationType-request";
+import { RequestProductSpecifications } from "../../specification-type-management/models/add-specificationType-request";
 
 export interface RequestProduct {
     name: string;
@@ -10,7 +10,7 @@ export interface RequestProduct {
     imageUrl: string;
     manufacturer: string;
     isActive: boolean;
-    color: string;
+    colors: string;
     discount: number;
     productSpecifications: RequestProductSpecifications[];
 }

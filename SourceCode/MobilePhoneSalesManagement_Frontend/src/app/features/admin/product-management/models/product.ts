@@ -1,5 +1,5 @@
 import { Brand } from "../../brand-management/models/brand.model";
-import { productSpecifications } from "./specificationType";
+import { productSpecifications } from "../../specification-type-management/models/specificationType";
 
 export interface Product {
     productId: string;
@@ -12,7 +12,7 @@ export interface Product {
     imageUrl: string;
     manufacturer: string;
     isActive: boolean;
-    color: string;
+    colors: string;
     discount: number;
     createdAt: Date;
     updatedAt: Date;

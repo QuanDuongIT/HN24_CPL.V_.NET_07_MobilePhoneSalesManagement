@@ -22,7 +22,7 @@ namespace ServerApp.BLL.Services.ViewModels
         public string ImageUrl { get; set; }
         public string Manufacturer { get; set; }
         public bool IsActive { get; set; } = true;
-        public string Color { get; set; }
+        public string Colors { get; set; }
         [SkipValidation]
         public int Discount { get; set; } = 0;
 
@@ -40,7 +40,7 @@ namespace ServerApp.BLL.Services.ViewModels
         public string ImageUrl { get; set; }
         public string Manufacturer { get; set; }
         public bool IsActive { get; set; } = true;
-        public string Color { get; set; }
+        public string Colors { get; set; }
         public int Discount { get; set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;

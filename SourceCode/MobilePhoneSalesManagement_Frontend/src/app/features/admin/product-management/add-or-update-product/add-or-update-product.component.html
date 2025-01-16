@@ -3,7 +3,7 @@
     <form #form="ngForm" (ngSubmit)="onFormSubmit()">
         <div class="row">
             <!-- Hình ảnh -->
-            <div class="col-md-4 mt-3">
+            <div class="col-md-3 mt-3">
                 <div
                     style="width: 216px; height: 244px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; background-color: #f9f9f9;">
                     <ng-container *ngIf="model.imageUrl; else noImage">
@@ -16,7 +16,7 @@
                 </div>
             </div>
 
-            <div class="col-md-8 mt-3">
+            <div class="col-md-9 mt-3">
                 <div class="row">
                     <!-- URL hình ảnh -->
                     <div class="col-md-6 mb-3">
@@ -46,7 +46,7 @@
                     </div>
                     <!-- Hoạt động -->
                     <div class="col-md-2 mb-3">
-                        <label for="isActive" class="form-label">Hoạt Động</label>
+                        <label for="isActive" class="form-label">Còn Hoạt Động</label>
                         <select id="isActive" name="isActive" [(ngModel)]="model.isActive" class="form-control">
                             <option [value]="true">Có</option>
                             <option [value]="false">Không</option>
@@ -88,9 +88,20 @@
 
         <div class="row">
             <!-- Màu sắc -->
-            <div class="col-md-6 mb-3">
-                <label for="color" class="form-label">Màu Sắc</label>
-                <input type="text" id="color" name="color" [(ngModel)]="model.color" class="form-control" required />
+            <div class="mb-3">
+                <div class="mt-3">
+                    <label for="presetColors" class="form-label">Chọn Màu</label>
+                    <div class="d-flex flex-wrap">
+                        <div *ngFor="let color of presetColors" class="color-option" [style.background-color]="color"
+                            (click)="selectPresetColor(color)"
+                            style="width: 40px; height: 40px; margin: 5px; border-radius: 50%; cursor: pointer;">
+                            <!-- Hiển thị dấu tick nếu màu đã được chọn -->
+                            <div *ngIf="isColorSelected(color)" class="color-tick">
+                                ✔
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -106,31 +117,48 @@
 
         <!-- Thông số kỹ thuật -->
         <div class="mt-3">
-            <label for="specifications" class="form-label">Thông Số Kỹ Thuật</label>
+            <h3 for="specifications" class="form-label">Thông Số Kỹ Thuật
+                <button type="button" class="btn btn-danger ms-2" (click)="showOnhowOnSpecificationType()">Thêm</button>
+            </h3>
             <div *ngFor="let spec of model.productSpecifications; let i = index">
                 <div class="d-flex align-items-center mb-2">
                     <input [(ngModel)]="spec.specificationType.name" [name]="'new specification type' + i"
                         class="form-control me-2" placeholder="Loại thông số" [disabled]="true" />
                     <input [(ngModel)]="spec.value" [name]="'specValue' + i" class="form-control me-2"
                         placeholder="Giá trị" />
-                    <button type="button" class="btn btn-danger" (click)="removeSpecification(i)">Xóa</button>
+                    <button type="button" class="btn btn-danger ms-2" (click)="removeSpecification(i)">Xóa</button>
                 </div>
             </div>
 
-            <div class="mt-3 d-flex">
-                <select [(ngModel)]="selectedSpecificationType" name="selectedSpecificationType"
-                    class="form-control me-2">
-                    <ng-container *ngIf="specificationTypes$ | async as specTypes">
-                        <option *ngFor="let type of specTypes" [ngValue]="type">{{ type.name }}</option>
-                    </ng-container>
-                </select>
-                <button type="button" class="btn btn-secondary" (click)="addSpecification()">Thêm Thông Số</button>
+            <div class="mb-2" *ngIf="specificationTypes$ | async as specTypes">
+                <div class="d-flex align-items-center mb-2" *ngIf="specTypes.length>0">
+                    <select class="form-control me-2" [(ngModel)]="selectedSpecificationType"
+                        name="selectedSpecificationType">
+                        <ng-container>
+                            <option *ngFor="let type of specTypes" [ngValue]="type">{{ type.name }}</option>
+                        </ng-container>
+                    </select>
+                    <button type="button" class="form-control me-2" (click)="addSpecification()">Thêm Thông Số</button>
+                    <label type="button" class="btn ms-2"></label>
+                    <label type="button" class="btn ms-2"></label>
+                </div>
+
             </div>
         </div>
 
-        <!-- Nút lưu -->
-        <div class="mt-3">
+        <!-- Nút lưu và nút làm mới -->
+        <div class="mt-3 d-flex justify-content-center">
+            <button class="btn btn-secondary me-2" type="button" (click)="resetForm()">Làm Mới</button>
             <button class="btn btn-primary" type="submit" [disabled]="form.invalid">Lưu</button>
         </div>
+
+        <div *ngIf="isAddSpecificationType" class="overlay" (click)="hideAddSpecificationType()"></div>
+
+
     </form>
+    <div *ngIf="isAddSpecificationType" class="modal-container">
+        <app-specification-type-management [specificationTypes]="specificationTypes$"
+            (close)="hideAddSpecificationType()">
+        </app-specification-type-management>
+    </div>
 </div>

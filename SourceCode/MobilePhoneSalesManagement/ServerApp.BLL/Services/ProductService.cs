@@ -161,7 +161,7 @@ public interface IProductService : IBaseService<Product>
                     ImageUrl = productVm.ImageUrl,
                     Manufacturer = productVm.Manufacturer,
                     IsActive = productVm.IsActive,
-                    Color = productVm.Color,
+                    Colors = productVm.Colors,
                     Discount = productVm.Discount
                 };
 
@@ -195,7 +195,7 @@ public interface IProductService : IBaseService<Product>
                     ImageUrl = product.ImageUrl,
                     Manufacturer = product.Manufacturer,
                     IsActive = product.IsActive,
-                    Color = product.Color,
+                     Colors = product.Colors,
                     Discount = product.Discount,
                     CreatedAt = product.CreatedAt,
                     UpdatedAt = product.UpdatedAt
@@ -249,7 +249,7 @@ public interface IProductService : IBaseService<Product>
                     ImageUrl = product.ImageUrl,
                     Manufacturer = product.Manufacturer,
                     IsActive = product.IsActive,
-                    Color = product.Color,
+                     Colors = product.Colors,
                     Discount = product.Discount,
                     CreatedAt = product.CreatedAt,
                     UpdatedAt = product.UpdatedAt,
@@ -281,7 +281,7 @@ public interface IProductService : IBaseService<Product>
                 ImageUrl = product.ImageUrl,
                 Manufacturer = product.Manufacturer,
                 IsActive = product.IsActive,
-                Color = product.Color,
+                 Colors = product.Colors,
                 Discount = product.Discount,
                 CreatedAt = product.CreatedAt,
                 UpdatedAt = product.UpdatedAt,
@@ -402,7 +402,7 @@ public interface IProductService : IBaseService<Product>
                 ImageUrl = product.ImageUrl,
                 Manufacturer = product.Manufacturer,
                 IsActive = product.IsActive,
-                Color = product.Color,
+                 Colors = product.Colors,
                 Discount = product.Discount, // Gán mặc định hoặc tính toán tùy theo logic
                 CreatedAt = product.CreatedAt,
                 UpdatedAt = product.UpdatedAt,
@@ -461,7 +461,7 @@ public interface IProductService : IBaseService<Product>
                 existingProduct.ImageUrl = productVm.ImageUrl;
                 existingProduct.Manufacturer = productVm.Manufacturer;
                 existingProduct.IsActive = productVm.IsActive;
-                existingProduct.Color = productVm.Color;
+                existingProduct.Colors = productVm.Colors;
                 existingProduct.Discount = productVm.Discount;
                 existingProduct.UpdatedAt= DateTime.Now;
                 // Cập nhật Product vào cơ sở dữ liệu
@@ -508,7 +508,7 @@ public interface IProductService : IBaseService<Product>
                     ImageUrl = existingProduct.ImageUrl,
                     Manufacturer = existingProduct.Manufacturer,
                     IsActive = existingProduct.IsActive,
-                    Color = existingProduct.Color,
+                     Colors = existingProduct.Colors,
                     Discount = existingProduct.Discount,
                     CreatedAt = existingProduct.CreatedAt,
                     UpdatedAt = existingProduct.UpdatedAt
@@ -540,7 +540,7 @@ public interface IProductService : IBaseService<Product>
             product.ImageUrl = product.ImageUrl;
             product.Manufacturer = product.Manufacturer;
             product.IsActive = product.IsActive;
-            product.Color = product.Color;
+            product.Colors = product.Colors;
             product.Discount = product.Discount;
             product.UpdatedAt = DateTime.Now;
 
@@ -719,7 +719,7 @@ public interface IProductService : IBaseService<Product>
                     ImageUrl = p.ImageUrl,
                     Manufacturer = p.Manufacturer,
                     IsActive = p.IsActive,
-                    Color = p.Color,
+                     Colors = p.Colors,
                     Discount = p.Discount,
                     CreatedAt = p.CreatedAt,
                     UpdatedAt = p.UpdatedAt,
@@ -755,7 +755,7 @@ public interface IProductService : IBaseService<Product>
                     ImageUrl = p.ImageUrl,
                     Manufacturer = p.Manufacturer,
                     IsActive = p.IsActive,
-                    Color = p.Color,
+                     Colors = p.Colors,
                     Discount = p.Discount,
                     CreatedAt = p.CreatedAt,
                     UpdatedAt = p.UpdatedAt,

@@ -120,13 +120,12 @@
 
                             <td>
                                 <div class="icon-container">
-                                    <i *ngIf="filter === 'Active'" (click)="updateProduct(product.productId)"
+                                    <i *ngIf="filter !== 'Active'" (click)="updateProduct(product.productId)"
                                         class="bi bi-pencil-square"></i>
                                     <i class="bi bi-arrow-counterclockwise" (click)="restoreProduct(product.productId)"
                                         *ngIf="filter === 'Inactive'"></i>
                                 </div>
-                                <div *ngIf="filter === 'Active'||filter === 'Inactive'"
-                                    (click)="onDeleteProduct(product.productId, product.isActive)"
+                                <div (click)="onDeleteProduct(product.productId, product.isActive)"
                                     class="icon-container">
                                     <i class="bi bi-trash" style="transform: scale(1.5);"></i>
                                 </div>
