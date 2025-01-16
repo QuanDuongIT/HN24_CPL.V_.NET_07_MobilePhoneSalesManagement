@@ -8,6 +8,7 @@ import { ValidatorsService } from '../../../../core/services/validators-service/
 import { AuthService } from '../../../auth/services/auth.service';
 import { log } from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
 import { Router } from '@angular/router';
+import { UserClientService } from '../service/user-client.service';
 
 @Component({
   selector: 'app-account',
@@ -35,7 +36,7 @@ export class AccountComponent {
 
   constructor(
     private router: Router,
-    private userService: UserService,
+    private userService: UserClientService,
     private toastService: ToastService,
     private validateService: ValidatorsService
   ) {}

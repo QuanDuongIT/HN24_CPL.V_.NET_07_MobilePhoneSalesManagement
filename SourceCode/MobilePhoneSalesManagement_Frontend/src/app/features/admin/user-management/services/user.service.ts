@@ -81,28 +81,5 @@ export class UserService {
     return this.http.post(`${BASE_URL_API}/users/toggle-block-users`, userIds);
   }
 
-  // client
-  getCurrentUser(): Observable<any> {
-    const token = this.authService.getCookie('Authentication');
-    const headers = new HttpHeaders({
-      'Authorization': `${token}`
-    });
-    return this.http.get(`${BASE_URL_API}/users/me`, { headers, withCredentials: true });
-  }
-  updateCurrentUser(user: any): Observable<any> {
-    const token = this.authService.getCookie('Authentication');
-    const headers = new HttpHeaders({
-      'Authorization': `${token}`
-    });
-    
-    return this.http.put(`${BASE_URL_API}/users/update-me`, user, { headers, withCredentials: true });
-  }
-  changePassword(model: any): Observable<any> {
-    const token = this.authService.getCookie('Authentication');
-    const headers = new HttpHeaders({
-      'Authorization': `${token}`
-    });
-    
-    return this.http.post(`${BASE_URL_API}/users/change-password`, model, { headers, withCredentials: true });
-  }
+  
 }

@@ -1,13 +1,19 @@
-﻿using ServerApp.BLL.Services.Base;
-using ServerApp.BLL.Services.InterfaceServices;
+﻿using Microsoft.EntityFrameworkCore;
+using ServerApp.BLL.Services.Base;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
-using ServerApp.DAL.Repositories;
-using ServerApp.DAL.Repositories.Generic;
 
 namespace ServerApp.BLL.Services
 {
+    public interface ICartService : IBaseService<Cart>
+    {
+
+        Task<List<CartViewModel>> GetCartItemsAsync(int userId);
+        Task<ServiceResult> UpdateCartAsync(int userId, int productId, int quantity);
+        Task<ServiceResult> RemoveFromCartAsync(int userId, int productId);
+        Task<decimal> GetCartTotalAsync(int userId);
+    }
     public class CartService : BaseService<Cart>, ICartService
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -17,42 +23,112 @@ namespace ServerApp.BLL.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<int> AddCartAsync(CartVm cartVm)
+        public async Task<List<CartViewModel>> GetCartItemsAsync(int userId)
         {
+            var cartItems = await _unitOfWork.CartRepository.GetAllAsync(
+                filter: c => c.UserId == userId && c.Status == "Added",
+                include: c => c.Include(c => c.Product)
+                );
 
-            var cart = new Cart()
+            return cartItems.Select(c => new CartViewModel
             {
-                UserId = cartVm.UserId,
-                ProductId = cartVm.ProductId,
-                Quantity = cartVm.Quantity,
-                AddedAt = cartVm.AddedAt
+                ProductId = c.ProductId,
+                ProductName = c.Product?.Name ?? "Unknown",
+                ImageUrl = c.Product?.ImageUrl ?? "default.jpg",
+                Color = c.Product?.Color ?? "N/A",
+                Price = c.Product?.Price ?? 0,
+                Quantity = c.Quantity
+            }).ToList();
+        }
+
+
+        public async Task<ServiceResult> UpdateCartAsync(int userId, int productId, int quantity)
+        {
+            var existingCartItem = await _unitOfWork.CartRepository
+                .GetAsync(
+                    filter: c => c.UserId == userId && c.ProductId == productId && c.Status == "Added",
+                    include: c => c.Include(x => x.Product).Include(x => x.User)
+                );
+
+            if (existingCartItem != null)
+            {
+                existingCartItem.Quantity += quantity;
+                existingCartItem.TotalPrice = existingCartItem.Quantity * existingCartItem.Product.Price;
+
+                if (existingCartItem.Quantity == 0)
+                {
+                    _unitOfWork.CartRepository.Delete(existingCartItem);
+                    _unitOfWork.SaveChanges();
+                    return new ServiceResult
+                    {
+                        Success = true,
+                        Message = "Cập nhật giỏ hàng thành công"
+                    };
+                }
+                else
+                {
+                    await _unitOfWork.CartRepository.UpdateAsync(existingCartItem);
+                }
+            }
+            else
+            {
+                var product = _unitOfWork.ProductRepository.GetById(productId);
+                if (product == null)
+                {
+                    return new ServiceResult
+                    {
+                        Success = false,
+                        Message = "Không tồn tại sản phẩm"
+                    };
+                }
+
+                var cartItem = new Cart
+                {
+                    UserId = userId,
+                    ProductId = productId,
+                    Quantity = quantity,
+                    TotalPrice = product.Price * quantity
+                };
+
+                await _unitOfWork.CartRepository.AddAsync(cartItem);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Success = true,
+                Message = "Cập nhật giỏ hàng thành công"
             };
-            return await AddAsync(cart);
         }
 
-        public async Task<bool> UpdateCartAsync(int id, CartVm cartVm)
+        public async Task<ServiceResult> RemoveFromCartAsync(int userId, int productId)
         {
-            var cart = await GetByIdAsync(id);
-            cart.ProductId = cartVm.ProductId;
-            cart.Quantity = cartVm.Quantity;
-            cart.UserId = cartVm.UserId;
-            cart.AddedAt = cartVm.AddedAt;
-            return await UpdateAsync(cart) > 0;
+            var cartItem = await _unitOfWork.CartRepository
+                .FirstOrDefaultAsync(c => c.UserId == userId && c.ProductId == productId && c.Status == "Added");
+
+            if (cartItem == null)
+            {
+                return new ServiceResult
+                {
+                    Success = false,
+                    Message = "Không tìm thấy giỏ hàng"
+                };
+            }
+
+            _unitOfWork.CartRepository.Delete(cartItem);
+            await _unitOfWork.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Success = true,
+                Message = "Cập nhật giỏ hàng thành công"
+            };
         }
 
-        public async Task<bool> DeleteByIdAsync(int id)
+        public async Task<decimal> GetCartTotalAsync(int userId)
         {
-            return await DeleteAsync(id) > 0;
-        }
-
-        public async Task<Cart?> GetByCartIdAsync(int id)
-        {
-            return await GetByIdAsync(id);
-        }
-
-        public async Task<IEnumerable<Cart>> GetAllCartAsync()
-        {
-            return await GetAllAsync();
+            var list = await _unitOfWork.CartRepository
+                .GetAllAsync(c => c.UserId == userId && c.Status == "Added");
+            return list.Sum(c => c.TotalPrice);
         }
     }
 

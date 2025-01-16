@@ -71,3 +71,12 @@ npm install @angular/animations --save
 
 ## day format
 npm install dayjs --save
+
+## full lệnh
+npm install xlsx file-saver
+npm install file-saver --save
+npm install ngx-cookie-service --save
+npm install jwt-decode --save
+npm install dayjs --save
+npm i ngx-toastr
+npm install @angular/animations --save

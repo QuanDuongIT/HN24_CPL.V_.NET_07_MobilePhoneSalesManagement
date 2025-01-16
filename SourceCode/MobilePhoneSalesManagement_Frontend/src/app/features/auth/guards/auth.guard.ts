@@ -22,19 +22,16 @@ export const authGuard: CanActivateFn = (route, state) => {
 
     if (expirationDate < currentTime) {
       authService.logout();
-      return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } })
+      window.location.replace('/login');
+      return false;
     }
     
     // Kiểm tra role của người dùng (nếu route yêu cầu role admin)
     const requiredRole = route.data?.['role']; // Lấy role yêu cầu từ route data
     const userRole = decodeToken['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
 
-    console.log(requiredRole);
-    console.log(userRole);
-    
-    
-    if (requiredRole && userRole !== requiredRole) {
-      window.location.href = `/login`;
+    if (requiredRole && userRole.toLowerCase() !== requiredRole.toLowerCase()) {
+      window.location.href = `/home`;
       return false;
     }
 
@@ -42,5 +39,6 @@ export const authGuard: CanActivateFn = (route, state) => {
   }
 
   authService.logout();
-  return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } })
+  window.location.replace('/login');
+  return false;
 };

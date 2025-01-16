@@ -26,6 +26,9 @@ namespace ServerApp.BLL.Services
         Task<UserVm> GetCurrentUserAsync(string userId);
         Task<bool> UpdateCurrentUserAsync(string userId, UserClientVm userVm);
 
+        // wish list
+        Task<List<WishListVm>> GetWishListByUserIdAsync(int userId);
+        Task<ServiceResult> ToggleWishListAsync(int userId, int productId);
     }
     public class UserService : BaseService<User>, IUserService
     {
@@ -436,6 +439,57 @@ namespace ServerApp.BLL.Services
 
             _unitOfWork.Context.Entry(user).State = EntityState.Modified;
             return await _unitOfWork.SaveChangesAsync() > 0;
+        }
+
+
+        public async Task<List<WishListVm>> GetWishListByUserIdAsync(int userId)
+        {
+            var wishLists = await _unitOfWork.WishListRepository.GetAllAsync(w => w.UserId == userId, include: w => w.Include(wl => wl.Product));
+
+            return wishLists.Select(w => new WishListVm
+            {
+                ProductId = w.ProductId,
+                ProductName = w.Product.Name,
+                ImageUrl = !string.IsNullOrEmpty(w.Product.ImageUrl)
+                            ? w.Product.ImageUrl.Split(';').FirstOrDefault()
+                            : null,
+                OriginalPrice = w.Product?.OldPrice ?? 0,
+                DiscountedPrice = w.Product?.Price ?? 0,
+                DiscountPercentage = w.Product?.Discount ?? 0,
+                AddedAt = w.AddedAt
+            }).ToList();
+        }
+
+        public async Task<ServiceResult> ToggleWishListAsync(int userId, int productId)
+        {
+            // Kiểm tra xem sản phẩm đã tồn tại trong Wishlist chưa
+            var existingWishList = await _unitOfWork.WishListRepository.FirstOrDefaultAsync(w => w.UserId == userId && w.ProductId == productId);
+            if (existingWishList != null)
+            {
+                _unitOfWork.WishListRepository.Delete(existingWishList);
+                await _unitOfWork.SaveChangesAsync();
+                return new ServiceResult
+                {
+                    Success = true,
+                    Message = "Đã xóa khỏi wishlist"
+                };
+            }
+
+            // Thêm sản phẩm mới vào Wishlist
+            var wishList = new WishList
+            {
+                UserId = userId,
+                ProductId = productId,
+                AddedAt = DateTime.Now
+            };
+
+            await _unitOfWork.WishListRepository.AddAsync(wishList);
+            await _unitOfWork.SaveChangesAsync();
+            return new ServiceResult
+            {
+                Success = true,
+                Message = "Đã thêm vào wishlist"
+            };
         }
     }
 

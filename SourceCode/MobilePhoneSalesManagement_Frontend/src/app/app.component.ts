@@ -1,7 +1,9 @@
 import { Component, Renderer2 } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { ToastrModule } from 'ngx-toastr';
 import { ToastService } from './core/services/toast-service/toast.service';
+import { Title } from '@angular/platform-browser';
+import { filter, map } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +13,10 @@ import { ToastService } from './core/services/toast-service/toast.service';
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  title = 'MobilePhoneSalesManagement_Frontend'; // Thuộc tính mẫu cho component
   isClientLayout: boolean = false;
   isAdminLayout: boolean = false;
 
-  constructor(private renderer: Renderer2) {}
+  constructor(private renderer: Renderer2, private router: Router, private titleService: Title) {}
 
   ngOnInit() {
     // Kiểm tra route hiện tại để xác định layout
@@ -28,6 +29,27 @@ export class AppComponent {
       this.isAdminLayout = false;
       this.loadClientScripts();
     }
+
+    // set title
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        map(() => {
+          const route = this.router.routerState.root;
+          let title = '';
+          let currentRoute = route;
+          while (currentRoute.firstChild) {
+            currentRoute = currentRoute.firstChild;
+          }
+          if (currentRoute.snapshot.data['title']) {
+            title = currentRoute.snapshot.data['title'];
+          }
+          return title || 'Nhom 21 LT WEB';
+        })
+      )
+      .subscribe((title: string) => {
+        this.titleService.setTitle(title);
+      });
   }
   loadClientScripts() {
     this.addStylesheet('/assets/css/bootstrap.min.css');
@@ -35,6 +57,14 @@ export class AppComponent {
     this.addStylesheet('/assets/css/owl.carousel.css');
     this.addStylesheet('/assets/css/owl.theme.default.css');
     this.addStylesheet('/assets/css/font-awesome.min.css');
+    this.setFavicon('logo_icon.png');
+    this.addStylesheet(
+      'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
+      'sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==',
+      'anonymous',
+      'no-referrer'
+    );
+    
 
     this.addScript('/assets/js/jquery.min.js', () => {
       // Sau khi jQuery đã sẵn sàng, load Bootstrap và các tệp khác
@@ -69,13 +99,25 @@ export class AppComponent {
     this.addScript('/assets/js/multiple-carousel.js');
   }
 
-  addStylesheet(href: string): void {
+  addStylesheet(href: string, integrity?: string, crossorigin?: string, referrerPolicy?: string): void {
     const link = this.renderer.createElement('link');
+    
     this.renderer.setAttribute(link, 'rel', 'stylesheet');
     this.renderer.setAttribute(link, 'href', href);
+    
+    if (integrity) {
+      this.renderer.setAttribute(link, 'integrity', integrity);
+    }
+    if (crossorigin) {
+      this.renderer.setAttribute(link, 'crossorigin', crossorigin);
+    }
+    if (referrerPolicy) {
+      this.renderer.setAttribute(link, 'referrerpolicy', referrerPolicy);
+    }
+    
     this.renderer.appendChild(document.head, link);
   }
-
+  
   addScript(src: string, callback?: () => void) {
     const script = document.createElement('script');
     script.src = src;
@@ -87,5 +129,15 @@ export class AppComponent {
     }
 
     document.body.appendChild(script);
+  }
+  setFavicon(image: string): void {
+    // Tạo thẻ <link>
+    const link: HTMLLinkElement = this.renderer.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/png';
+    link.href = `assets/images/${image}`; // Đường dẫn tới file favicon
+
+    // Thêm thẻ <link> vào <head>
+    this.renderer.appendChild(document.head, link);
   }
 }

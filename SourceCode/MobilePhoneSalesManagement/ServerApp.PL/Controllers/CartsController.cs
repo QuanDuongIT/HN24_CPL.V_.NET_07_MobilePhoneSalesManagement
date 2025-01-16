@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ServerApp.BLL.Services.ViewModels;
 using ServerApp.BLL.Services;
-using ServerApp.DAL.Models;
-using ServerApp.BLL.Services.InterfaceServices;
+using System.Security.Claims;
 
 namespace ServerApp.PL.Controllers
 {
@@ -12,81 +10,98 @@ namespace ServerApp.PL.Controllers
     public class CartsController : ControllerBase
     {
         private readonly ICartService _cartService;
+        private readonly IUserService _userService;
 
-        public CartsController(ICartService cartService)
+        public CartsController(ICartService cartService, IUserService userService)
         {
             _cartService = cartService;
+            _userService = userService;
         }
 
-        // Lấy tất cả cart
+        [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cart>>> GetAllCarts()
+        public async Task<IActionResult> GetCartItems()
         {
-            var carts = await _cartService.GetAllCartAsync();
-            if (carts == null || !carts.Any())
+            try
             {
-                return NotFound("No carts found.");
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null)
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "Vui lòng đăng nhập"
+                    });
+                }
+
+                var user = await _userService.GetByUserIdAsync(int.Parse(userId));
+                var cartItems = await _cartService.GetCartItemsAsync(int.Parse(userId));
+                return Ok(cartItems);
             }
-            return Ok(carts);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi lấy giỏ hàng.", error = ex.Message });
+            }
         }
 
-        // Lấy người dùng theo ID
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Cart>> GetCartById(int id)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateCart([FromQuery] int productId, [FromQuery] int quantity)
         {
-            var cart = await _cartService.GetByCartIdAsync(id);
-            if (cart == null)
+
+            try
             {
-                return NotFound($"Cart with ID {id} not found.");
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null)
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "Vui lòng đăng nhập"
+                    });
+                }
+
+                var user = await _userService.GetByUserIdAsync(int.Parse(userId));
+                var result = await _cartService.UpdateCartAsync(int.Parse(userId), productId, quantity);
+
+                return Ok(new
+                {
+                    success = result.Success,
+                    message = result.Message,
+                });
             }
-            return Ok(cart);
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi cập nhật giỏ hàng.", error = ex.Message });
+            }
         }
-
-        // Thêm người dùng mới
-        [HttpPost]
-        public async Task<ActionResult<Cart>> AddCart([FromBody] CartVm cart)
+        [HttpDelete("remove/{productId}")]
+        public async Task<IActionResult> RemoveFromCart(int productId)
         {
-            if (cart == null)
+            try
             {
-                return BadRequest("Cart data is null.");
-            }
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null)
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "Vui lòng đăng nhập"
+                    });
+                }
 
-            var result = await _cartService.AddCartAsync(cart);
-            if (result > 0)
+                var user = await _userService.GetByUserIdAsync(int.Parse(userId));
+                var result = await _cartService.RemoveFromCartAsync(int.Parse(userId), productId);
+
+                return Ok(new
+                {
+                    success = result.Success,
+                    message = result.Message,
+                });
+            }
+            catch (Exception ex)
             {
-                return Ok();
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi xóa sản phẩm.", error = ex.Message });
             }
-            return BadRequest("Error while adding cart.");
-        }
-
-        // Cập nhật thông tin người dùng
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCart(int id, CartVm cartVm)
-        {
-            if (cartVm == null)
-            {
-                return BadRequest("Car data is invalid.");
-            }
-
-            var updated = await _cartService.UpdateCartAsync(id, cartVm);
-            if (updated)
-            {
-                return NotFound($"Car with ID {id} not found.");
-            }
-
-            return NoContent();
-        }
-        // Xóa người dùng theo ID
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteCart(int id)
-        {
-            var deleted = await _cartService.DeleteByIdAsync(id);
-            if (deleted)
-            {
-                return NotFound($"Car with ID {id} not found.");
-            }
-
-            return NoContent();  // Trả về 204 khi xóa thành công
         }
     }
 }

@@ -29,11 +29,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error) => {
       // Nếu gặp lỗi 401 (Unauthorized) và có refreshToken, thực hiện làm mới token
       if (error.status === 401 && refreshToken) {
-        
-        console.log(error);
-        
-        console.log(refreshToken);
-
         return authService.refreshToken(refreshToken).pipe(
           switchMap((res) => {
             // Lưu token mới vào cookie
@@ -52,11 +47,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           }),
           catchError((refreshError) => {
             // Nếu refresh token không thành công, logout và chuyển hướng đến trang login
-            console.error('Refresh token failed', refreshError);
             router.navigate(['/login']);
             return of(refreshError);  // Trả về error nếu không thể làm mới token
           })
         );
+      }
+
+      if (error.status == 440) {
+        router.navigate(['/login']);
       }
 
       // Nếu không phải lỗi 401, ném lỗi gốc

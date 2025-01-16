@@ -25,6 +25,7 @@ export class UserEditComponent {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['user'] && this.user.email != null) {
       this.user.dateOfBirth = dayjs(this.user.dateOfBirth).format('YYYY-MM-DD');
+      this.user.role = this.user.role.toLowerCase();
     }
   }
 

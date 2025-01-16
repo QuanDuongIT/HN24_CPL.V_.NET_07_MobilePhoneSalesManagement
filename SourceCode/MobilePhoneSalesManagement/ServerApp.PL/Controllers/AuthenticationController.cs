@@ -43,7 +43,7 @@ namespace ServerApp.PL.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Unauthorized(new { message = ex.Message });
+                return StatusCode(440, ex.Message);
             }
         }
 
