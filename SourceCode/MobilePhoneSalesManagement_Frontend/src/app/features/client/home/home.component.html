@@ -8,16 +8,17 @@
 
     <!-- Brand Logos -->
     <div class="row text-center mt-5">
-        <div 
-            *ngFor="let brand of ['nexus_brand', 'iphone_brand', 'samsung_brand', 'htc_brand', 'alc_brand', 'pixel_brand', 'vivo_brand']"
-            [ngClass]="brand === 'iphone_brand' ? 'col-md-6' : 'col-md-3'">
-            <img [src]="'../../../../assets/images/Product/' + brand + '.png'" alt="{{ brand }}"
-                class="img-fluid mb-2" />
+        <div class="row">
+            <div *ngFor="let brand of ['nexus_brand', 'iphone_brand', 'samsung_brand', 'htc_brand', 'alc_brand', 'pixel_brand', 'vivo_brand']"
+                [ngClass]="brand === 'iphone_brand' ? 'col-md-6 brand-iphone' : 'col-md-3 brand-item'">
+                <img [src]="'../../../../assets/images/Product/' + brand + '.png'" alt="{{ brand }}"
+                    class="img-fluid mb-2" />
+            </div>
         </div>
     </div>
 
     <!-- New Products -->
-    <div class="row mt-5">
+    <div class="mt-5">
         <div class="col-12">
             <h2 class="text-center">Sản phẩm mới nhất</h2>
         </div>

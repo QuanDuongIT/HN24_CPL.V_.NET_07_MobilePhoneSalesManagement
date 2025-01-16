@@ -13,8 +13,8 @@ export class ProductService {
     return this.http.get<Product[]>(`${BASE_URL_API}/Products/get-all-products`);
   }
   // Lọc sản phẩm
-  filterProducts(filterRequest: any): Observable<Product[]> {
-    return this.http.post<Product[]>(`${BASE_URL_API}/Products/filter`, filterRequest);
+  filterProducts(filterRequest: any): Observable<{ products: Product[], totalPages: number }> {
+    return this.http.post<{ products: Product[], totalPages: number }>(`${BASE_URL_API}/Products/filter`, filterRequest);
   }
   newestProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(`${BASE_URL_API}/Products/get-newest-product`);

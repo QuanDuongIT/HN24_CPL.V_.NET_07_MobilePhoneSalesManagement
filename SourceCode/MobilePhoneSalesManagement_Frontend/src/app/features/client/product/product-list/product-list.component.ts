@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ProductService } from '../services/product.service';
 
 @Component({
@@ -29,21 +30,41 @@ export class ProductListComponent implements OnInit {
     { label: 'Trên 512GB', value: 'above512' }
   ];
   filterRequest: any = {
+    Search: '',
     Brands: [],
     Prices: [],
     ScreenSizes: [],
     InternalMemory: [],
-    Sort: ''
+    Sort: '',
+    PageNumber: 1,
+    PageSize: 15
   };
-  constructor(private productService: ProductService) { }
+  totalPages: number = 1; // Tổng số trang
+  constructor(private productService: ProductService, private route: ActivatedRoute) { }
   ngOnInit() {
-    this.getFilteredProducts();
+    this.route.queryParams.subscribe((params) => {
+      if (params['search']) {
+        this.filterRequest.search = params['search'];
+      }
+      this.getFilteredProducts();
+    });
+    
   }
   getFilteredProducts() {
     console.log('filterRequest:', this.filterRequest);
     this.productService.filterProducts(this.filterRequest).subscribe(
       (data) => {
-        this.products = data;
+        console.log('Data:', data);
+        console.log('Product:', data.products);
+        console.log('totalspage:', data.totalPages);
+        // Kiểm tra dữ liệu trả về
+        if (data && Array.isArray(data.products)) {
+          this.products = data.products;
+          this.totalPages = data.totalPages;  // đảm bảo totalPages có giá trị mặc định
+          this.calculatePagination(); // Tính toán danh sách phân trang
+        } else {
+          console.error('Dữ liệu trả về không có trường Products hoặc không phải mảng.');
+        }
       },
       (error) => {
         console.error('Lỗi khi lấy danh sách sản phẩm:', error);
@@ -89,5 +110,44 @@ export class ProductListComponent implements OnInit {
   onSortChange(event: any) {
     this.filterRequest.Sort = event.target.value;
     this.getFilteredProducts();
+  }
+  changePage(pageNumber: number) {
+    if (pageNumber < 1 || pageNumber > this.totalPages) return; // Kiểm tra số trang hợp lệ
+    this.filterRequest.PageNumber = pageNumber;
+    this.getFilteredProducts();
+  }
+  pagination: any[] = [];
+
+  calculatePagination() {
+    const current = this.filterRequest.PageNumber;
+    const total = this.totalPages;
+    const delta = 2; // Số trang hiển thị xung quanh trang hiện tại
+    const range = [];
+    const rangeWithDots: any[] = [];
+    let l: number;
+
+    // Xác định khoảng hiển thị
+    for (let i = Math.max(2, current - delta); i <= Math.min(total - 1, current + delta); i++) {
+      range.push(i);
+    }
+
+    // Thêm các trang đầu, cuối và dấu "..."
+    if (current - delta > 2) {
+      rangeWithDots.push(1, '...');
+    } else {
+      rangeWithDots.push(1);
+    }
+
+    range.forEach((i) => {
+      rangeWithDots.push(i);
+    });
+
+    if (current + delta < total - 1) {
+      rangeWithDots.push('...', total);
+    } else if (total > 1) {
+      rangeWithDots.push(total);
+    }
+
+    this.pagination = rangeWithDots;
   }
 }

@@ -1,4 +1,3 @@
-
 <div class="header-wrapper">
     <div class="container">
         <div class="row">
@@ -12,8 +11,9 @@
             <!-- search -->
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                 <div class="search-bg">
-                    <input type="text" class="form-control" placeholder="Search Here">
-                    <button type="Submit"><i class="fa fa-search"></i></button>
+                    <input type="text" class="form-control" placeholder="Search Here" [(ngModel)]="searchKeyword"
+                        (keydown.enter)="onSearch()" />
+                    <button type="Submit" (click)="onSearch()"><i class="fa fa-search"></i></button>
                 </div>
             </div>
             <!-- /.search -->
@@ -25,12 +25,13 @@
                         <li class="hidden-xs">|</li>
                         <li *ngIf="isAuthenticated; else loginLink">
                             <a (click)="logout()" class="title hidden-xs" style="cursor: pointer;">Đăng xuất</a>
-                          </li>
-                          <ng-template #loginLink>
+                        </li>
+                        <ng-template #loginLink>
                             <li><a href="/login" class="title hidden-xs">Đăng nhập</a></li>
-                          </ng-template>
+                        </ng-template>
                         <li><a href="favorite-list.html"><i class="fa fa-heart"></i></a></li>
-                        <li><a href="cart.html" class="title"><i class="fa fa-shopping-cart"></i>   <sup class="cart-quantity">1</sup></a>
+                        <li><a href="cart.html" class="title"><i class="fa fa-shopping-cart"></i> <sup
+                                    class="cart-quantity">1</sup></a>
                         </li>
                     </ul>
                 </div>

@@ -27,3 +27,107 @@ h5 {
 hr {
     border-color: #ddd;
 }
+
+.change-pages {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    /* Căn giữa theo chiều ngang */
+    align-items: center;
+    /* Căn giữa theo chiều dọc */
+}
+
+.btn-pages {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.btn-add1 {
+    display: flex;
+    flex-direction: column;
+    /* Xếp các nút theo chiều dọc */
+    justify-content: center;
+    /* Căn giữa theo chiều dọc */
+    align-items: center;
+    /* Căn giữa theo chiều ngang */
+    gap: 10px;
+    /* Khoảng cách giữa các nút */
+}
+
+.btn-them {
+    width: 100%;
+    /* Đảm bảo các nút chiếm toàn bộ chiều rộng của container */
+}
+
+.ds-sp-sort {}
+
+/* Nhóm bộ lọc */
+.filter-group {
+    margin-bottom: 1.5rem;
+}
+
+.filter-header {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+/* Danh sách bộ lọc */
+.filter-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 14px;
+}
+
+/* Input checkbox và nhãn */
+.form-check-input {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+}
+
+.form-check-label {
+    cursor: pointer;
+    color: #333;
+    font-size: 14px;
+}
+
+/* Thay đổi trạng thái hover */
+.filter-item:hover .form-check-label {
+    color: #007bff;
+    text-decoration: underline;
+}
+
+/* Khoảng cách giữa các nhóm */
+.filter-group+.filter-group {
+    margin-top: 1rem;
+}
+
+/* Toggle icon */
+.toggle-icon {
+    font-size: 18px;
+    transition: all 0.2s ease;
+}
+
+.sort-text {
+    font-size: 20px;
+}
+
+.sort-box {
+    margin-bottom: 20px;
+}
+
+.filter-box {
+    margin-top: 80px;
+}
