@@ -35,6 +35,7 @@ export class AppComponent {
     this.addStylesheet('/assets/css/owl.carousel.css');
     this.addStylesheet('/assets/css/owl.theme.default.css');
     this.addStylesheet('/assets/css/font-awesome.min.css');
+    this.setFavicon('logo_icon.png');
 
     this.addScript('/assets/js/jquery.min.js', () => {
       // Sau khi jQuery đã sẵn sàng, load Bootstrap và các tệp khác
@@ -87,5 +88,15 @@ export class AppComponent {
     }
 
     document.body.appendChild(script);
+  }
+  setFavicon(image: string): void {
+    // Tạo thẻ <link>
+    const link: HTMLLinkElement = this.renderer.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/png';
+    link.href = `assets/images/${image}`; // Đường dẫn tới file favicon
+
+    // Thêm thẻ <link> vào <head>
+    this.renderer.appendChild(document.head, link);
   }
 }
