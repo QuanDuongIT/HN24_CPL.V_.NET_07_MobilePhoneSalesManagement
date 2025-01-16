@@ -56,25 +56,9 @@ public interface IProductService : IBaseService<Product>
                 // Kiểm tra SpecificationType có tồn tại không
                 var specificationType = await _specificationTypeService.GetBySpecificationTypeIdAsync(spec.SpecificationTypeId);
 
-                var specificationTypeVm = new InputSpecificationTypeVm
-                {
-                    Name = spec.SpecificationType.Name
-                };
-
-                if (specificationType != null)
-                {
-                    // Cập nhật SpecificationType
-                    specificationType = await _specificationTypeService.UpdateSpecificationTypeAsync(spec.SpecificationTypeId, specificationTypeVm);
-                }
-                else
-                {
-                    // Thêm mới SpecificationType
-                    specificationType = await _specificationTypeService.AddSpecificationTypeAsync(specificationTypeVm);
-                }
-
                 if (specificationType == null)
                 {
-                    throw new ArgumentException($"Failed to process SpecificationType: {spec.SpecificationType.Name}");
+                    throw new ArgumentException($"Failed to process SpecificationTypeId: {spec.SpecificationTypeId}");
                 }
 
                 // Thêm ProductSpecification vào danh sách
@@ -100,25 +84,9 @@ public interface IProductService : IBaseService<Product>
             {
                 var specificationType = await _specificationTypeService.GetBySpecificationTypeIdAsync(spec.SpecificationTypeId);
 
-                var specificationTypeVm = new InputSpecificationTypeVm
-                {
-                    Name = spec.SpecificationType.Name
-                };
-
-                if (specificationType != null)
-                {
-                    // Cập nhật SpecificationType nếu đã tồn tại
-                    specificationType = await _specificationTypeService.UpdateSpecificationTypeAsync(spec.SpecificationTypeId, specificationTypeVm);
-                }
-                else
-                {
-                    // Thêm mới SpecificationType nếu không tồn tại
-                    specificationType = await _specificationTypeService.AddSpecificationTypeAsync(specificationTypeVm);
-                }
-
                 if (specificationType == null)
                 {
-                    throw new ArgumentException($"Failed to process SpecificationType: {spec.SpecificationType.Name}");
+                    throw new ArgumentException($"Failed to process SpecificationTypeId : {spec.SpecificationTypeId}");
                 }
 
                 // Kiểm tra xem ProductSpecification này đã tồn tại chưa trong danh sách hiện tại

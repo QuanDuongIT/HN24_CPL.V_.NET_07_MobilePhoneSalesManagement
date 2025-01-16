@@ -20,7 +20,7 @@ export class ProductManagementComponent {
 
   page$?: Observable<PagedResult<Product>>;
   orderBy = false;
-  isAddProductVisible = false;
+  isAddProductVisible = true;
   productToUpdate?: Product;
   page: number = 1;
   pageSize: number = 10;
@@ -47,8 +47,7 @@ export class ProductManagementComponent {
       this.totalPages = res.totalPages;
       this.productCheckboxes = Array(res.items.length).fill(false);
       this.selectedProductIds = [];
-    }
-    );
+    });
     this.isLoading = false;
   }
   loadProductsFilter(filter: boolean): void {

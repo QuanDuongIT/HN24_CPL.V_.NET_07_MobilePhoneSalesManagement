@@ -51,7 +51,6 @@ export class AddOrUpdateProductComponent {
   }
 
   ngOnInit(): void {
-
     this.specificationTypes$ = this.productService.getSpecificationTypes();
     this.specificationTypes$ = this.productService.getSpecificationTypes().pipe(
       map((types: specificationType[]) => [this.defaultSpecificationType, ...types])

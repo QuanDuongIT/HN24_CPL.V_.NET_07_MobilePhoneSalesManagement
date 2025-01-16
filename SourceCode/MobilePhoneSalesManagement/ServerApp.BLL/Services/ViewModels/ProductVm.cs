@@ -26,12 +26,6 @@ namespace ServerApp.BLL.Services.ViewModels
         [SkipValidation]
         public int Discount { get; set; } = 0;
 
-        // Navigation properties
-        //public virtual InputBrandVm Brand { get; set; }
-        //public virtual ICollection<Cart> Carts { get; set; }
-        //public virtual ICollection<OrderItem> OrderItems { get; set; }
-        //public virtual ICollection<WishList> WishLists { get; set; }
-        //public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<InputProductSpecificationVm> ProductSpecifications { get; set; }
     }
     public class ProductVm
