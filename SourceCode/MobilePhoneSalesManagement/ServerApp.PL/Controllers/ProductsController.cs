@@ -33,12 +33,15 @@ namespace ServerApp.PL.Controllers
         }
 
         [HttpPost("filter")]
-        public async Task<ActionResult<IEnumerable<ProductVm>>> FilterProducts([FromBody] FilterRequest filterRequest)
+        public async Task<ActionResult<(IEnumerable<ProductVm> Products, int TotalPages)>> FilterProducts([FromBody] FilterRequest filterRequest)
         {
             try
             {
-                var filteredProducts = await _productService.FilterProductsAsync(filterRequest);
-                return Ok(filteredProducts);
+                // Kiểm tra và thiết lập giá trị mặc định cho PageNumber và PageSize nếu không có
+                filterRequest.PageNumber ??= 1;   // Mặc định PageNumber là 1 nếu không có
+                filterRequest.PageSize ??= 15;     // Mặc định PageSize là 15 nếu không có
+                var (products, totalPages) = await _productService.FilterProductsAsync(filterRequest);
+                return Ok(new { Products = products, TotalPages = totalPages });
             }
             catch (Exception e)
             {
@@ -197,6 +200,24 @@ namespace ServerApp.PL.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { Message = ex.Message });
+            }
+        }
+        [HttpGet("search-by-name")]
+        public async Task<IActionResult> SearchProductsByName([FromQuery] string name)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(name))
+                {
+                    return BadRequest(new { message = "Product name cannot be empty." });
+                }
+
+                var products = await _productService.SearchProductsByNameAsync(name);
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
     }

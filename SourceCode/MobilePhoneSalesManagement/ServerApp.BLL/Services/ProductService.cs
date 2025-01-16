@@ -13,7 +13,7 @@ public interface IProductService : IBaseService<Product>
     Task<IEnumerable<ProductVm>> GetAllProductAsync(
         Expression<Func<Product, bool>>? filter = null,
         Func<IQueryable<Product>, IOrderedQueryable<Product>>? orderBy = null);
-        Task<IEnumerable<ProductVm>> FilterProductsAsync(FilterRequest filterRequest);
+        Task<(IEnumerable<ProductVm>, int totalPages)> FilterProductsAsync(FilterRequest filterRequest);
         Task<ProductVm> AddProductAsync(InputProductVm brandVm);
         Task<ProductVm> UpdateProductAsync(int id, InputProductVm brandVm);
         Task<int> UpdateProductAsync(Product product);
@@ -28,6 +28,7 @@ public interface IProductService : IBaseService<Product>
         Task<PagedResult<ProductVm>> GetAllProductAsync(
             int? pageNumber, int? pageSize,
             Expression<Func<Product, bool>>? filter = null, bool? orderBy = true);
+        Task<IEnumerable<ProductVm>> SearchProductsByNameAsync(string name);
 }
     public class ProductService : BaseService<Product>, IProductService
     {
@@ -612,7 +613,7 @@ public interface IProductService : IBaseService<Product>
     }
 
 
-    public async Task<IEnumerable<ProductVm>> FilterProductsAsync(FilterRequest filterRequest)
+    public async Task<(IEnumerable<ProductVm>, int totalPages)> FilterProductsAsync(FilterRequest filterRequest)
         {
             try
             {
@@ -737,9 +738,22 @@ public interface IProductService : IBaseService<Product>
                         query = query.OrderByDescending(p => p.Price);
                         break;
                 }
+            query = query.Where(p => p.Name.Contains(filterRequest.Search, StringComparison.OrdinalIgnoreCase));
+            // Chuyển query về IQueryable để có thể sử dụng CountAsync
+            var queryableQuery = query.AsQueryable();
+            // Tính tổng số sản phẩm (dùng cho totalPages)
+            int totalProducts = queryableQuery.Count();
 
-                // Chuyển sang ViewModel và trả về
-                return query.Select(p => new ProductVm
+            // Phân trang - Giới hạn tối đa 15 sản phẩm mỗi trang
+            int pageNumber = filterRequest.PageNumber ?? 1;
+            int pageSize = filterRequest.PageSize ?? 15;
+
+            // Tính tổng số trang
+            int totalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
+
+            var pagedQuery = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+            // Chuyển sang ViewModel và trả về
+            var products = pagedQuery.Select(p => new ProductVm
                 {
                     ProductId = p.ProductId,
                     Name = p.Name,
@@ -756,12 +770,13 @@ public interface IProductService : IBaseService<Product>
                     CreatedAt = p.CreatedAt,
                     UpdatedAt = p.UpdatedAt,
                 }).ToList();
-            }
+            return (products, totalPages);
+        }
             catch (Exception ex)
             {
                 // Ghi log lỗi hoặc xử lý tùy vào yêu cầu dự án
                 Console.WriteLine($"An error occurred: {ex.Message}");
-                return Enumerable.Empty<ProductVm>();
+                return (Enumerable.Empty<ProductVm>(), 0);
             }
         }
     public async Task<IEnumerable<ProductVm>> GetNewestProductsAsync()
@@ -806,6 +821,37 @@ public interface IProductService : IBaseService<Product>
     public Task<bool> AddProductToCartAsync(int productId, CartVm cartVm)
     {
         throw new NotImplementedException();
+    }
+    public async Task<IEnumerable<ProductVm>> SearchProductsByNameAsync(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            throw new ArgumentException("Search term cannot be null or empty.");
+        }
+
+        // Lấy danh sách sản phẩm chứa tên được tìm kiếm (không phân biệt chữ hoa/thường)
+        var products = await GetAllAsync(p => p.Name.Contains(name));
+
+        // Chuyển đổi sang ProductVm
+        var result = products.Select(p => new ProductVm
+        {
+            ProductId = p.ProductId,
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price,
+            OldPrice = p.OldPrice,
+            StockQuantity = p.StockQuantity,
+            BrandId = p.BrandId,
+            ImageUrl = p.ImageUrl,
+            Manufacturer = p.Manufacturer,
+            IsActive = p.IsActive,
+            Color = p.Color,
+            Discount = p.Discount,
+            CreatedAt = p.CreatedAt,
+            UpdatedAt = p.UpdatedAt
+        });
+
+        return result;
     }
 }
 
