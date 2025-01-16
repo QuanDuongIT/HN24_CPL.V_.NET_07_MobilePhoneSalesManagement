@@ -1,0 +1,13 @@
+.box_img {
+  width: 60px;
+  margin-right: 10px;
+}
+p {
+  margin: 0;
+}
+.promotion-code {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: space-between;
+}

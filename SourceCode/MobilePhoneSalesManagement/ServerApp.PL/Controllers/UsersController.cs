@@ -12,12 +12,10 @@ namespace ServerApp.PL.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IUserDetailsService _userDetailsService;
 
-        public UsersController(IUserService userService, IUserDetailsService userDetailsService)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
-            _userDetailsService = userDetailsService;
         }
 
         // Lấy tất cả người dùng
@@ -33,18 +31,6 @@ namespace ServerApp.PL.Controllers
             // Trả về danh sách PagedResult UserVm
             return Ok(users);
         }
-
-        //public async Task<ActionResult<PagedResult<UserVm>>> GetAllUsers(int? pageNumber, int? pageSize)
-        //{
-        //    // Lấy danh sách người dùng từ dịch vụ User
-        //    var users = await _userService.GetAllUserAsync(pageNumber, pageSize);
-        //    if (users == null || !users.Items.Any())
-        //    {
-        //        return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
-        //    }
-        //    // Trả về danh sách PagedResult UserVm
-        //    return Ok(users);
-        //}
 
         // Lấy người dùng theo ID
         [HttpGet("{id}")]
@@ -365,6 +351,45 @@ namespace ServerApp.PL.Controllers
                 });
             }
 
+        }
+
+        [Authorize]
+        [HttpGet("get-wish-list")]
+        public async Task<IActionResult> GetWishList()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    message = "Vui lòng đăng nhập."
+                });
+            }
+            var wishLists = await _userService.GetWishListByUserIdAsync(int.Parse(userId));
+            return Ok(wishLists);
+        }
+
+        [Authorize]
+        [HttpPut("toggle-wish-list")]
+        public async Task<IActionResult> ToggleWishList([FromBody] int productId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Ok(new
+                {
+                    success = false,
+                    message = "Vui lòng đăng nhập."
+                });
+            }
+
+            var rs = await _userService.ToggleWishListAsync(int.Parse(userId), productId);
+            return Ok(new
+            {
+                success = rs.Success,
+                message = rs.Message,
+            });
         }
     }
 

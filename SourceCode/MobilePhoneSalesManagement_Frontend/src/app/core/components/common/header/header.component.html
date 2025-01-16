@@ -29,8 +29,8 @@
                           <ng-template #loginLink>
                             <li><a href="/login" class="title hidden-xs">Đăng nhập</a></li>
                           </ng-template>
-                        <li><a href="favorite-list.html"><i class="fa fa-heart"></i></a></li>
-                        <li><a href="cart.html" class="title"><i class="fa fa-shopping-cart"></i>   <sup class="cart-quantity">1</sup></a>
+                        <li><a href="/wishlist"><i class="fa fa-heart"></i></a></li>
+                        <li><a href="/cart" class="title"><i class="fa fa-shopping-cart"></i>   <sup class="cart-quantity">{{ this.count }}</sup></a>
                         </li>
                     </ul>
                 </div>
@@ -50,10 +50,10 @@
                             <li class="active"><a href="/home">Trang chủ</a></li>
                             <li><a href="/products">Điện thoại</a>
                             </li>
-                            <li><a href="about.html">Thông tin</a>
+                            <li><a href="/about">Thông tin</a>
                             </li>
-                            <li><a href="blog-default.html">Bài viết</a> </li>
-                            <li><a href="contact-us.html">Liên hệ, hỗ trợ</a>
+                            <li><a href="/blogs">Bài viết</a> </li>
+                            <li><a href="/contact">Liên hệ, hỗ trợ</a>
                             </li>
                         </ul>
                     </div>

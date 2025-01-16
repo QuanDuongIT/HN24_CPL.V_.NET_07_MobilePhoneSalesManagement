@@ -14,14 +14,19 @@ import { VerifyEmailComponent } from './features/auth/verify-email/verify-email.
 import { ResetPasswordComponent } from './features/auth/reset-password/reset-password.component';
 import { AccountComponent } from './features/client/user/account/account.component';
 import { authGuard } from './features/auth/guards/auth.guard';
+import { AboutComponent } from './features/client/about/about.component';
+import { ContactComponent } from './features/client/contact/contact.component';
+import { BlogsComponent } from './features/client/blogs/blogs.component';
+import { WishlistComponent } from './features/client/user/wishlist/wishlist.component';
+import { CartComponent } from './features/client/cart/cart.component';
 
 export const routes: Routes = [
   // { path: 'admin', redirectTo: '/admin/user-management', pathMatch: 'full' },
   {
     path: 'admin',
     component: AdminLayoutComponent,
-    canActivate: [authGuard],
-    data: { role: 'admin' },
+    // canActivate: [authGuard],
+    data: { role: 'admin', title: 'Admin - MobliePhoneSale' },
     children: [
       { path: 'user-management', component: UserManagementComponent },
       { path: 'brand-management', component: BrandManagementComponent },
@@ -32,21 +37,25 @@ export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   {
     path: '',
-    component: ClientLayoutComponent, // Giao diện layout cho client
+    component: ClientLayoutComponent,
     children: [
-      { path: 'home', component: HomeComponent }, // Trang chủ của client
-      { path: 'products', component: ProductListComponent }, // Danh sách sản phẩm
+      { path: 'home', component: HomeComponent, data: { title: 'Trang chủ' } }, // Trang chủ của client
+      { path: 'products', component: ProductListComponent, data: { title: 'Cửa hàng' } }, // Danh sách sản phẩm
+      { path: 'about', component: AboutComponent, data: { title: 'Thông tin' } }, // Danh sách sản phẩm
+      { path: 'blogs', component: BlogsComponent, data: { title: 'Bài viết' } }, // Danh sách sản phẩm
+      { path: 'contact', component: ContactComponent, data: { title: 'Liên hệ, hỗ trợ' } }, // Danh sách sản phẩm
       // { path: 'product/:id', component: ProductDetailComponent }, // Chi tiết sản phẩm
-      // { path: 'cart', component: CartComponent }, // Giỏ hàng
+      { path: 'cart', component: CartComponent }, // Giỏ hàng
       // { path: 'checkout', component: CheckoutComponent }, // Thanh toán
 
       // auth
-      { path: 'login', component: LoginComponent },
-      { path: 'register', component: RegisterComponent },
-      { path: 'forgot-password', component: ForgotPasswordComponent },
-      { path: 'reset-password', component: ResetPasswordComponent },
+      { path: 'login', component: LoginComponent, data: { title: 'Đăng nhập' } },
+      { path: 'register', component: RegisterComponent, data: { title: 'Đăng ký' } },
+      { path: 'forgot-password', component: ForgotPasswordComponent, data: { title: 'Quên mật khẩu' } },
+      { path: 'reset-password', component: ResetPasswordComponent, data: { title: 'Khôi phục mật khẩu' } },
       // user
-      { path: 'account', component: AccountComponent },
+      { path: 'account', component: AccountComponent, data: { title: 'Tài khoản' } },
+      { path: 'wishlist', component: WishlistComponent, data: { title: 'Sản phẩm yêu thích' } },
       { path: 'verify-email', component: VerifyEmailComponent },
     ]
   }

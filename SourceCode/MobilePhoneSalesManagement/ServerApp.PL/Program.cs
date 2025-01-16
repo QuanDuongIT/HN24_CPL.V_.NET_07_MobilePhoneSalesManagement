@@ -7,14 +7,12 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PresentationLayer.Exceptions;
 using ServerApp.BLL.Services;
-using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Data;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories;
 using ServerApp.DAL.Repositories.Generic;
-using ServerApp.DAL.Seed;
 using System.Text;
 
 namespace ServerApp.PL

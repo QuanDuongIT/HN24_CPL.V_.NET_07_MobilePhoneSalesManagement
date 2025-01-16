@@ -1,6 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../services/product.service';
+import { UserClientService } from '../../user/service/user-client.service';
+import { error } from 'jquery';
+import { ToastService } from '../../../../core/services/toast-service/toast.service';
+import { CartService } from '../../cart/service/cart.service';
 
 @Component({
   selector: 'app-product-list',
@@ -9,6 +13,7 @@ import { ProductService } from '../services/product.service';
   styleUrl: './product-list.component.css'
 })
 export class ProductListComponent implements OnInit {
+
   products: any[] = [];
   brands: string[] = ['Samsung', 'Apple', 'Xiaomi', 'Vsmart', 'Oppo', 'Vivo', 'Nokia', 'Huawei'];
   priceRanges = [
@@ -35,7 +40,7 @@ export class ProductListComponent implements OnInit {
     InternalMemory: [],
     Sort: ''
   };
-  constructor(private productService: ProductService) { }
+  constructor(private productService: ProductService, private userService: UserClientService, private cartService: CartService, private toastService: ToastService) { }
   ngOnInit() {
     this.getFilteredProducts();
   }
@@ -89,5 +94,38 @@ export class ProductListComponent implements OnInit {
   onSortChange(event: any) {
     this.filterRequest.Sort = event.target.value;
     this.getFilteredProducts();
+  }
+
+  toggleWishList(productId: any) {
+    this.userService.toggleWishList(productId).subscribe(
+      (res) => {
+        if (res.success) {
+          this.toastService.showSuccess(res.message);
+        } else {
+          this.toastService.showError(res.message);
+        }
+        
+      },
+      (err) => {
+        this.toastService.showError('Lỗi khi gửi yêu cầu');
+        console.log(err);
+      }
+    )
+  }
+
+  addToCart(productId: number) {
+    this.cartService.updateCart(productId, 1).subscribe(
+      (res) => {
+        if (res.success) {
+          this.toastService.showSuccess(res.message);
+        } else {
+          this.toastService.showError(res.message);
+        }
+      },
+      (err) => {
+        console.log(err);
+        
+      }
+    )
   }
 }
