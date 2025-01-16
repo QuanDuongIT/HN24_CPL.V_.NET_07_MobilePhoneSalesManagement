@@ -4,12 +4,15 @@ using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories.Generic;
+using System.Linq.Expressions;
 using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 
 namespace ServerApp.BLL.Services;
 public interface IProductService : IBaseService<Product>
     {
-        Task<IEnumerable<ProductVm>> GetAllProductAsync();
+    Task<IEnumerable<ProductVm>> GetAllProductAsync(
+        Expression<Func<Product, bool>>? filter = null,
+        Func<IQueryable<Product>, IOrderedQueryable<Product>>? orderBy = null);
         Task<IEnumerable<ProductVm>> FilterProductsAsync(FilterRequest filterRequest);
         Task<ProductVm> AddProductAsync(InputProductVm brandVm);
         Task<ProductVm> UpdateProductAsync(int id, InputProductVm brandVm);
@@ -22,7 +25,9 @@ public interface IProductService : IBaseService<Product>
         Task<IEnumerable<ProductSpecificationVm>> GetProductSpecificationsByProductIdAsync(int productId);
         Task<bool> AddProductToCartAsync(int productId,CartVm cartVm);
         Task<IEnumerable<ProductVm>> GetNewestProductsAsync();
-        Task<PagedResult<ProductVm>> GetAllProductAsync(int? pageNumber, int? pageSize);
+        Task<PagedResult<ProductVm>> GetAllProductAsync(
+            int? pageNumber, int? pageSize,
+            Expression<Func<Product, bool>>? filter = null, bool? orderBy = true);
 }
     public class ProductService : BaseService<Product>, IProductService
     {
@@ -288,9 +293,12 @@ public interface IProductService : IBaseService<Product>
 
         }
 
-        public async Task<IEnumerable<ProductVm>> GetAllProductAsync()
-        {
+        public async Task<IEnumerable<ProductVm>> GetAllProductAsync(
+            Expression<Func<Product, bool>>? filter = null,
+            Func<IQueryable<Product>, IOrderedQueryable<Product>>? orderBy = null)
+            {
             var resuilt = await GetAllAsync(
+                filter,orderBy,
                     includesProperties: "Brand,ProductSpecifications,ProductSpecifications.SpecificationType"
                 );
             var productViewModels = resuilt.Select(product => new ProductVm
@@ -338,21 +346,36 @@ public interface IProductService : IBaseService<Product>
 
             return productViewModels;
         }
-        public async Task<PagedResult<ProductVm>> GetAllProductAsync(int? pageNumber, int? pageSize)
+        public async Task<PagedResult<ProductVm>> GetAllProductAsync(
+            int? pageNumber, int? pageSize,
+            Expression<Func<Product, bool>>? filter = null,bool? orderBy=true)
         {
+
+            Func<IQueryable<Product>, IOrderedQueryable<Product>> isOrderBy = orderBy ?? true
+           ? query => query.OrderBy(p => p.UpdatedAt)
+           : query => query.OrderByDescending(p => p.UpdatedAt);
+
+
             int currentPage = pageNumber ?? 1;
             int currentPageSize = pageSize ?? 10;
 
-            var query = await GetAllProductAsync();
+            var query = await GetAllProductAsync(filter, orderBy: isOrderBy);
 
             var totalCount = query.Count();
-            var paginatedProducts = query
-                .OrderBy(u => u.ProductId)
-                .Skip((currentPage - 1) * currentPageSize)
-                .Take(currentPageSize)
-                .ToList();
-            
-            return new PagedResult<ProductVm>
+                IEnumerable<ProductVm> paginatedProducts;
+            if (orderBy == true)
+                paginatedProducts = query
+                   .OrderBy(p => p.UpdatedAt)
+                   .Skip((currentPage - 1) * currentPageSize)
+                   .Take(currentPageSize)
+                   .ToList();
+            else
+                paginatedProducts = query
+                   .OrderByDescending(p => p.UpdatedAt)
+                   .Skip((currentPage - 1) * currentPageSize)
+                   .Take(currentPageSize)
+                   .ToList();
+        return new PagedResult<ProductVm>
             {
                 CurrentPage = currentPage,
                 PageSize = currentPageSize,
@@ -551,10 +574,11 @@ public interface IProductService : IBaseService<Product>
             product.IsActive = product.IsActive;
             product.Color = product.Color;
             product.Discount = product.Discount;
+            product.UpdatedAt = DateTime.Now;
 
-            // Cập nhật Product vào cơ sở dữ liệu
-            
-            return await _unitOfWork.GenericRepository<Product>().ModifyAsync(product);
+        // Cập nhật Product vào cơ sở dữ liệu
+
+        return await _unitOfWork.GenericRepository<Product>().ModifyAsync(product);
         }
     public async Task<ProductDetailVm> GetProductDetailsAsync(int productId)
     {

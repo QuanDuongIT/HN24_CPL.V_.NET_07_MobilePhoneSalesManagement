@@ -1,4 +1,12 @@
-/* Hiệu ứng fade-in cho bảng sản phẩm */
+.text-center {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+h1 {
+    text-align: center;
+}
+
 .table {
     width: 100%;
     opacity: 0;
@@ -58,10 +66,10 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     width: 1400px;
-    max-width: 90%;
+    max-width: 50%;
     min-width: 800px;
     overflow-y: auto;
-    max-height: 90vh;
+    max-height: 100vh;
 }
 
 /* Style cho nút Update */
@@ -75,21 +83,176 @@
 }
 
 .link-update:hover {
-    background-color: #28a745;
-    color: white;
+    color: rgb(187, 179, 63);
 }
 
-/* Style cho nút Delete */
+.table td {
+    height: 65px;
+    vertical-align: middle;
+}
+
+.icon-container {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin: 5px 0;
+    line-height: 40px;
+    text-align: center;
+    overflow: hidden;
+    box-sizing: border-box;
+    transition: transform 0.3s ease;
+    /* Thêm hiệu ứng khi hover */
+}
+
+.icon-container i {
+    font-size: 24px;
+    /* Kích thước icon ban đầu */
+    transition: font-size 0.3s ease;
+    /* Thêm hiệu ứng mượt mà khi thay đổi kích thước */
+}
+
+/* Thay đổi kích thước icon khi hover */
+.icon-container:hover i {
+    font-size: 35px;
+    /* Kích thước icon khi hover */
+}
+
+/* Các hiệu ứng hover riêng cho các icon */
+.bi-pencil-square:hover,
+.bi-arrow-counterclockwise:hover {
+    color: rgb(235, 118, 10);
+}
+
+.bi-trash:hover {
+    color: red;
+}
+
+
 .link-delete {
     color: #dc3545;
     text-decoration: none;
     font-weight: 500;
-    padding: 4px 8px;
+    padding: 4px 6px;
     border-radius: 4px;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .link-delete:hover {
-    background-color: #dc3545;
-    color: white;
+    color: #f01026;
+}
+
+.table thead th {
+    background-color: #F0F0F0;
+    /* Màu nền cho header */
+    border: none;
+    /* Loại bỏ đường viền của header */
+    padding: 15px;
+    /* Thêm khoảng cách bên trong */
+    text-align: center;
+    /* Căn giữa nội dung */
+}
+
+/* Phong cách cho các row trong table */
+.table tbody tr {
+    border-bottom: 1px solid #ADAAAA;
+    /* Đường viền dưới màu ADAAAA */
+}
+
+/* Loại bỏ viền tổng thể của bảng */
+.table {
+    border-collapse: collapse;
+    /* Gộp viền để tránh trùng lặp */
+    border: none;
+    /* Loại bỏ viền bảng */
+}
+
+/* Loại bỏ viền của các ô trong bảng */
+.table th,
+.table td {
+    border: none;
+    /* Loại bỏ viền của các ô */
+}
+
+/* Đảm bảo chỉ có viền dưới cho các hàng */
+.table tbody tr {
+    border: none;
+    /* Loại bỏ viền khác */
+    border-bottom: 1px solid #ADAAAA;
+    /* Viền dưới màu ADAAAA */
+}
+
+/* Loại bỏ viền khác của bảng */
+.table {
+    border: none;
+    padding: 0 35px;
+    /* Loại bỏ đường viền tổng thể của bảng */
+}
+
+.table td,
+.table th {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0 15px;
+}
+
+.table tbody tr td {
+    height: 65px;
+}
+
+.table thead th {
+    height: 63px;
+}
+
+.container {
+    border: 1px solid #ccc;
+    padding: 10px 35px;
+    margin: 15px 0;
+    border-radius: 4px;
+    max-width: 100%;
+}
+
+#showProduct {
+    width: 120px;
+}
+
+.arrow {
+    width: 16px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* Ẩn checkbox mặc định */
+/* input[type="checkbox"] {
+    display: none;
+} */
+
+/* Tạo một vòng tròn giả thay thế checkbox */
+input[type="checkbox"]:checked+.check-icon {
+    display: inline-block;
+    font-size: 24px;
+    color: red;
+}
+
+.check-icon {
+    display: none;
+    font-size: 24px;
+
+    color: grey;
+}
+
+
+
+.checkbox-container {
+    position: relative;
+    /* Đặt vị trí của container */
+    display: inline-block;
+    /* Cho phép các phần tử con nằm cùng một dòng */
+}
+
+.checkbox-container i {
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    transform: translateY(-75%);
+    cursor: pointer;
 }
