@@ -5,6 +5,7 @@ import { Brand } from '../models/brand.model';
 import { BrandService } from '../services/brand.service';
 import { RequestBrand } from '../models/add-brand-request.model';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-add-or-update-brand',
@@ -20,38 +21,30 @@ export class AddOrUpdateBrandComponent {
   model: RequestBrand;
   addBrandSubscription?: Subscription;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['brandToUpdate'] && this.brandToUpdate) {
-      // Khi brandToUpdate thay đổi, cập nhật lại form
-      this.model.name = this.brandToUpdate.name;
-      this.model.imageUrl = this.brandToUpdate.imageUrl;
-      this.model.isActive = this.brandToUpdate.isActive;
-    }
-
-    console.log(this.brandToUpdate);
-  }
-
-  closeModal() {
-    this.close.emit(); // Phát sự kiện đóng modal
-  }
-
-  submitBrand() {
-    this.add.emit();
-    this.closeModal();
-  }
-
-  constructor(private brandService: BrandService) {
+  constructor(private brandService: BrandService, private toastr: ToastrService) {
     this.model = {
       name: '',
       imageUrl: '',
       isActive: true
+    };
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['brandToUpdate'] && this.brandToUpdate) {
+      this.model.name = this.brandToUpdate.name;
+      this.model.imageUrl = this.brandToUpdate.imageUrl;
+      this.model.isActive = this.brandToUpdate.isActive;
     }
   }
 
+  closeModal() {
+    this.close.emit();
+  }
+
   onFormSubmit() {
-    if (this.brandToUpdate)
+    if (this.brandToUpdate) {
       this.updateBrand();
-    else
+    } else {
       this.addBrandSubscription = this.brandService.addBrand(this.model).subscribe({
         next: response => {
           this.add.emit(this.model.name);
@@ -59,20 +52,34 @@ export class AddOrUpdateBrandComponent {
         },
         error: err => {
           console.log(err);
+          if (err.error && err.error.Message) {
+            this.toastr.error(err.error.Message, 'Lỗi');
+          } else {
+            this.toastr.error('Đã xảy ra lỗi khi thêm thương hiệu.', 'Lỗi');
+          }
         }
       });
+    }
   }
+
+
   updateBrand() {
-    // Gửi yêu cầu cập nhật thương hiệu
-    if (this.brandToUpdate)
-      this.addBrandSubscription = this.brandService.updateBrand(this.brandToUpdate?.brandId, this.model).subscribe({
+    if (this.brandToUpdate) {
+      this.addBrandSubscription = this.brandService.updateBrand(this.brandToUpdate.brandId, this.model).subscribe({
         next: response => {
-          this.closeModal();
+          this.toastr.success('Thương hiệu đã được cập nhật thành công!', 'Thành công');
           this.add.emit(this.model.name);
+          this.closeModal();
         },
         error: err => {
           console.log(err);
+          if (err.error && err.error.Message) {
+            this.toastr.error(err.error.Message, 'Lỗi');
+          } else {
+            this.toastr.error('Đã xảy ra lỗi khi thêm thương hiệu.', 'Lỗi');
+          }
         }
       });
+    }
   }
 }

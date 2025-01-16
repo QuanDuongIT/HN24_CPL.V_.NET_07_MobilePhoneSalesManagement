@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { specificationType } from './models/specificationType';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-specification-type-management',
@@ -19,15 +20,13 @@ export class SpecificationTypeManagementComponent implements OnInit {
   newSpecificationName: string = '';
   isAddingNew: boolean = false;
 
-  constructor(private specificationTypesService: SpecificationTypesService) { }
+  constructor(
+    private specificationTypesService: SpecificationTypesService,
+    private toastr: ToastrService
+  ) { }
 
   ngOnInit(): void {
-    if (this.specificationTypes) {
-      this.specificationTypes.subscribe(specs => {
-        this.editMode = Array(specs.length).fill(false);
-        this.isTemporary = Array(specs.length).fill(false);
-      });
-    }
+    this.load();
   }
 
   load() {
@@ -47,12 +46,21 @@ export class SpecificationTypeManagementComponent implements OnInit {
     if (this.newSpecificationName.trim()) {
       this.specificationTypesService.addSpecificationTypes({
         "name": this.newSpecificationName
-      }).subscribe(() => {
+      }).subscribe({
+        next: () => {
+          this.toastr.success('Thêm đặc tính thành công!', 'Thành công');
+          this.newSpecificationName = ''; // Reset sau khi thêm xong
+          this.cancelAddingNew();
+          this.load();
+        },
+        error: (err) => {
+          if (err.error && err.error.Message) {
+            this.toastr.error(err.error.Message, 'Lỗi');
+          } else {
+            this.toastr.error('Đã xảy ra lỗi khi thêm đặc tính.', 'Lỗi');
+          }
+        }
       });
-      this.newSpecificationName = ''; // Reset sau khi thêm xong
-      this.cancelAddingNew();
-
-      this.load();
     }
   }
 
@@ -63,9 +71,19 @@ export class SpecificationTypeManagementComponent implements OnInit {
   async saveSpecification(index: number, spec: specificationType): Promise<void> {
     await this.specificationTypesService.updateSpecificationTypes(parseInt(spec.specificationTypeId), {
       "name": spec.name
-    }).subscribe(() => {
-      this.editMode[index] = false;
-      this.load();
+    }).subscribe({
+      next: () => {
+        this.editMode[index] = false;
+        this.toastr.success('Cập nhật đặc tính thành công!', 'Thành công');
+        this.load();
+      },
+      error: (err) => {
+        if (err.error && err.error.Message) {
+          this.toastr.error(err.error.Message, 'Lỗi');
+        } else {
+          this.toastr.error('Đã xảy ra lỗi khi cập nhật đặc tính.', 'Lỗi');
+        }
+      }
     });
   }
 
@@ -76,15 +94,26 @@ export class SpecificationTypeManagementComponent implements OnInit {
         specs.splice(index, 1);
         this.editMode.splice(index, 1);
         this.isTemporary.splice(index, 1);
+        this.toastr.success('Đã xóa mục tạm thời.', 'Thành công');
       });
     } else {
       this.specificationTypes?.subscribe(specs => {
         const specToDelete = specs[index];
-        this.specificationTypesService.deleteSpecificationTypes(specToDelete.specificationTypeId).subscribe(() => {
-          specs.splice(index, 1);
-          this.editMode.splice(index, 1);
-          this.isTemporary.splice(index, 1);
-          this.load();
+        this.specificationTypesService.deleteSpecificationTypes(specToDelete.specificationTypeId).subscribe({
+          next: () => {
+            specs.splice(index, 1);
+            this.editMode.splice(index, 1);
+            this.isTemporary.splice(index, 1);
+            this.toastr.success('Đặc tính đã được xóa thành công!', 'Thành công');
+            this.load();
+          },
+          error: (err) => {
+            if (err.error && err.error.Message) {
+              this.toastr.error(err.error.Message, 'Lỗi');
+            } else {
+              this.toastr.error('Đã xảy ra lỗi khi xóa đặc tính.', 'Lỗi');
+            }
+          }
         });
       });
     }
