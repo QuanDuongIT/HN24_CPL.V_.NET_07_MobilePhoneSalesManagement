@@ -118,7 +118,8 @@
         <!-- Thông số kỹ thuật -->
         <div class="mt-3">
             <h3 for="specifications" class="form-label">Thông Số Kỹ Thuật
-                <button type="button" class="btn btn-danger ms-2" (click)="showOnhowOnSpecificationType()">Thêm</button>
+                <button type="button" class="btn btn-primary ms-2"
+                    (click)="showOnhowOnSpecificationType()">Thêm</button>
             </h3>
             <div *ngFor="let spec of model.productSpecifications; let i = index">
                 <div class="d-flex align-items-center mb-2">
@@ -151,14 +152,11 @@
             <button class="btn btn-secondary me-2" type="button" (click)="resetForm()">Làm Mới</button>
             <button class="btn btn-primary" type="submit" [disabled]="form.invalid">Lưu</button>
         </div>
-
-        <div *ngIf="isAddSpecificationType" class="overlay" (click)="hideAddSpecificationType()"></div>
-
-
     </form>
-    <div *ngIf="isAddSpecificationType" class="modal-container">
-        <app-specification-type-management [specificationTypes]="specificationTypes$"
-            (close)="hideAddSpecificationType()">
-        </app-specification-type-management>
-    </div>
+
+</div>
+<div *ngIf="isAddSpecificationType" class="overlay" (click)="hideAddSpecificationType()"></div>
+<div *ngIf="isAddSpecificationType" class="modal-container">
+    <app-specification-type-management [specificationTypes]="specificationTypes$" (close)="hideAddSpecificationType()">
+    </app-specification-type-management>
 </div>

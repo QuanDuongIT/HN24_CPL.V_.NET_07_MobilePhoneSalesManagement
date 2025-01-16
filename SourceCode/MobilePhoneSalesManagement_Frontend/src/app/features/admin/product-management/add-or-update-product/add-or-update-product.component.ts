@@ -24,6 +24,7 @@ export class AddOrUpdateProductComponent {
   @Output() close = new EventEmitter<void>();
   @Output() add = new EventEmitter<Product>();
   @Input() productToUpdate?: Product;
+  @Input() isAddProductVisible?: Product;
 
   model: RequestProduct;
   brands$?: Observable<Brand[]>;

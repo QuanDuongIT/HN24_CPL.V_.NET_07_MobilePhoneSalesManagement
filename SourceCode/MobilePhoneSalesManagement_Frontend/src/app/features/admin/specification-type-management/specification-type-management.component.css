@@ -70,3 +70,37 @@ button {
     margin-top: 20px;
     cursor: pointer;
 }
+
+.specification-list {
+    max-height: 360px;
+    /* Chiều cao tối đa, điều chỉnh tùy theo chiều cao item */
+    overflow-y: auto;
+    /* Kích hoạt thanh cuộn dọc */
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.specification-item {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.specification-input {
+    flex: 1;
+    margin-right: 8px;
+}
+
+.btn-save,
+.btn-edit,
+.btn-delete {
+    margin-left: 8px;
+}
+
+.btn-add {
+    margin-top: 16px;
+    display: inline-block;
+}

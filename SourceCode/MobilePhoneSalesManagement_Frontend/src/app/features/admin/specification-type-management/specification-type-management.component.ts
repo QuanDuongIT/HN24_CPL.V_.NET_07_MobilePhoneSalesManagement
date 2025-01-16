@@ -15,8 +15,8 @@ export class SpecificationTypeManagementComponent implements OnInit {
   @Input() specificationTypes?: Observable<specificationType[]>;
 
   editMode: boolean[] = [];
-  isTemporary: boolean[] = []; // Theo dõi các mục được thêm tạm thời
-  newSpecificationName: string = ''; // Thay đổi từ đối tượng thành chuỗi
+  isTemporary: boolean[] = [];
+  newSpecificationName: string = '';
   isAddingNew: boolean = false;
 
   constructor(private specificationTypesService: SpecificationTypesService) { }
@@ -35,7 +35,8 @@ export class SpecificationTypeManagementComponent implements OnInit {
   }
 
   toggleEditMode(index: number): void {
-    this.editMode[index] = !this.editMode[index];
+    this.isTemporary[index] = true;
+    this.editMode[index] = true;
   }
 
   startAddingNew() {
@@ -47,10 +48,11 @@ export class SpecificationTypeManagementComponent implements OnInit {
       this.specificationTypesService.addSpecificationTypes({
         "name": this.newSpecificationName
       }).subscribe(() => {
-        this.load();
       });
       this.newSpecificationName = ''; // Reset sau khi thêm xong
       this.cancelAddingNew();
+
+      this.load();
     }
   }
 
@@ -58,13 +60,11 @@ export class SpecificationTypeManagementComponent implements OnInit {
     this.isAddingNew = false;
   }
 
-  saveSpecification(index: number, spec: specificationType): void {
-
-    this.editMode[index] = true;
-    this.specificationTypesService.updateSpecificationTypes(parseInt(spec.specificationTypeId), {
+  async saveSpecification(index: number, spec: specificationType): Promise<void> {
+    await this.specificationTypesService.updateSpecificationTypes(parseInt(spec.specificationTypeId), {
       "name": spec.name
     }).subscribe(() => {
-      // this.editMode[index] = false;
+      this.editMode[index] = false;
       this.load();
     });
   }

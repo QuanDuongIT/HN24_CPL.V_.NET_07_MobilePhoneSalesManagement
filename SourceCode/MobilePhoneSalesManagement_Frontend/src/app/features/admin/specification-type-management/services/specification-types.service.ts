@@ -25,7 +25,7 @@ export class SpecificationTypesService {
 
   updateSpecificationTypes(specificationTypesId: number, specificationTypes: any): Observable<any> {
     console.log(specificationTypesId, specificationTypes);
-    return this.http.put(`${BASE_URL_API}/SpecificationTypes/update-specificationType/${14}`, specificationTypes);
+    return this.http.put(`${BASE_URL_API}/SpecificationTypes/update-specificationType/${specificationTypesId}`, specificationTypes);
   }
 
   deleteSpecificationTypes(specificationTypesId: string): Observable<any> {

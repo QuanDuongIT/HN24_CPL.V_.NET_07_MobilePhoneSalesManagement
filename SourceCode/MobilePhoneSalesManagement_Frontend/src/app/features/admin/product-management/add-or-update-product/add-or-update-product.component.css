@@ -1,3 +1,4 @@
+/* Overlay cho modal */
 .overlay {
     position: fixed;
     top: 0;
@@ -8,7 +9,7 @@
     z-index: 999;
 }
 
-/* Modal container khi thêm hoặc cập nhật sản phẩm */
+/* Modal container */
 .modal-container {
     position: fixed;
     top: 50%;
@@ -26,188 +27,83 @@
     max-height: 100vh;
 }
 
+/* Form control */
 .form-control {
     width: 100%;
-    /* Đảm bảo ô nhập chiếm toàn bộ cột */
+    font-size: 1rem;
+    padding: 8px 12px;
 }
 
-.color-option {
-    position: relative;
-    border: 2px solid #ccc;
-    /* Thêm border cho ô màu */
-    border-radius: 50%;
-    /* Làm cho ô màu có dạng tròn */
-    box-sizing: border-box;
-    /* Đảm bảo border không làm ảnh hưởng đến kích thước của ô */
-}
-
+/* Color option */
+.color-option,
 .color-box {
     position: relative;
     border: 2px solid #ccc;
-    /* Thêm border cho ô màu */
     border-radius: 50%;
-    /* Làm cho ô màu có dạng tròn */
+    box-sizing: border-box;
 }
 
-.color-tick {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 18px;
-    /* Điều chỉnh kích thước dấu tick */
-}
-
+.color-tick,
 .color-box span {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     color: white;
+    font-size: 18px;
 }
 
+/* Headings */
 h1,
 h3 {
     text-align: center;
     margin: 0 auto;
 }
 
+/* Buttons */
 button {
     margin: 0 10px;
-    /* Thêm khoảng cách giữa các nút (trái và phải) */
-    padding: 10px 20px;
-    /* Thêm khoảng cách bên trong nút (trên-dưới và trái-phải) */
+    padding: 8px 15px;
+    font-size: 1rem;
+    margin-top: 5px;
 }
 
 .btn-primary {
     margin-right: 15px;
-    /* Đặc biệt thêm margin cho nút "Lưu" */
 }
 
 .btn-secondary {
     margin-left: 15px;
-    /* Đặc biệt thêm margin cho nút "Làm Mới" */
 }
 
-/* Thông số kỹ thuật */
+/* Spacing and alignment */
 .mt-3 {
     margin-top: 20px;
 }
 
 .d-flex {
-    margin-bottom: 10px;
-    /* Điều chỉnh khoảng cách giữa các dòng */
-}
-
-.form-control {
-    font-size: 1rem;
-    /* Điều chỉnh kích thước chữ trong các input và select */
-    padding: 8px 12px;
-    /* Điều chỉnh padding để các input dễ nhìn hơn */
-}
-
-button {
-    padding: 8px 15px;
-    /* Điều chỉnh padding cho nút */
-    font-size: 1rem;
-    /* Điều chỉnh font size của nút */
-    margin-top: 5px;
-    /* Đảm bảo nút không dính quá sát các input */
-}
-
-button.form-control {
-    width: auto;
-    /* Đảm bảo nút không kéo dài ra quá dài */
-    margin-left: 10px;
-    /* Thêm khoảng cách cho nút để dễ nhìn */
-}
-
-/* Điều chỉnh khoảng cách cho các dropdown và nút "Thêm Thông Số" */
-.d-flex .form-control.me-2 {
-    width: 200px;
-    /* Đặt chiều rộng cho các input và select */
-}
-
-/* Đảm bảo các nút "Xóa" sẽ căn chỉnh hợp lý */
-button.btn-danger {
-    padding: 5px 10px;
-    /* Thêm padding cho nút "Xóa" */
-    font-size: 0.9rem;
-    /* Giảm font size của nút "Xóa" để không quá to */
-}
-
-/* Đảm bảo các phần tử trong dòng flex có khoảng cách hợp lý */
-.d-flex .form-control {
-    flex-grow: 1;
-    /* Giúp các input chiếm hết chiều rộng nếu cần thiết */
-}
-
-/* Đảm bảo các nút trong nhóm 1 và nhóm 2 căn chỉnh đồng đều */
-.d-flex {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 10px;
 }
 
 .d-flex .form-control {
     flex-grow: 1;
 }
 
-button {
-    padding: 8px 15px;
-    font-size: 1rem;
-    margin-top: 5px;
+.d-flex input,
+.d-flex button {
+    height: 38px;
 }
 
-/* Thêm khoảng cách giữa các nút trong nhóm 1 và nhóm 2 */
-button.me-2 {
-    margin-right: 10px;
-    /* Khoảng cách giữa các nút */
-}
-
-/* Điều chỉnh khoảng cách nút "Xóa" */
 button.btn-danger {
+    padding: 0 15px;
     margin-left: 10px;
-    /* Khoảng cách giữa nút "Xóa" và các input */
+    font-size: 0.9rem;
 }
 
 .d-flex.justify-content-center {
     gap: 20px;
-    /* Khoảng cách giữa nút lưu và nút làm mới */
     margin-top: 20px;
-}
-
-button.btn-secondary {
-    width: auto;
-}
-
-button.btn-primary {
-    width: auto;
-}
-
-.d-flex {
-    display: flex;
-    align-items: center;
-}
-
-/* Đảm bảo các input có cùng độ cao */
-.d-flex input {
-    height: 38px;
-    /* Đặt chiều cao cố định cho input */
-}
-
-/* Đảm bảo nút "Xóa" có cùng độ cao với input */
-.d-flex button {
-    height: 38px;
-    /* Đặt chiều cao cố định cho nút Xóa */
-    padding: 0 15px;
-    /* Thêm padding ngang cho nút */
-    display: flex;
-    align-items: center;
-    /* Căn giữa nội dung trong nút */
-    justify-content: center;
-    /* Căn giữa nội dung trong nút */
-    font-size: 14px;
-    /* Điều chỉnh kích thước chữ nếu cần */
 }
