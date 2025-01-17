@@ -12,6 +12,12 @@
                     </ng-container>
                     <ng-template #noImage>
                         <span style="color: #aaa; font-size: 14px;">Không có ảnh</span>
+                        <button type="button" (click)="fileInput.click()" style="margin-top: 10px;"
+                            class="btn btn-primary btn-sm">
+                            Tải ảnh lên
+                        </button>
+                        <!-- Input file để chọn ảnh -->
+                        <input #fileInput type="file" (change)="onImageSelected($event)" style="display: none;" />
                     </ng-template>
                 </div>
             </div>

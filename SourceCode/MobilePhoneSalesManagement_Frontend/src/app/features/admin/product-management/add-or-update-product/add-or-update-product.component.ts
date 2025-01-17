@@ -24,7 +24,9 @@ export class AddOrUpdateProductComponent {
   @Output() add = new EventEmitter<Product>();
   @Input() productToUpdate?: Product;
   @Input() isAddProductVisible?: Product;
-
+  modelImg: any = {
+    imageUrl: ''
+  };
   model: RequestProduct;
   brands$?: Observable<Brand[]>;
   selectedColor: string = '';
@@ -57,7 +59,21 @@ export class AddOrUpdateProductComponent {
       productSpecifications: []
     };
   }
+  // Hàm xử lý khi người dùng chọn ảnh
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Đọc ảnh và gán vào model.imageUrl
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.model.imageUrl = reader.result as string;
 
+        console.log("gg", this.model.imageUrl)
+      };
+      reader.readAsDataURL(file);
+      console.log("gg", this.model.imageUrl)
+    }
+  }
   ngOnInit(): void {
     this.specificationTypes$ = this.productService.getSpecificationTypes();
     this.specificationTypes$ = this.productService.getSpecificationTypes().pipe();

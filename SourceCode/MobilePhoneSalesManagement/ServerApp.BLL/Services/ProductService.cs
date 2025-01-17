@@ -158,7 +158,7 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = productVm.OldPrice,
                     StockQuantity = productVm.StockQuantity,
                     BrandId = productVm.BrandId,
-                    ImageUrl = productVm.ImageUrl,
+                    ImageId = productVm.ImageId,
                     Manufacturer = productVm.Manufacturer,
                     IsActive = productVm.IsActive,
                     Colors = productVm.Colors,
@@ -192,7 +192,7 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = product.OldPrice,
                     StockQuantity = product.StockQuantity,
                     BrandId = product.BrandId,
-                    ImageUrl = product.ImageUrl,
+                    ImageId = product.ImageId,
                     Manufacturer = product.Manufacturer,
                     IsActive = product.IsActive,
                      Colors = product.Colors,
@@ -246,7 +246,7 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = product.OldPrice,
                     StockQuantity = product.StockQuantity,
                     BrandId = product.BrandId,
-                    ImageUrl = product.ImageUrl,
+                    ImageId = product.ImageId,
                     Manufacturer = product.Manufacturer,
                     IsActive = product.IsActive,
                      Colors = product.Colors,
@@ -278,7 +278,7 @@ public interface IProductService : IBaseService<Product>
                 OldPrice = product.OldPrice,
                 StockQuantity = product.StockQuantity,
                 BrandId = product.BrandId,
-                ImageUrl = product.ImageUrl,
+                ImageId = product.ImageId,
                 Manufacturer = product.Manufacturer,
                 IsActive = product.IsActive,
                  Colors = product.Colors,
@@ -290,7 +290,7 @@ public interface IProductService : IBaseService<Product>
                     BrandId = product.Brand.BrandId,
                     Name = product.Brand.Name,
                     IsActive = product.Brand.IsActive,
-                    ImageUrl = product.Brand.ImageUrl,
+                    ImageId = product.Brand.ImageId,
                     ProductCount = product.Brand.Products.Count,
                     CreatedAt = product.CreatedAt,
                     UpdatedAt = product.Brand.UpdatedAt
@@ -399,7 +399,7 @@ public interface IProductService : IBaseService<Product>
                 OldPrice = product.OldPrice,
                 StockQuantity = product.StockQuantity,
                 BrandId = product.BrandId,
-                ImageUrl = product.ImageUrl,
+                ImageId = product.ImageId,
                 Manufacturer = product.Manufacturer,
                 IsActive = product.IsActive,
                  Colors = product.Colors,
@@ -411,7 +411,7 @@ public interface IProductService : IBaseService<Product>
                     BrandId = product.Brand.BrandId,
                     Name = product.Brand.Name,
                     IsActive = product.Brand.IsActive,
-                    ImageUrl = product.Brand.ImageUrl,
+                    ImageId = product.Brand.ImageId,
                     ProductCount = product.Brand.Products.Count,
                     CreatedAt = product.CreatedAt,
                     UpdatedAt = product.Brand.UpdatedAt
@@ -458,7 +458,7 @@ public interface IProductService : IBaseService<Product>
                 existingProduct.OldPrice = productVm.OldPrice;
                 existingProduct.StockQuantity = productVm.StockQuantity;
                 existingProduct.BrandId = productVm.BrandId;
-                existingProduct.ImageUrl = productVm.ImageUrl;
+                existingProduct.ImageId = productVm.ImageId;
                 existingProduct.Manufacturer = productVm.Manufacturer;
                 existingProduct.IsActive = productVm.IsActive;
                 existingProduct.Colors = productVm.Colors;
@@ -505,7 +505,7 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = existingProduct.OldPrice,
                     StockQuantity = existingProduct.StockQuantity,
                     BrandId = existingProduct.BrandId,
-                    ImageUrl = existingProduct.ImageUrl,
+                    ImageId = existingProduct.ImageId,
                     Manufacturer = existingProduct.Manufacturer,
                     IsActive = existingProduct.IsActive,
                      Colors = existingProduct.Colors,
@@ -537,7 +537,7 @@ public interface IProductService : IBaseService<Product>
             product.OldPrice = product.OldPrice;
             product.StockQuantity = product.StockQuantity;
             product.BrandId = product.BrandId;
-            product.ImageUrl = product.ImageUrl;
+            product.ImageId = product.ImageId;
             product.Manufacturer = product.Manufacturer;
             product.IsActive = product.IsActive;
             product.Colors = product.Colors;
@@ -569,7 +569,7 @@ public interface IProductService : IBaseService<Product>
             ProductName = product.Name,
             Description = product.Description,
             Price = product.Price,
-            ImageUrl = product.ImageUrl,
+            ImageId = product.ImageId,
     
                // Lấy tên thương hiệu từ Brand
             CreatedDate = product.CreatedDate,
@@ -716,7 +716,7 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = p.OldPrice,
                     StockQuantity = p.StockQuantity,
                     BrandId = p.BrandId,
-                    ImageUrl = p.ImageUrl,
+                    ImageId = p.ImageId,
                     Manufacturer = p.Manufacturer,
                     IsActive = p.IsActive,
                      Colors = p.Colors,
@@ -752,7 +752,7 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = p.OldPrice,
                     StockQuantity = p.StockQuantity,
                     BrandId = p.BrandId,
-                    ImageUrl = p.ImageUrl,
+                    ImageId = p.ImageId,
                     Manufacturer = p.Manufacturer,
                     IsActive = p.IsActive,
                      Colors = p.Colors,

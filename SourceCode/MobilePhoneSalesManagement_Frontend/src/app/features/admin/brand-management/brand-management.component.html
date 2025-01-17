@@ -87,8 +87,8 @@
                         <tr *ngFor="let brand of page.items;let i = index; trackBy: trackByBrandId">
                             <td class="text-center">B0{{ brand.brandId }}</td>
                             <td>
-                                <img [src]="brand.imageUrl" alt="Brand Image" class="img-thumbnail"
-                                    style="max-width: 100px; max-height: 100px;" />
+                                <img [src]="'data:image/jpeg;base64,' + brand.image.imageBase64" alt="Brand Image"
+                                    class="img-thumbnail" style="max-width: 100px; max-height: 100px;" />
                             </td>
                             <td>{{ brand.name }}</td>
                             <td class="text-center">{{ brand.productCount }}</td>

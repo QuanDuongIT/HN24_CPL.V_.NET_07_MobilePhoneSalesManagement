@@ -9,7 +9,6 @@
         public decimal OldPrice { get; set; } // Giá cũ
         public int StockQuantity { get; set; } = 0; // Số lượng trong kho
         public int? BrandId { get; set; } // Khóa ngoại liên kết với bảng Brand
-        public string ImageUrl { get; set; } // Đường dẫn URL của hình ảnh sản phẩm
         public string Manufacturer { get; set; } // Nhà sản xuất
         public bool IsActive { get; set; } = true; // Trạng thái hoạt động
         public string Colors { get; set; } // Màu sắc sản phẩm
@@ -27,5 +26,7 @@
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
         public int? CategoryId { get; set; }
+        public int? ImageId { get; set; }
+        public virtual Image Image { get; set; }
     }
 }

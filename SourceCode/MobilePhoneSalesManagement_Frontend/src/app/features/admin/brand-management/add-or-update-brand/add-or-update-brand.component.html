@@ -7,15 +7,27 @@
         </div>
 
         <div class="row">
-            <!-- Image URL -->
-            <div class="col-md-12 mt-3">
-                <label for="imageUrl" class="form-label">Image URL</label>
-                <input type="text" id="imageUrl" name="imageUrl" [(ngModel)]="model.imageUrl" class="form-control"
-                    required />
-            </div>
-            <!-- Hiển thị ảnh nếu có giá trị -->
-            <div class="mt-3" *ngIf="model.imageUrl">
-                <img [src]="model.imageUrl" alt="Product Image" class="img-thumbnail" />
+            <div class="col-md-3 mt-3">
+                <div style="width: 216px; height: 244px; display: flex; align-items: center; 
+                    justify-content: center; border: 1px solid #ccc; background-color: #f9f9f9;">
+                    <ng-container *ngIf="model.image.imageBase64; else noImage">
+                        <img [src]="model.image.imageBase64" alt="Hình sản phẩm" class="img-thumbnail"
+                            style="max-width: 100%; max-height: 100%; object-fit: cover;" />
+                    </ng-container>
+                    <ng-template #noImage>
+                        <span style="color: #aaa; font-size: 14px;">Không có ảnh</span>
+                    </ng-template>
+                    <button *ngIf="model.image.imageBase64" type="button" (click)="fileInput.click()"
+                        style="margin-top: 10px;" class="btn btn-secondary btn-sm">
+                        Đổi ảnh
+                    </button>
+                    <button *ngIf="!model.image.imageBase64" type="button" (click)="fileInput.click()"
+                        style="margin-top: 10px;" class="btn btn-primary btn-sm">
+                        Tải ảnh lên
+                    </button>
+                    <!-- Input file để chọn ảnh -->
+                    <input #fileInput type="file" (change)="onImageSelected($event)" style="display: none;" />
+                </div>
             </div>
         </div>
 

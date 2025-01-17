@@ -28,6 +28,9 @@ export class BrandManagementComponent {
   selectAllChecked: boolean = false;
   brandCheckboxes: boolean[] = [];
   selectedBrandIds: string[] = [];
+  model = {
+    imageUrl: '',
+  };
 
   constructor(
     private brandService: BrandService,
@@ -37,7 +40,16 @@ export class BrandManagementComponent {
   ngOnInit(): void {
     this.loadBrands();
   }
-
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.model.imageUrl = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
   loadBrands(): void {
     this.isLoading = true;
     this.page$ = this.brandService.getBrandsbyPage(this.page, this.pageSize);
@@ -47,6 +59,7 @@ export class BrandManagementComponent {
       this.totalPages = res.totalPages;
       this.brandCheckboxes = Array(res.items.length).fill(false);
       this.selectedBrandIds = [];
+      console.log(res)
     });
     this.isLoading = false;
   }
@@ -64,6 +77,16 @@ export class BrandManagementComponent {
       this.totalPages = res.totalPages;
       this.brandCheckboxes = Array(res.items.length).fill(false);
       this.selectedBrandIds = [];
+      if (res.items[1]?.image?.imageBase64) {
+        this.model.imageUrl = 'data:image/jpeg;base64,/9j/' + res.items[1].image.imageBase64;
+      } else {
+        this.model.imageUrl = ''; // Giá trị mặc định nếu không có imageBase64
+      }
+      console.log(this.model.imageUrl);
+
+      console.log(this.model.imageUrl);
+      console.log(res.items);
+
     });
     this.isLoading = false;
   }
@@ -114,6 +137,7 @@ export class BrandManagementComponent {
     this.page$.subscribe(res => {
       this.pageSize = res.pageSize;
       this.totalPages = res.totalPages;
+      console.log(res)
     });
     this.isLoading = false;
   }
@@ -224,6 +248,7 @@ export class BrandManagementComponent {
     this.brandService.getBrandById(brandId).subscribe((brand: Brand) => {
       this.brandToUpdate = brand;
       this.onOnwitchloadBrands();
+      console.log(brand)
     });
   }
 

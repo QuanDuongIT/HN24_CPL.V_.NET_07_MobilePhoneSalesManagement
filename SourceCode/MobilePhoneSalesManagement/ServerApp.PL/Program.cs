@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PresentationLayer.Exceptions;
@@ -68,6 +69,7 @@ namespace ServerApp.PL
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+
             // Đăng ký EmailService
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
@@ -117,6 +119,7 @@ namespace ServerApp.PL
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddSingleton<IEmailService, EmailService>();
             builder.Services.AddScoped<ISpecificationTypeService, SpecificationTypeService>();
+            builder.Services.AddScoped<IImageService, ImageService>();
 
             builder.Services.AddHttpContextAccessor();
 
@@ -129,6 +132,7 @@ namespace ServerApp.PL
             {
                 var services = scope.ServiceProvider;
                 var context = services.GetRequiredService<ShopDbContext>();
+                
 
                 context.Database.EnsureDeleted();
                 // Áp dụng migrations nếu chưa có

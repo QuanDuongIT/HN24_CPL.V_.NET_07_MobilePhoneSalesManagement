@@ -23,6 +23,7 @@ namespace ServerApp.DAL.Data
         public DbSet<SpecificationType> SpecificationTypes { get; set; }
         public DbSet<ProductSpecification> ProductSpecifications { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Image> Images { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -84,6 +85,19 @@ namespace ServerApp.DAL.Data
             // khóa chính OrderItem
             modelBuilder.Entity<OrderItem>()
                 .HasKey(c => new { c.OrderId, c.ProductId });
+
+
+            // Mối quan hệ giữa Product và Image
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Image) // Một sản phẩm có một hình ảnh
+                .WithMany()  // Không cần phải tạo mối quan hệ ngược lại trong Image
+                .HasForeignKey(p => p.ImageId); // Khóa ngoại
+
+            // Mối quan hệ giữa Brand và Image
+            modelBuilder.Entity<Brand>()
+                .HasOne(b => b.Image) // Một thương hiệu có một hình ảnh
+                .WithMany()  // Không cần phải tạo mối quan hệ ngược lại trong Image
+                .HasForeignKey(b => b.ImageId); // Khóa ngoại
         }
 
     }

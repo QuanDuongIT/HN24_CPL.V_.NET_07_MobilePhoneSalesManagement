@@ -19,7 +19,6 @@ namespace ServerApp.BLL.Services.ViewModels
         public int? BrandId { get; set; }
 
         [SkipValidation]
-        public string ImageUrl { get; set; }
         public string Manufacturer { get; set; }
         public bool IsActive { get; set; } = true;
         public string Colors { get; set; }
@@ -27,6 +26,8 @@ namespace ServerApp.BLL.Services.ViewModels
         public int Discount { get; set; } = 0;
 
         public virtual ICollection<InputProductSpecificationVm> ProductSpecifications { get; set; }
+        public int? ImageId { get; set; }
+        public virtual ImageRequest Image { get; set; }
     }
     public class ProductVm
     {
@@ -37,7 +38,6 @@ namespace ServerApp.BLL.Services.ViewModels
         public decimal OldPrice { get; set; }
         public int StockQuantity { get; set; } = 0;
         public int? BrandId { get; set; }
-        public string ImageUrl { get; set; }
         public string Manufacturer { get; set; }
         public bool IsActive { get; set; } = true;
         public string Colors { get; set; }
@@ -52,5 +52,7 @@ namespace ServerApp.BLL.Services.ViewModels
         //public virtual ICollection<WishList> WishLists { get; set; }
         //public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<ProductSpecificationVm> ProductSpecifications { get; set; }
+        public int? ImageId { get; set; }
+        public virtual Image? Image { get; set; }
     }
 }

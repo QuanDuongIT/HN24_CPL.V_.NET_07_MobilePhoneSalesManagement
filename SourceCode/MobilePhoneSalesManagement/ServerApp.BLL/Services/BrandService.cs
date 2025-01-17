@@ -4,6 +4,7 @@ using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using static Org.BouncyCastle.Asn1.Cmp.Challenge;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ServerApp.BLL.Services
 {
@@ -25,10 +26,12 @@ namespace ServerApp.BLL.Services
     public class BrandService : BaseService<Brand>, IBrandService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IImageService _imageService;
 
-        public BrandService(IUnitOfWork unitOfWork) : base(unitOfWork)
+        public BrandService(IUnitOfWork unitOfWork, IImageService imageService) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
+            _imageService = imageService;
         }
 
         public async Task<IEnumerable<BrandVm>> GetAllBrandAsync()
@@ -41,7 +44,7 @@ namespace ServerApp.BLL.Services
             {
                 BrandId = brand.BrandId,
                 Name = brand.Name,
-                ImageUrl=brand.ImageUrl,
+                ImageId = brand.ImageId,
                 IsActive = brand.IsActive,
                 ProductCount=brand.Products.Count,
                 CreatedAt= brand.CreatedAt,
@@ -56,7 +59,7 @@ namespace ServerApp.BLL.Services
             int currentPageSize = pageSize ?? 10;
 
             var query = await GetAllAsync(
-                includesProperties: "Products"
+                includesProperties: "Image,Products"
             );
 
             var totalCount = query.Count();
@@ -69,11 +72,16 @@ namespace ServerApp.BLL.Services
             {
                 BrandId = brand.BrandId,
                 Name = brand.Name,
-                ImageUrl = brand.ImageUrl,
+                ImageId = brand.ImageId,
                 IsActive = brand.IsActive,
                 ProductCount = brand.Products?.Count ?? 0, 
                 CreatedAt = brand.CreatedAt,
-                UpdatedAt = brand.UpdatedAt
+                UpdatedAt = brand.UpdatedAt,
+                Image = brand.Image != null ? new ImageRequest
+                {
+                    Name = brand.Image.Name,
+                    ImageBase64 = Convert.ToBase64String(brand.Image.ImageData)
+                } : null
             });
            
 
@@ -90,7 +98,8 @@ namespace ServerApp.BLL.Services
 
         public async Task<BrandVm?> GetByBrandIdAsync(int id)
         {
-            var brand = await GetByIdAsync(id);
+            var brand = await GetOneAsync(b=>b.BrandId==id,
+                includesProperties: "Image,Products");
             if (brand == null)
             {
                 throw new ExceptionNotFound("Brand not found");
@@ -99,11 +108,16 @@ namespace ServerApp.BLL.Services
             {
                 BrandId = brand.BrandId,
                 Name = brand.Name,
-                ImageUrl=brand.ImageUrl,
+                ImageId = brand.ImageId,
                 IsActive = brand.IsActive,
                 ProductCount = brand.Products?.Count ?? 0, 
                 CreatedAt = brand.CreatedAt,
-                UpdatedAt = brand.UpdatedAt
+                UpdatedAt = brand.UpdatedAt,
+                Image = brand.Image != null ? new ImageRequest
+                {
+                    Name = brand.Image.Name,
+                    ImageBase64 = Convert.ToBase64String(brand.Image.ImageData)
+                } : null
             };
 
             return brandVm;
@@ -117,7 +131,7 @@ namespace ServerApp.BLL.Services
 
             var query = await GetAllAsync(b=>
             b.IsActive== filter&&b.BrandId!=0,
-                includesProperties: "Products"
+                includesProperties: "Image,Products"
             );
 
             var totalCount = query.Count();
@@ -130,13 +144,18 @@ namespace ServerApp.BLL.Services
             {
                 BrandId = brand.BrandId,
                 Name = brand.Name,
-                ImageUrl = brand.ImageUrl,
+                ImageId = brand.ImageId,
                 IsActive = brand.IsActive,
                 ProductCount = brand.Products?.Count ?? 0, 
                 CreatedAt = brand.CreatedAt,
-                UpdatedAt = brand.UpdatedAt
+                UpdatedAt=brand.UpdatedAt,
+                Image = brand.Image != null ? new ImageRequest
+                {
+                    Name = brand.Image.Name,
+                    ImageBase64 = Convert.ToBase64String(brand.Image.ImageData)
+                } : null
             });
-
+            ;
 
             return new PagedResult<BrandVm>
             {
@@ -154,7 +173,7 @@ namespace ServerApp.BLL.Services
 
             var query = await GetAllAsync(b =>
                 b.Name.Contains(search),
-                includesProperties: "Products"
+                includesProperties: "Image,Products"
             );
 
             var totalCount = query.Count();
@@ -167,11 +186,16 @@ namespace ServerApp.BLL.Services
             {
                 BrandId = brand.BrandId,
                 Name = brand.Name,
-                ImageUrl = brand.ImageUrl,
+                ImageId = brand.ImageId,
                 IsActive = brand.IsActive,
                 ProductCount = brand.Products?.Count ?? 0, 
                 CreatedAt = brand.CreatedAt,
-                UpdatedAt = brand.UpdatedAt
+                UpdatedAt = brand.UpdatedAt,
+                Image = brand.Image != null ? new ImageRequest
+                {
+                    Name = brand.Image.Name,
+                    ImageBase64 = Convert.ToBase64String(brand.Image.ImageData)
+                } : null
             });
 
 
@@ -186,30 +210,35 @@ namespace ServerApp.BLL.Services
         }
         public async Task<BrandVm> AddBrandAsync(InputBrandVm brandVm)
         {
-            ValidateModelPropertiesWithAttribute(brandVm);
-            
-            var findBrand = await _unitOfWork.GenericRepository<Brand>().GetAsync(b =>
-                b.Name == brandVm.Name
-            );
-            if (findBrand == null)
-            {
-                var brand = new Brand
-                {
-                    Name = brandVm.Name,
-                    ImageUrl = brandVm.ImageUrl,
-                    IsActive = brandVm.IsActive,
-                };
+            //ValidateModelPropertiesWithAttribute(brandVm);
 
-                if (await AddAsync(brand) > 0)
+            //var findBrand = await _unitOfWork.GenericRepository<Brand>().GetAsync(b =>
+            //    b.Name == brandVm.Name
+            //);
+            if (true)
+            {
+                var id= await _imageService.AddImageAsync(brandVm.Image);
+                if (id != null)
                 {
-                    return new BrandVm
+                    var brand = new Brand
                     {
-                        BrandId = brand.BrandId,
-                        Name = brand.Name,
-                        ImageUrl=brand.ImageUrl,
-                        IsActive = brand.IsActive
+                        Name = brandVm.Name,
+                        ImageId = id,
+                        IsActive = brandVm.IsActive,
                     };
+
+                    if (await AddAsync(brand) > 0)
+                    {
+                        return new BrandVm
+                        {
+                            BrandId = brand.BrandId,
+                            Name = brand.Name,
+                            ImageId = brand.ImageId,
+                            IsActive = brand.IsActive
+                        };
+                    }
                 }
+                
                 throw new ArgumentException("Failed to update brand");
             }
             throw new ExceptionBusinessLogic("Brand name is already in use.");
@@ -237,7 +266,8 @@ namespace ServerApp.BLL.Services
             }
             brand.Name = brandVm.Name;
             brand.IsActive = brandVm.IsActive;
-            brand.ImageUrl = brandVm.ImageUrl;
+            brand.ImageId = brandVm.ImageId;
+            //brand.Image.ImageData = Convert.ToBase64String(brandVm.Image==.Image.ImageBase64);
             brand.UpdatedAt = DateTime.Now;
             var result = await _unitOfWork.GenericRepository<Brand>().ModifyAsync(brand);
 
@@ -250,7 +280,7 @@ namespace ServerApp.BLL.Services
             {
                 BrandId = brand.BrandId,
                 Name = brand.Name,
-                ImageUrl=brand.ImageUrl,
+                ImageId = brand.ImageId,
                 ProductCount = brand.Products?.Count ?? 0, 
                 IsActive = brand.IsActive,
                 CreatedAt = brand.CreatedAt
@@ -261,7 +291,7 @@ namespace ServerApp.BLL.Services
         {
             // Cập nhật thông tin Brand
             brand.Name = brand.Name;
-            brand.ImageUrl = brand.ImageUrl;
+            brand.ImageId = brand.ImageId;
             brand.IsActive = brand.IsActive;
             brand.UpdatedAt = DateTime.Now;
 
@@ -295,7 +325,7 @@ namespace ServerApp.BLL.Services
                     BrandId = brand.BrandId,
                     Name = brand.Name,
                     ProductCount = brand.Products?.Count ?? 0, 
-                    ImageUrl = brand.ImageUrl,
+                    ImageId = brand.ImageId,
                     IsActive = brand.IsActive
                 };
             }
