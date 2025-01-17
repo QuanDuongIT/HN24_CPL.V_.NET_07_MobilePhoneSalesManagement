@@ -1,4 +1,5 @@
 import { RequestProductSpecifications } from "../../specification-type-management/models/add-specificationType-request";
+import { RequestImage } from "../../image/models/add-image-request.model";
 
 export interface RequestProduct {
     name: string;
@@ -7,7 +8,8 @@ export interface RequestProduct {
     oldPrice: number;
     stockQuantity: number;
     brandId: number;
-    imageUrl: string;
+    imageId: number;
+    image: RequestImage;
     manufacturer: string;
     isActive: boolean;
     colors: string;

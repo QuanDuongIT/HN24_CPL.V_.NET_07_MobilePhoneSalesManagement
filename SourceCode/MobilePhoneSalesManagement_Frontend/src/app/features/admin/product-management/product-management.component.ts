@@ -20,7 +20,7 @@ export class ProductManagementComponent {
 
   page$?: Observable<PagedResult<Product>>;
   orderBy = false;
-  isAddProductVisible = true;
+  isAddProductVisible = false;
   productToUpdate?: Product;
   page: number = 1;
   pageSize: number = 10;
@@ -47,6 +47,7 @@ export class ProductManagementComponent {
       this.totalPages = res.totalPages;
       this.productCheckboxes = Array(res.items.length).fill(false);
       this.selectedProductIds = [];
+      console.log("res", res);
     });
     this.isLoading = false;
   }
@@ -196,6 +197,7 @@ export class ProductManagementComponent {
     this.isAddProductVisible = true;
     this.productService.getProductById(productId).subscribe((product: Product) => {
       this.productToUpdate = product;
+      console.log(this.productToUpdate)
       this.onOnwitchloadProducts();
     });
   }

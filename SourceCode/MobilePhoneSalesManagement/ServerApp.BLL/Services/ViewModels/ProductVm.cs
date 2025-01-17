@@ -53,6 +53,6 @@ namespace ServerApp.BLL.Services.ViewModels
         //public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<ProductSpecificationVm> ProductSpecifications { get; set; }
         public int? ImageId { get; set; }
-        public virtual Image? Image { get; set; }
+        public virtual ImageRequest? Image { get; set; }
     }
 }

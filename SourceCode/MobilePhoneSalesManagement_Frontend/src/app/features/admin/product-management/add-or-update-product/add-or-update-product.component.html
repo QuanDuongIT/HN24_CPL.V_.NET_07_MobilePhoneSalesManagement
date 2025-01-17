@@ -6,30 +6,29 @@
             <div class="col-md-3 mt-3">
                 <div
                     style="width: 216px; height: 244px; display: flex; align-items: center; justify-content: center; border: 1px solid #ccc; background-color: #f9f9f9;">
-                    <ng-container *ngIf="model.imageUrl; else noImage">
-                        <img [src]="model.imageUrl" alt="Hình sản phẩm" class="img-thumbnail"
+                    <ng-container *ngIf="model.image; else noImage">
+                        <img [src]="model.image.imageBase64" alt="Hình sản phẩm" class="img-thumbnail"
                             style="max-width: 100%; max-height: 100%; object-fit: cover;" />
                     </ng-container>
                     <ng-template #noImage>
                         <span style="color: #aaa; font-size: 14px;">Không có ảnh</span>
-                        <button type="button" (click)="fileInput.click()" style="margin-top: 10px;"
-                            class="btn btn-primary btn-sm">
-                            Tải ảnh lên
-                        </button>
-                        <!-- Input file để chọn ảnh -->
-                        <input #fileInput type="file" (change)="onImageSelected($event)" style="display: none;" />
                     </ng-template>
+                    <button *ngIf="model.image.imageBase64" type="button" (click)="fileInput.click()"
+                        style="margin-top: 10px;" class="btn btn-secondary btn-sm">
+                        Đổi ảnh
+                    </button>
+                    <button type="button" (click)="fileInput.click()" style="margin-top: 10px;"
+                        class="btn btn-primary btn-sm">
+                        Tải ảnh lên
+                    </button>
+                    <!-- Input file để chọn ảnh -->
+                    <input #fileInput type="file" (change)="onImageSelected($event)" style="display: none;" />
+
                 </div>
             </div>
 
             <div class="col-md-9 mt-3">
                 <div class="row">
-                    <!-- URL hình ảnh -->
-                    <div class="col-md-6 mb-3">
-                        <label for="imageUrl" class="form-label">URL Hình Ảnh</label>
-                        <input type="text" id="imageUrl" name="imageUrl" [(ngModel)]="model.imageUrl"
-                            class="form-control" required />
-                    </div>
                     <!-- Tên sản phẩm -->
                     <div class="col-md-6 mb-3">
                         <label for="productName" class="form-label">Tên Sản Phẩm</label>

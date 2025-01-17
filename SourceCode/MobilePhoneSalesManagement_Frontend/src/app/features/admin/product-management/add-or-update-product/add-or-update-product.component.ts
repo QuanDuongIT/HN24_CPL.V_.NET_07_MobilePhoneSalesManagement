@@ -46,7 +46,11 @@ export class AddOrUpdateProductComponent {
   constructor(private productService: ProductService, private brandService: BrandService, private toastr: ToastrService, private cdRef: ChangeDetectorRef) {
     this.model = {
       name: '',
-      imageUrl: '',
+      imageId: 0,
+      image: {
+        imageBase64: '',
+        name: ''
+      },
       brandId: 0,
       colors: '',
       description: '',
@@ -66,12 +70,10 @@ export class AddOrUpdateProductComponent {
       // Đọc ảnh và gán vào model.imageUrl
       const reader = new FileReader();
       reader.onload = () => {
-        this.model.imageUrl = reader.result as string;
-
-        console.log("gg", this.model.imageUrl)
+        this.model.image.imageBase64 = reader.result as string;
+        console.log("gg", this.model)
       };
       reader.readAsDataURL(file);
-      console.log("gg", this.model.imageUrl)
     }
   }
   ngOnInit(): void {
@@ -95,7 +97,11 @@ export class AddOrUpdateProductComponent {
   resetForm() {
     this.model = {
       name: '',
-      imageUrl: '',
+      imageId: 0,
+      image: {
+        imageBase64: '',
+        name: ''
+      },
       brandId: 0,
       colors: '',
       description: '',
@@ -160,7 +166,7 @@ export class AddOrUpdateProductComponent {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['productToUpdate'] && this.productToUpdate) {
       this.model = this.productToUpdate;
-
+      this.model.image.imageBase64 = 'data:image/jpeg;base64,' + this.productToUpdate.image.imageBase64;
       if (this.model.colors) {
         this.colors = this.model.colors.split(',').map(color => ({
           id: Date.now(),
@@ -168,6 +174,7 @@ export class AddOrUpdateProductComponent {
         }));
       }
 
+      console.log(this.productToUpdate.image);
       this.updatedProductSpecifications = this.model.productSpecifications.map(spec => ({
         ...spec,
         editMode: false

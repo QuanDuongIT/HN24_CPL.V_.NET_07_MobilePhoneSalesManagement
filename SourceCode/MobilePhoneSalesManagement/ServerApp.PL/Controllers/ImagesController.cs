@@ -46,10 +46,10 @@ namespace ServerApp.PL.Controllers
             return Ok(new { image });
 
         }
-        [HttpGet]
-        public IActionResult GetAllImage()
+        [HttpGet("get-all-images-by-page")]
+        public IActionResult GetAllImage([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var imageIds = _imageService.GetAllImageId(1,10);
+            var imageIds = _imageService.GetAllImageId(pageNumber, pageSize);
 
             return Ok(new { imageIds });
 

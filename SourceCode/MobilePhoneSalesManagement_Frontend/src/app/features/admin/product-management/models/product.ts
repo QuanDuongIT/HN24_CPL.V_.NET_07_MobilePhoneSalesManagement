@@ -1,5 +1,6 @@
 import { Brand } from "../../brand-management/models/brand.model";
 import { productSpecifications } from "../../specification-type-management/models/specificationType";
+import { Image } from "../../../admin/image/models/image";
 
 export interface Product {
     productId: string;
@@ -9,7 +10,8 @@ export interface Product {
     oldPrice: number;
     stockQuantity: number;
     brandId: number;
-    imageUrl: string;
+    image: Image;
+    imageId: number;
     manufacturer: string;
     isActive: boolean;
     colors: string;
