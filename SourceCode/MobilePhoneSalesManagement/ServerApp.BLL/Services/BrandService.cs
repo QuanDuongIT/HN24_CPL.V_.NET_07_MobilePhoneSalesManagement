@@ -3,8 +3,10 @@ using ServerApp.BLL.Services.Base;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
+using System;
 using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 using static System.Net.Mime.MediaTypeNames;
+using Image = ServerApp.DAL.Models.Image;
 
 namespace ServerApp.BLL.Services
 {
@@ -266,8 +268,10 @@ namespace ServerApp.BLL.Services
             }
             brand.Name = brandVm.Name;
             brand.IsActive = brandVm.IsActive;
-            brand.ImageId = brandVm.ImageId;
-            //brand.Image.ImageData = Convert.ToBase64String(brandVm.Image==.Image.ImageBase64);
+
+            await _imageService.UpdateImageAsync(brandVm.ImageId ?? 0, brandVm.Image);
+
+
             brand.UpdatedAt = DateTime.Now;
             var result = await _unitOfWork.GenericRepository<Brand>().ModifyAsync(brand);
 
@@ -315,6 +319,7 @@ namespace ServerApp.BLL.Services
             else
             {
                 _unitOfWork.GenericRepository<Brand>().Delete(id);
+                _unitOfWork.GenericRepository<Image>().Delete(brand.ImageId ?? 0);
                 isdelete = _unitOfWork.SaveChanges();
             }
 

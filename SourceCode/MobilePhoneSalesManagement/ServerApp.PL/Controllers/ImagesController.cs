@@ -31,6 +31,13 @@ namespace ServerApp.PL.Controllers
             return BadRequest("Invalid product data");
         }
 
+        [HttpPut("update-image/{id}")]
+        public async Task<IActionResult> UpdateImage(int id,[FromBody] ImageRequest imageRequest)
+        {
+            return Ok(await _imageService.UpdateImageAsync(id,imageRequest));
+            return BadRequest("Invalid product data");
+        }
+
         [HttpGet("get-image-by-id/{id}")]
         public IActionResult GetImage(int id)
         {

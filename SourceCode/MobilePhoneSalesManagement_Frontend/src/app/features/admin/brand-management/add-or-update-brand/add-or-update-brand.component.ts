@@ -63,24 +63,24 @@ export class AddOrUpdateBrandComponent {
   onFormSubmit() {
 
     console.log("gg", this.model)
-    // if (this.brandToUpdate) {
-    //   this.updateBrand();
-    // } else {
-    //   this.addBrandSubscription = this.brandService.addBrand(this.model).subscribe({
-    //     next: response => {
-    //       this.add.emit(this.model.name);
-    //       this.closeModal();
-    //     },
-    //     error: err => {
-    //       console.log(err);
-    //       if (err.error && err.error.Message) {
-    //         this.toastr.error(err.error.Message, 'Lỗi');
-    //       } else {
-    //         this.toastr.error('Đã xảy ra lỗi khi thêm thương hiệu.', 'Lỗi');
-    //       }
-    //     }
-    //   });
-    // }
+    if (this.brandToUpdate) {
+      this.updateBrand();
+    } else {
+      this.addBrandSubscription = this.brandService.addBrand(this.model).subscribe({
+        next: response => {
+          this.add.emit(this.model.name);
+          this.closeModal();
+        },
+        error: err => {
+          console.log(err);
+          if (err.error && err.error.Message) {
+            this.toastr.error(err.error.Message, 'Lỗi');
+          } else {
+            this.toastr.error('Đã xảy ra lỗi khi thêm thương hiệu.', 'Lỗi');
+          }
+        }
+      });
+    }
   }
 
 

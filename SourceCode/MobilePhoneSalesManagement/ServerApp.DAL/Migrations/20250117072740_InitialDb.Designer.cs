@@ -12,7 +12,7 @@ using ServerApp.DAL.Data;
 namespace ServerApp.DAL.Migrations
 {
     [DbContext(typeof(ShopDbContext))]
-    [Migration("20250116211040_InitialDb")]
+    [Migration("20250117072740_InitialDb")]
     partial class InitialDb
     {
         /// <inheritdoc />

@@ -49,8 +49,8 @@ namespace ServerApp.DAL.Seed
                         IsActive = true 
                         },
                         new Brand { 
-                            Name = "Apple",
-                            ImageId = 1,
+                            Name = "Applesgsgsfdg",
+                            ImageId = 2,
                             IsActive = true 
                         }
                     );

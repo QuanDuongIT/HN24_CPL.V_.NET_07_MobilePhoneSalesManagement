@@ -15,7 +15,7 @@ namespace ServerApp.BLL.Services
     {
         Task<int> AddImageAsync(ImageRequest imageRequest);
 
-
+        Task<int> UpdateImageAsync(int id, ImageRequest imageRequest);
         Task<ImageRequest?> GetByImageIdAsync(int id);
         Task<PagedResult<Image>> GetAllImageId(int? pageNumber, int? pageSize);
 
@@ -88,6 +88,25 @@ namespace ServerApp.BLL.Services
             await _unitOfWork.GenericRepository<Image>().AddAsync(image);
             await _context.SaveChangesAsync();
             return image.ImageId;
+        }
+        public async Task<int> UpdateImageAsync(int id,ImageRequest imageRequest)
+        {
+
+            //ValidateModelPropertiesWithAttribute(imageRequest);
+            var image = await _unitOfWork.GenericRepository<Image>().GetByIdAsync(id);
+            if (image == null)
+            {
+                throw new ExceptionNotFound("Image not found");
+            }
+
+            // Chuyển mảng byte thành Base64 string
+            string base64Image = Convert.ToBase64String(image.ImageData);
+
+            var image_data = imageRequest.ImageBase64.Split(",")[1];
+            image.Name = imageRequest.Name;
+            image.ImageData = Convert.FromBase64String(image_data);
+            
+            return await _unitOfWork.GenericRepository<Image>().ModifyAsync(image);
         }
 
 
