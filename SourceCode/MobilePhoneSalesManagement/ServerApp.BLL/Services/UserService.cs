@@ -444,14 +444,14 @@ namespace ServerApp.BLL.Services
 
         public async Task<List<WishListVm>> GetWishListByUserIdAsync(int userId)
         {
-            var wishLists = await _unitOfWork.WishListRepository.GetAllAsync(w => w.UserId == userId, include: w => w.Include(wl => wl.Product));
+            var wishLists = await _unitOfWork.WishListRepository.GetAllAsync(w => w.UserId == userId, include: w => w.Include(wl => wl.Product).ThenInclude(p => p.Image));
 
             return wishLists.Select(w => new WishListVm
             {
                 ProductId = w.ProductId,
                 ProductName = w.Product.Name,
-                ImageUrl = !string.IsNullOrEmpty(w.Product.ImageUrl)
-                            ? w.Product.ImageUrl.Split(';').FirstOrDefault()
+                ImageUrl = w.Product.Image != null
+                            ? Convert.ToBase64String(w.Product.Image.ImageData)
                             : null,
                 OriginalPrice = w.Product?.OldPrice ?? 0,
                 DiscountedPrice = w.Product?.Price ?? 0,

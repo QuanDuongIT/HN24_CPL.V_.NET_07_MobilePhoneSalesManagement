@@ -11,7 +11,7 @@
                       <button class="btn-delete" (click)="removeFromWishList(product.productId)">×</button>
                       <div class="thumbnail">
                         <a [href]="'/product-single/' + product.productId" class="img">
-                          <img src="assets/images/Product/oppo.png" alt="{{ product.productName }}">
+                          <img [src]="'data:image/jpeg;base64,' + product.imageUrl"  alt="{{ product.productName }}">
                         </a>
                       </div>
                   

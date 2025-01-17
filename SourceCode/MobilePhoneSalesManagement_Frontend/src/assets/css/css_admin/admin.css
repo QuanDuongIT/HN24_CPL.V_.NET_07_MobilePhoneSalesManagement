@@ -42,6 +42,7 @@ button:focus {
 
 #sidebar-wrapper .list-group {
   width: 15rem;
+  min-height: 100vh;
 }
 
 #page-content-wrapper {

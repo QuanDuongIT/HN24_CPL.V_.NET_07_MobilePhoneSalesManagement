@@ -27,15 +27,17 @@ namespace ServerApp.BLL.Services
         {
             var cartItems = await _unitOfWork.CartRepository.GetAllAsync(
                 filter: c => c.UserId == userId && c.Status == "Added",
-                include: c => c.Include(c => c.Product)
+                include: c => c.Include(c => c.Product).ThenInclude(p => p.Image)
                 );
 
             return cartItems.Select(c => new CartViewModel
             {
                 ProductId = c.ProductId,
                 ProductName = c.Product?.Name ?? "Unknown",
-                ImageUrl = c.Product?.ImageUrl ?? "default.jpg",
-                Color = c.Product?.Color ?? "N/A",
+                ImageUrl = c.Product.Image != null
+                            ? Convert.ToBase64String(c.Product.Image.ImageData)
+                            : null,
+                Color = c.Product?.Colors ?? "N/A",
                 Price = c.Product?.Price ?? 0,
                 Quantity = c.Quantity
             }).ToList();

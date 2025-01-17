@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { CartService } from '../../../../features/client/cart/service/cart.service';
 
@@ -20,30 +19,27 @@ export class HeaderComponent {
 
   constructor(
     private authService: AuthService,
-    private cookieService: CookieService,
     private router: Router,
     private cartService: CartService
   ) {}
 
   ngOnInit(): void {
+    // Lắng nghe trạng thái xác thực
     this.authService.isAuthenticated.subscribe((status) => {
       this.isAuthenticated = status;
-    });
-    if (this.isAuthenticated) {
-      this.fetchCartItems();
-    }
-  }
-  fetchCartItems(): void {
-    this.cartService.getCartItems().subscribe(
-      (res) => {
-        this.cartItems = res;
-        this.count = this.cartItems.length;
-      },
-      (err) => {
-        this.cartItems = [];
+      if (this.isAuthenticated) {
+        this.cartService.fetchCartCount();
+      } else {
+        this.count = 0;
       }
-    );
+    });
+  
+    // Lắng nghe thay đổi số lượng giỏ hàng
+    this.cartService.cartCount$.subscribe((count) => {
+      this.count = count;
+    });
   }
+  
 
   logout(): void {
     this.authService.logout();

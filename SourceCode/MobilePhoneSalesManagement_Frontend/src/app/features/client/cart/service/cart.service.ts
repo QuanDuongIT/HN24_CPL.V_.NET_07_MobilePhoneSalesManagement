@@ -1,15 +1,34 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BASE_URL_API } from '../../../../app.config';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from '../../../auth/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
+  private cartCount = new BehaviorSubject<number>(0); // Giá trị mặc định là 0
 
   constructor(private http: HttpClient, private authService: AuthService) { }
+
+  cartCount$ = this.cartCount.asObservable(); // Biến Observable để lắng nghe
+
+  updateCartCount(count: number): void {
+    
+    this.cartCount.next(count); // Cập nhật giá trị count
+  }
+  fetchCartCount(): void {
+    this.getCartItems().subscribe(
+      (res) => {
+        const count = res.length;
+        this.updateCartCount(count);
+      },
+      (err) => {
+        this.updateCartCount(0);
+      }
+    );
+  }
 
   getCartItems(): Observable<any>  {
     const token = this.authService.getCookie('Authentication');

@@ -56,7 +56,7 @@
             <div class="product-title item-center">
               <div class="box_img">
                 <img
-                  src="assets/images/Product/oppo.png"
+                [src]="'data:image/jpeg;base64,' + item.imageUrl"
                   alt="{{ item.productName }}"
                 />
               </div>

@@ -4,6 +4,8 @@ import { ToastrModule } from 'ngx-toastr';
 import { ToastService } from './core/services/toast-service/toast.service';
 import { Title } from '@angular/platform-browser';
 import { filter, map } from 'rxjs';
+import { CartService } from './features/client/cart/service/cart.service';
+import { AuthService } from './features/auth/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -15,10 +17,17 @@ import { filter, map } from 'rxjs';
 export class AppComponent {
   isClientLayout: boolean = false;
   isAdminLayout: boolean = false;
+  isAuthenticated = false;
 
-  constructor(private renderer: Renderer2, private router: Router, private titleService: Title) {}
+
+  constructor(private renderer: Renderer2, private router: Router, private titleService: Title, private authService: AuthService) {}
 
   ngOnInit() {
+    // check login
+    this.authService.isAuthenticated.subscribe((status) => {
+      this.isAuthenticated = status;
+    });
+    
     // Kiểm tra route hiện tại để xác định layout
     if (window.location.pathname.startsWith('/admin')) {
       this.isAdminLayout = true;
@@ -58,12 +67,12 @@ export class AppComponent {
     this.addStylesheet('/assets/css/owl.theme.default.css');
     this.addStylesheet('/assets/css/font-awesome.min.css');
     this.setFavicon('logo_icon.png');
-    this.addStylesheet(
-      'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
-      'sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==',
-      'anonymous',
-      'no-referrer'
-    );
+    // this.addStylesheet(
+    //   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css',
+    //   'sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==',
+    //   'anonymous',
+    //   'no-referrer'
+    // );
     
 
     this.addScript('/assets/js/jquery.min.js', () => {

@@ -61,6 +61,7 @@ export class CartComponent {
         if (res.success) {
           this.toastService.showSuccess(res.message);
           this.fetchCartItems();
+          this.cartService.fetchCartCount();
         } else {
           this.toastService.showError(res.message);
         }
@@ -95,6 +96,7 @@ export class CartComponent {
         if (res.success) {
           this.toastService.showSuccess(res.message);
           this.fetchCartItems();
+          this.cartService.fetchCartCount();
         } else {
           this.toastService.showError(res.message);
         }
@@ -181,6 +183,7 @@ export class CartComponent {
           if (res.success) {
             this.toastService.showSuccess(res.message);
             this.fetchCartItems();
+            this.cartService.fetchCartCount();
           } else {
             this.toastService.showError(res.message);
           }

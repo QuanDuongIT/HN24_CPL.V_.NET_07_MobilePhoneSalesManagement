@@ -141,6 +141,7 @@ export class ProductListComponent implements OnInit {
       (res) => {
         if (res.success) {
           this.toastService.showSuccess(res.message);
+          this.cartService.fetchCartCount();
         } else {
           this.toastService.showError(res.message);
         }
