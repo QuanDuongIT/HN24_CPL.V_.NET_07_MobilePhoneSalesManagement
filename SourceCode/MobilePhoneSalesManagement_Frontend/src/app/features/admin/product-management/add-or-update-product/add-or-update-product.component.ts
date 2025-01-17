@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { map, Observable, Subscription } from 'rxjs';
 import { ProductService } from '../services/product.service';
@@ -7,38 +7,52 @@ import { CommonModule } from '@angular/common';
 import { Product } from '../models/product';
 import { Brand } from '../../brand-management/models/brand.model';
 import { BrandService } from '../../brand-management/services/brand.service';
-import { productSpecifications, specificationType } from '../models/specificationType';
-import { ProductSpecificationWithEditMode } from '../models/add-specificationType-request';
+import { SpecificationTypeManagementComponent } from '../../specification-type-management/specification-type-management.component';
+import { ProductSpecificationWithEditMode } from '../../specification-type-management/models/add-specificationType-request';
+import { specificationType } from '../../specification-type-management/models/specificationType';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-add-or-update-product',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, SpecificationTypeManagementComponent],
   templateUrl: './add-or-update-product.component.html',
-  styleUrl: './add-or-update-product.component.css'
+  styleUrls: ['./add-or-update-product.component.css']
 })
 export class AddOrUpdateProductComponent {
 
   @Output() close = new EventEmitter<void>();
   @Output() add = new EventEmitter<Product>();
   @Input() productToUpdate?: Product;
-
+  @Input() isAddProductVisible?: Product;
+  modelImg: any = {
+    imageUrl: ''
+  };
   model: RequestProduct;
   brands$?: Observable<Brand[]>;
+  selectedColor: string = '';
   specificationTypes$?: Observable<specificationType[]>; // Danh sách SpecificationType
   selectedSpecificationType?: specificationType; // Giá trị được chọn trong select
   addProductSubscription?: Subscription;
   updatedProductSpecifications?: ProductSpecificationWithEditMode[] = [];
-  // Default Specification Type
-  private defaultSpecificationType: specificationType = {
-    specificationTypeId: '0',
-    name: 'new specification type'
-  };
-  constructor(private productService: ProductService, private brandService: BrandService) {
+  colors: { id: number, color: string }[] = [];
+  presetColors: string[] = [
+    'red', 'blue', 'green', 'yellow', 'orange',
+    'purple', 'pink', 'gray', 'white', 'black',
+    'gold', 'silver', 'lavender'
+  ];
+
+  isAddSpecificationType = false;
+
+  constructor(private productService: ProductService, private brandService: BrandService, private toastr: ToastrService, private cdRef: ChangeDetectorRef) {
     this.model = {
       name: '',
-      imageUrl: '',
+      imageId: 0,
+      image: {
+        imageBase64: '',
+        name: ''
+      },
       brandId: 0,
-      color: '',
+      colors: '',
       description: '',
       discount: 0,
       manufacturer: '',
@@ -49,26 +63,97 @@ export class AddOrUpdateProductComponent {
       productSpecifications: []
     };
   }
-
+  // Hàm xử lý khi người dùng chọn ảnh
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Đọc ảnh và gán vào model.imageUrl
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.model.image.imageBase64 = reader.result as string;
+        console.log("gg", this.model)
+      };
+      reader.readAsDataURL(file);
+    }
+  }
   ngOnInit(): void {
-
     this.specificationTypes$ = this.productService.getSpecificationTypes();
-    this.specificationTypes$ = this.productService.getSpecificationTypes().pipe(
-      map((types: specificationType[]) => [this.defaultSpecificationType, ...types])
-    );
+    this.specificationTypes$ = this.productService.getSpecificationTypes().pipe();
     this.brands$ = this.brandService.getBrands();
   }
 
-  addSpecification() {
+  addColor() {
+    if (this.selectedColor) {
+      const newColor = { id: Date.now(), color: this.selectedColor }; // Sử dụng timestamp làm id
+      this.colors.push(newColor);
+      this.selectedColor = ''; // Reset ô nhập
+    }
+  }
 
-    console.log(this.model.productSpecifications)
+  isColorSelected(color: string): boolean {
+    return this.colors.some(c => c.color === color);  // Kiểm tra nếu có màu trùng trong mảng colors
+  }
+
+  resetForm() {
+    this.model = {
+      name: '',
+      imageId: 0,
+      image: {
+        imageBase64: '',
+        name: ''
+      },
+      brandId: 0,
+      colors: '',
+      description: '',
+      discount: 0,
+      manufacturer: '',
+      oldPrice: 0,
+      price: 0,
+      stockQuantity: 0,
+      isActive: true,
+      productSpecifications: []
+    };
+    this.selectedSpecificationType = undefined;
+    this.colors = [];
+  }
+
+  showOnhowOnSpecificationType() {
+    this.isAddSpecificationType = true;
+    this.specificationTypes$?.subscribe(res => console.log(res));
+  }
+
+  selectPresetColor(color: string) {
+    const colorIndex = this.colors.findIndex(c => c.color === color);
+    if (colorIndex === -1) {
+      this.colors.push({ id: Date.now(), color: color });
+    } else {
+      this.colors.splice(colorIndex, 1);
+    }
+  }
+
+  removeColor(index: number): void {
+    this.colors.splice(index, 1);
+  }
+
+  filterSpecificationTypes() {
+    this.specificationTypes$ = this.specificationTypes$?.pipe(
+      map(types =>
+        types.filter(type =>
+          !this.model.productSpecifications.some(spec => spec.specificationTypeId === type.specificationTypeId)
+        )
+      )
+    );
+  }
+
+  addSpecification() {
     if (this.selectedSpecificationType) {
       this.model.productSpecifications.push({
         specificationTypeId: this.selectedSpecificationType.specificationTypeId,
         value: '',
-        specificationType: { name: this.selectedSpecificationType.name }
+        specificationType: { specificationTypeId: this.selectedSpecificationType.specificationTypeId, name: this.selectedSpecificationType.name }
       });
-      this.selectedSpecificationType = undefined; // Reset sau khi thêm
+      this.filterSpecificationTypes();
+      this.selectedSpecificationType = undefined;
     }
   }
 
@@ -80,25 +165,49 @@ export class AddOrUpdateProductComponent {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['productToUpdate'] && this.productToUpdate) {
-      // Khi productToUpdate thay đổi, cập nhật lại form
       this.model = this.productToUpdate;
+      this.model.image.imageBase64 = 'data:image/jpeg;base64,' + this.productToUpdate.image.imageBase64;
+      if (this.model.colors) {
+        this.colors = this.model.colors.split(',').map(color => ({
+          id: Date.now(),
+          color: color.trim()
+        }));
+      }
 
-      // Thêm thuộc tính editMode mà không làm thay đổi dữ liệu gốc
+      console.log(this.productToUpdate.image);
       this.updatedProductSpecifications = this.model.productSpecifications.map(spec => ({
-        ...spec,  // Lấy tất cả các thuộc tính gốc
-        editMode: false  // Thêm thuộc tính mới
+        ...spec,
+        editMode: false
       }));
 
       console.log(this.updatedProductSpecifications);
+    }
 
+    if (changes['specificationTypes$'] && this.specificationTypes$) {
+      this.updateSpecificationNames();
     }
 
     console.log(this.productToUpdate);
     console.log(this.model);
   }
+  updateSpecificationNames() {
+    if (this.specificationTypes$ && this.model.productSpecifications) {
+      this.specificationTypes$.subscribe(specTypes => {
+        // Cập nhật lại tên cho mỗi specificationType trong productSpecifications
+        this.model.productSpecifications.forEach(spec => {
+          const matchedSpecType = specTypes.find(type => type.specificationTypeId === spec.specificationTypeId);
+          if (matchedSpecType) {
+            spec.specificationType.name = matchedSpecType.name;  // Cập nhật lại tên
+          }
+        });
 
+        // Đảm bảo thay đổi được phát hiện
+        this.cdRef.detectChanges();
+      });
+    }
+  }
   closeModal() {
-    this.close.emit(); // Phát sự kiện đóng modal
+    this.close.emit();
   }
 
   submitProduct() {
@@ -106,36 +215,69 @@ export class AddOrUpdateProductComponent {
     this.closeModal();
   }
 
-
   onFormSubmit() {
-
-    console.log(this.model);
-    if (this.productToUpdate)
+    this.model.colors = this.colors.map(color => color.color).join(', ');
+    if (this.productToUpdate) {
       this.updateProduct();
-    else
+    } else {
       this.addProductSubscription = this.productService.addProduct(this.model).subscribe({
         next: response => {
           this.add.emit();
           this.closeModal();
+          this.toastr.success('Sản phẩm đã được thêm thành công!', 'Thành công');
         },
         error: err => {
           console.log(err);
+          if (err.error && err.error.Message) {
+            this.toastr.error(err.error.Message, 'Lỗi');
+          } else {
+            this.toastr.error('Đã xảy ra lỗi khi thêm sản phẩm.', 'Lỗi');
+          }
         }
       });
+    }
   }
+
   updateProduct() {
-    // Gửi yêu cầu cập nhật thương hiệu
-    if (this.productToUpdate)
+    if (this.productToUpdate) {
       this.addProductSubscription = this.productService.updateProduct(this.productToUpdate?.productId, this.model).subscribe({
         next: response => {
           this.closeModal();
           this.add.emit();
+          this.toastr.success('Sản phẩm đã được cập nhật thành công!', 'Thành công');
         },
         error: err => {
           console.log(err);
+          if (err.error && err.error.Message) {
+            this.toastr.error(err.error.Message, 'Lỗi');
+          } else {
+            this.toastr.error('Đã xảy ra lỗi khi cập nhật sản phẩm.', 'Lỗi');
+          }
         }
       });
+    }
+  }
+
+  hideAddSpecificationType() {
+    this.isAddSpecificationType = false;
+    this.specificationTypes$ = this.productService.getSpecificationTypes();
+    this.specificationTypes$.subscribe(res => {
+      console.log("hi1", res); // Danh sách specificationTypes nhận được từ service
+
+      // Lặp qua productSpecifications để cập nhật tên của specificationType theo ID
+      if (this.model.productSpecifications) {
+        this.model.productSpecifications.forEach(spec => {
+          // Tìm specificationType tương ứng theo ID
+          const matchedSpecType = res.find(type => type.specificationTypeId === spec.specificationTypeId);
+          if (matchedSpecType) {
+            // Cập nhật tên của specificationType trong productSpecifications
+            spec.specificationType.name = matchedSpecType.name;
+          }
+        });
+      }
+    }
+    )
+    console.log("hi2", this.model);
   }
 
 }
-

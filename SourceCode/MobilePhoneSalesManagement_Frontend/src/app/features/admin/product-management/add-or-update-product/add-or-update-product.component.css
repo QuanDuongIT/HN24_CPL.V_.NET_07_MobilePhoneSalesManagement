@@ -1,0 +1,109 @@
+/* Overlay cho modal */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* Modal container */
+.modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: 1400px;
+    max-width: 50%;
+    min-width: 800px;
+    overflow-y: auto;
+    max-height: 100vh;
+}
+
+/* Form control */
+.form-control {
+    width: 100%;
+    font-size: 1rem;
+    padding: 8px 12px;
+}
+
+/* Color option */
+.color-option,
+.color-box {
+    position: relative;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    box-sizing: border-box;
+}
+
+.color-tick,
+.color-box span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 18px;
+}
+
+/* Headings */
+h1,
+h3 {
+    text-align: center;
+    margin: 0 auto;
+}
+
+/* Buttons */
+button {
+    margin: 0 10px;
+    padding: 8px 15px;
+    font-size: 1rem;
+    margin-top: 5px;
+}
+
+.btn-primary {
+    margin-right: 15px;
+}
+
+.btn-secondary {
+    margin-left: 15px;
+}
+
+/* Spacing and alignment */
+.mt-3 {
+    margin-top: 20px;
+}
+
+.d-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.d-flex .form-control {
+    flex-grow: 1;
+}
+
+.d-flex input,
+.d-flex button {
+    height: 38px;
+}
+
+button.btn-danger {
+    padding: 0 15px;
+    margin-left: 10px;
+    font-size: 0.9rem;
+}
+
+.d-flex.justify-content-center {
+    gap: 20px;
+    margin-top: 20px;
+}

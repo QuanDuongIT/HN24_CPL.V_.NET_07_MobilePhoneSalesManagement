@@ -31,7 +31,7 @@ export class ProductService {
     return this.http.delete(`${BASE_URL_API}/Products/delete-product-by-id/${productId}`);
   }
 
-  getSpecificationTypes(): Observable<import("../models/specificationType").specificationType[]> {
+  getSpecificationTypes(): Observable<import("../../specification-type-management/models/specificationType").specificationType[]> {
     return this.http.get<any>(`${BASE_URL_API}/SpecificationTypes/get-all-specificationTypes`);
   }
 

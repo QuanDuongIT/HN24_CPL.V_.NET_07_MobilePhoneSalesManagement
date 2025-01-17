@@ -19,20 +19,15 @@ namespace ServerApp.BLL.Services.ViewModels
         public int? BrandId { get; set; }
 
         [SkipValidation]
-        public string ImageUrl { get; set; }
         public string Manufacturer { get; set; }
         public bool IsActive { get; set; } = true;
-        public string Color { get; set; }
+        public string Colors { get; set; }
         [SkipValidation]
         public int Discount { get; set; } = 0;
 
-        // Navigation properties
-        //public virtual InputBrandVm Brand { get; set; }
-        //public virtual ICollection<Cart> Carts { get; set; }
-        //public virtual ICollection<OrderItem> OrderItems { get; set; }
-        //public virtual ICollection<WishList> WishLists { get; set; }
-        //public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<InputProductSpecificationVm> ProductSpecifications { get; set; }
+        public int? ImageId { get; set; }
+        public virtual ImageRequest Image { get; set; }
     }
     public class ProductVm
     {
@@ -43,10 +38,9 @@ namespace ServerApp.BLL.Services.ViewModels
         public decimal OldPrice { get; set; }
         public int StockQuantity { get; set; } = 0;
         public int? BrandId { get; set; }
-        public string ImageUrl { get; set; }
         public string Manufacturer { get; set; }
         public bool IsActive { get; set; } = true;
-        public string Color { get; set; }
+        public string Colors { get; set; }
         public int Discount { get; set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
@@ -58,5 +52,7 @@ namespace ServerApp.BLL.Services.ViewModels
         //public virtual ICollection<WishList> WishLists { get; set; }
         //public virtual ICollection<Review> Reviews { get; set; }
         public virtual ICollection<ProductSpecificationVm> ProductSpecifications { get; set; }
+        public int? ImageId { get; set; }
+        public virtual ImageRequest? Image { get; set; }
     }
 }
