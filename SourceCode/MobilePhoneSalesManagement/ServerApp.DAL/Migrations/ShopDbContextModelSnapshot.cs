@@ -201,9 +201,8 @@ namespace ServerApp.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("ImageId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -216,6 +215,8 @@ namespace ServerApp.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("BrandId");
+
+                    b.HasIndex("ImageId");
 
                     b.ToTable("Brands");
                 });
@@ -248,6 +249,32 @@ namespace ServerApp.DAL.Migrations
                     b.ToTable("Carts");
                 });
 
+            modelBuilder.Entity("ServerApp.DAL.Models.Image", b =>
+                {
+                    b.Property<int>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ImageId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ImageId");
+
+                    b.ToTable("Images");
+                });
+
             modelBuilder.Entity("ServerApp.DAL.Models.Order", b =>
                 {
                     b.Property<int>("OrderId")
@@ -260,6 +287,10 @@ namespace ServerApp.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("OrderStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -311,11 +342,17 @@ namespace ServerApp.DAL.Migrations
                     b.Property<int?>("BrandId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Color")
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Colors")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -325,9 +362,8 @@ namespace ServerApp.DAL.Migrations
                     b.Property<int>("Discount")
                         .HasColumnType("int");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("ImageId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -352,9 +388,14 @@ namespace ServerApp.DAL.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("ProductId");
 
                     b.HasIndex("BrandId");
+
+                    b.HasIndex("ImageId");
 
                     b.ToTable("Products");
                 });
@@ -640,6 +681,15 @@ namespace ServerApp.DAL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ServerApp.DAL.Models.Brand", b =>
+                {
+                    b.HasOne("ServerApp.DAL.Models.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId");
+
+                    b.Navigation("Image");
+                });
+
             modelBuilder.Entity("ServerApp.DAL.Models.Cart", b =>
                 {
                     b.HasOne("ServerApp.DAL.Models.Product", "Product")
@@ -696,7 +746,13 @@ namespace ServerApp.DAL.Migrations
                         .HasForeignKey("BrandId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("ServerApp.DAL.Models.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId");
+
                     b.Navigation("Brand");
+
+                    b.Navigation("Image");
                 });
 
             modelBuilder.Entity("ServerApp.DAL.Models.ProductSpecification", b =>

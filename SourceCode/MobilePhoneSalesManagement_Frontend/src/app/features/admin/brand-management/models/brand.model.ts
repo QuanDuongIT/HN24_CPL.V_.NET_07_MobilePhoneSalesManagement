@@ -1,9 +1,13 @@
+
+import { Image } from "../../../admin/image/models/image";
+
 export interface Brand {
     brandId: string;
     name: string;
-    imageUrl: string;
+    image: Image;
     isActive: boolean;
     productCount: number;
+    imageId: number;
     createdAt: Date;
     updatedAt: Date;
 }

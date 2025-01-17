@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Brand, PagedResult } from './models/brand.model';
 import { Observable } from 'rxjs';
 import { AddOrUpdateBrandComponent } from "./add-or-update-brand/add-or-update-brand.component";
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-brand-management',
@@ -15,8 +16,6 @@ import { AddOrUpdateBrandComponent } from "./add-or-update-brand/add-or-update-b
 })
 export class BrandManagementComponent {
 
-
-
   page$?: Observable<PagedResult<Brand>>;
   isAddBrandVisible = false;
   brandToUpdate?: Brand;
@@ -26,16 +25,31 @@ export class BrandManagementComponent {
   totalCount: number = 0;
   isLoading: boolean = false;
   filter: string = "ALL";
-  // Trạng thái checkbox
   selectAllChecked: boolean = false;
   brandCheckboxes: boolean[] = [];
   selectedBrandIds: string[] = [];
-  constructor(private brandService: BrandService) { }
+  model = {
+    imageUrl: '',
+  };
+
+  constructor(
+    private brandService: BrandService,
+    private toastr: ToastrService
+  ) { }
 
   ngOnInit(): void {
     this.loadBrands();
   }
-
+  onImageSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.model.imageUrl = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
   loadBrands(): void {
     this.isLoading = true;
     this.page$ = this.brandService.getBrandsbyPage(this.page, this.pageSize);
@@ -45,10 +59,11 @@ export class BrandManagementComponent {
       this.totalPages = res.totalPages;
       this.brandCheckboxes = Array(res.items.length).fill(false);
       this.selectedBrandIds = [];
-    }
-    );
+      console.log(res)
+    });
     this.isLoading = false;
   }
+
   loadBrandsFilter(filter: boolean): void {
     this.isLoading = true;
     this.page$ = this.brandService.filterBrandsbyPage(this.page, this.pageSize, filter);
@@ -62,6 +77,16 @@ export class BrandManagementComponent {
       this.totalPages = res.totalPages;
       this.brandCheckboxes = Array(res.items.length).fill(false);
       this.selectedBrandIds = [];
+      if (res.items[1]?.image?.imageBase64) {
+        this.model.imageUrl = 'data:image/jpeg;base64,/9j/' + res.items[1].image.imageBase64;
+      } else {
+        this.model.imageUrl = ''; // Giá trị mặc định nếu không có imageBase64
+      }
+      console.log(this.model.imageUrl);
+
+      console.log(this.model.imageUrl);
+      console.log(res.items);
+
     });
     this.isLoading = false;
   }
@@ -85,7 +110,6 @@ export class BrandManagementComponent {
         .map((brand) => brand.brandId);
 
       this.selectedBrandIds = Array.from(new Set([...this.selectedBrandIds, ...selectedIds]));
-
       this.selectedBrandIds = this.selectedBrandIds.filter((id) =>
         res.items.some((brand, index) => brand.brandId === id && this.brandCheckboxes[index])
       );
@@ -101,8 +125,8 @@ export class BrandManagementComponent {
         this.selectedBrandIds = [];
       });
   }
+
   deleteSelectedBrands() {
-    // console.log(this.selectedBrandIds);
     this.onDeleteMultipleBrands();
   }
 
@@ -113,8 +137,8 @@ export class BrandManagementComponent {
     this.page$.subscribe(res => {
       this.pageSize = res.pageSize;
       this.totalPages = res.totalPages;
-    }
-    );
+      console.log(res)
+    });
     this.isLoading = false;
   }
 
@@ -124,6 +148,7 @@ export class BrandManagementComponent {
     this.page = 1;
     this.onOnwitchloadBrands();
   }
+
   onOnwitchloadBrands(): void {
     if (this.filter == "Active") {
       this.loadBrandsFilter(true);
@@ -134,11 +159,13 @@ export class BrandManagementComponent {
     }
     this.resetSelectedBrandIds();
   }
+
   onItemsFilerChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     this.filter = target.value;
     this.onOnwitchloadBrands();
   }
+
   showAddBrand(): void {
     this.isAddBrandVisible = true;
   }
@@ -152,6 +179,7 @@ export class BrandManagementComponent {
   onAddBrand(): void {
     this.page = 1;
     this.onOnwitchloadBrands();
+    this.toastr.success('Thương hiệu đã được thêm thành công!', 'Thành công');
   }
 
   onDeleteBrand(brandId: any, isActive: boolean): void {
@@ -162,78 +190,103 @@ export class BrandManagementComponent {
     if (confirm(confirmMessage)) {
       this.brandService.deleteBrand(brandId).subscribe({
         next: () => {
+          this.toastr.success('Thương hiệu đã được xóa thành công!', 'Thành công');
           this.onOnwitchloadBrands();
         },
-        error: (err) => console.error(err),
+        error: (err) => {
+          if (err.error && err.error.Message) {
+            this.toastr.error(err.error.Message, 'Lỗi');
+          }
+          this.toastr.error('Đã xảy ra lỗi khi xóa thương hiệu.', 'Lỗi');
+          console.error(err);
+        }
       });
     }
   }
+
   onDeleteMultipleBrands(): void {
     const confirmMessage = this.filter == "Active"
       ? 'Bạn chắc chắn muốn chuyển các thương hiệu này vào thùng rác?'
       : 'Bạn chắc chắn muốn xóa các thương hiệu này?';
-    console.log(this.selectedBrandIds);
+
     if (confirm(confirmMessage)) {
       this.brandService.deleteMultipleBrands(this.selectedBrandIds).subscribe({
         next: () => {
+          this.toastr.success('Các thương hiệu đã được xóa thành công!', 'Thành công');
           this.onOnwitchloadBrands();
           this.resetSelectedBrandIds();
         },
-        error: (err) => console.error(err),
+        error: (err) => {
+          if (err.error && err.error.Message) {
+            this.toastr.error(err.error.Message, 'Lỗi');
+          }
+          this.toastr.error('Đã xảy ra lỗi khi xóa các thương hiệu.', 'Lỗi');
+          console.error(err);
+        }
       });
     }
   }
+
   onRestoreMultipleBrands(): void {
     this.brandService.restoreBrands(this.selectedBrandIds).subscribe({
       next: () => {
+        this.toastr.success('Các thương hiệu đã được khôi phục thành công!', 'Thành công');
         this.onOnwitchloadBrands();
       },
-      error: (err) => console.error(err),
+      error: (err) => {
+        if (err.error && err.error.Message) {
+          this.toastr.error(err.error.Message, 'Lỗi');
+        }
+        this.toastr.error('Đã xảy ra lỗi khi khôi phục thương hiệu.', 'Lỗi');
+        console.error(err);
+      }
     });
   }
+
   updateBrand(brandId: string): void {
     this.isAddBrandVisible = true;
     this.brandService.getBrandById(brandId).subscribe((brand: Brand) => {
       this.brandToUpdate = brand;
       this.onOnwitchloadBrands();
+      console.log(brand)
     });
   }
+
   restoreBrand(brandId: string): void {
     this.brandService.getBrandById(brandId).subscribe((brand: Brand) => {
       if (brand.isActive == false) {
         brand.isActive = true;
         this.brandService.updateBrand(brandId, brand).subscribe({
           next: response => {
+            this.toastr.success('Thương hiệu đã được khôi phục thành công!', 'Thành công');
             this.onOnwitchloadBrands();
           },
           error: err => {
+            if (err.error && err.error.Message) {
+              this.toastr.error(err.error.Message, 'Lỗi');
+            }
+            this.toastr.error('Đã xảy ra lỗi khi khôi phục thương hiệu.', 'Lỗi');
             console.log(err);
           }
         });
       }
     });
   }
-  // Điều hướng tới trang tiếp theo
+
   nextPage(): void {
-    console.log("fdsfs", this.totalPages)
     if (this.page < this.totalPages) {
       this.page++;
       this.onOnwitchloadBrands();
-      this.page$?.subscribe(res =>
-
-        console.log(res)
-      )
     }
   }
 
-  // Điều hướng tới trang trước
   previousPage(): void {
     if (this.page > 1) {
       this.page--;
       this.onOnwitchloadBrands();
     }
   }
-  // trackBy để tránh render lại toàn bộ bảng
+
   trackByBrandId(index: number, brand: Brand): string {
     return brand.brandId;
   }

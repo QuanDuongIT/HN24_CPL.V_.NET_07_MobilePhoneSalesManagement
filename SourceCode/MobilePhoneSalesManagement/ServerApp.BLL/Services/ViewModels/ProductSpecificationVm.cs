@@ -14,7 +14,7 @@ namespace ServerApp.BLL.Services.ViewModels
 
         // Navigation properties
         //public virtual Product Product { get; set; }
-        public virtual InputSpecificationTypeVm SpecificationType { get; set; }
+        //public virtual InputSpecificationTypeVm SpecificationType { get; set; }
     }
     public class ProductSpecificationVm
     {        

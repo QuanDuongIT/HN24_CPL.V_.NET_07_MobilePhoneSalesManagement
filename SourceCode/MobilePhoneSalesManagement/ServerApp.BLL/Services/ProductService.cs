@@ -4,6 +4,7 @@ using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories.Generic;
+using System;
 using System.Linq.Expressions;
 using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 
@@ -38,13 +39,15 @@ public interface IProductService : IBaseService<Product>
         private readonly IGenericRepository<Product> _productRepository;
         private readonly IGenericRepository<Category> _categoryRepository;
         private readonly IGenericRepository<Brand> _brandRepository;
+        private readonly IImageService _imageService; 
 
 
-    public ProductService(IUnitOfWork unitOfWork, ISpecificationTypeService specificationTypeService) : base(unitOfWork)
+    public ProductService(IUnitOfWork unitOfWork, ISpecificationTypeService specificationTypeService, IImageService imageService) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _specificationTypeService = specificationTypeService;
             _brandRepository = unitOfWork.GenericRepository<Brand>();
+            _imageService= imageService;
     }
 
         private async Task<List<ProductSpecification>> ProcessSpecificationTypesAsync(
@@ -57,25 +60,9 @@ public interface IProductService : IBaseService<Product>
                 // Kiểm tra SpecificationType có tồn tại không
                 var specificationType = await _specificationTypeService.GetBySpecificationTypeIdAsync(spec.SpecificationTypeId);
 
-                var specificationTypeVm = new InputSpecificationTypeVm
-                {
-                    Name = spec.SpecificationType.Name
-                };
-
-                if (specificationType != null)
-                {
-                    // Cập nhật SpecificationType
-                    specificationType = await _specificationTypeService.UpdateSpecificationTypeAsync(spec.SpecificationTypeId, specificationTypeVm);
-                }
-                else
-                {
-                    // Thêm mới SpecificationType
-                    specificationType = await _specificationTypeService.AddSpecificationTypeAsync(specificationTypeVm);
-                }
-
                 if (specificationType == null)
                 {
-                    throw new ArgumentException($"Failed to process SpecificationType: {spec.SpecificationType.Name}");
+                    throw new ArgumentException($"Failed to process SpecificationTypeId: {spec.SpecificationTypeId}");
                 }
 
                 // Thêm ProductSpecification vào danh sách
@@ -101,25 +88,9 @@ public interface IProductService : IBaseService<Product>
             {
                 var specificationType = await _specificationTypeService.GetBySpecificationTypeIdAsync(spec.SpecificationTypeId);
 
-                var specificationTypeVm = new InputSpecificationTypeVm
-                {
-                    Name = spec.SpecificationType.Name
-                };
-
-                if (specificationType != null)
-                {
-                    // Cập nhật SpecificationType nếu đã tồn tại
-                    specificationType = await _specificationTypeService.UpdateSpecificationTypeAsync(spec.SpecificationTypeId, specificationTypeVm);
-                }
-                else
-                {
-                    // Thêm mới SpecificationType nếu không tồn tại
-                    specificationType = await _specificationTypeService.AddSpecificationTypeAsync(specificationTypeVm);
-                }
-
                 if (specificationType == null)
                 {
-                    throw new ArgumentException($"Failed to process SpecificationType: {spec.SpecificationType.Name}");
+                    throw new ArgumentException($"Failed to process SpecificationTypeId : {spec.SpecificationTypeId}");
                 }
 
                 // Kiểm tra xem ProductSpecification này đã tồn tại chưa trong danh sách hiện tại
@@ -179,6 +150,11 @@ public interface IProductService : IBaseService<Product>
 
             try
             {
+                var idImage = await _imageService.AddImageAsync(productVm.Image);
+                if (idImage == null)
+                {
+                    throw new ExceptionBusinessLogic("Image add Failed.");
+                }
                 // Xử lý SpecificationType và chuẩn bị danh sách ProductSpecification
                 var productSpecificationsToAdd = await ProcessSpecificationTypesAsync(productVm.ProductSpecifications);
 
@@ -191,10 +167,10 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = productVm.OldPrice,
                     StockQuantity = productVm.StockQuantity,
                     BrandId = productVm.BrandId,
-                    ImageUrl = productVm.ImageUrl,
+                    ImageId = idImage,
                     Manufacturer = productVm.Manufacturer,
                     IsActive = productVm.IsActive,
-                    Color = productVm.Color,
+                    Colors = productVm.Colors,
                     Discount = productVm.Discount
                 };
 
@@ -225,10 +201,10 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = product.OldPrice,
                     StockQuantity = product.StockQuantity,
                     BrandId = product.BrandId,
-                    ImageUrl = product.ImageUrl,
+                    ImageId = idImage,
                     Manufacturer = product.Manufacturer,
                     IsActive = product.IsActive,
-                    Color = product.Color,
+                     Colors = product.Colors,
                     Discount = product.Discount,
                     CreatedAt = product.CreatedAt,
                     UpdatedAt = product.UpdatedAt
@@ -265,7 +241,8 @@ public interface IProductService : IBaseService<Product>
             else
             {
                 _unitOfWork.GenericRepository<Product>().Delete(id);
-                isdelete = _unitOfWork.SaveChanges();
+                 _unitOfWork.GenericRepository<Image>().Delete(product.ImageId ?? 0);
+            isdelete = _unitOfWork.SaveChanges();
             }
 
             if (isdelete > 0)
@@ -279,10 +256,10 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = product.OldPrice,
                     StockQuantity = product.StockQuantity,
                     BrandId = product.BrandId,
-                    ImageUrl = product.ImageUrl,
+                    ImageId = product.ImageId,
                     Manufacturer = product.Manufacturer,
                     IsActive = product.IsActive,
-                    Color = product.Color,
+                     Colors = product.Colors,
                     Discount = product.Discount,
                     CreatedAt = product.CreatedAt,
                     UpdatedAt = product.UpdatedAt,
@@ -300,7 +277,7 @@ public interface IProductService : IBaseService<Product>
             {
             var resuilt = await GetAllAsync(
                 filter,orderBy,
-                    includesProperties: "Brand,ProductSpecifications,ProductSpecifications.SpecificationType"
+                    includesProperties: "Image,Brand,ProductSpecifications,ProductSpecifications.SpecificationType"
                 );
             var productViewModels = resuilt.Select(product => new ProductVm
             {
@@ -311,19 +288,24 @@ public interface IProductService : IBaseService<Product>
                 OldPrice = product.OldPrice,
                 StockQuantity = product.StockQuantity,
                 BrandId = product.BrandId,
-                ImageUrl = product.ImageUrl,
+                ImageId = product.ImageId,
                 Manufacturer = product.Manufacturer,
                 IsActive = product.IsActive,
-                Color = product.Color,
+                 Colors = product.Colors,
                 Discount = product.Discount,
                 CreatedAt = product.CreatedAt,
                 UpdatedAt = product.UpdatedAt,
+                Image = product.Image != null ? new ImageRequest
+                {
+                    Name = product.Image.Name,
+                    ImageBase64 = Convert.ToBase64String(product.Image.ImageData)
+                } : null,
                 Brand = product.Brand != null ? new BrandVm
                 {
                     BrandId = product.Brand.BrandId,
                     Name = product.Brand.Name,
                     IsActive = product.Brand.IsActive,
-                    ImageUrl = product.Brand.ImageUrl,
+                    ImageId = product.Brand.ImageId,
                     ProductCount = product.Brand.Products.Count,
                     CreatedAt = product.CreatedAt,
                     UpdatedAt = product.Brand.UpdatedAt
@@ -417,7 +399,7 @@ public interface IProductService : IBaseService<Product>
             var product = await GetOneAsync(p =>
                 p.ProductId == id,
                     //&& p.ProductSpecifications.Select(ps=>ps.),
-                    includesProperties: "Brand,ProductSpecifications,ProductSpecifications.SpecificationType"
+                    includesProperties: "Image,Brand,ProductSpecifications,ProductSpecifications.SpecificationType"
                 );
             if (product == null)
             {
@@ -432,19 +414,24 @@ public interface IProductService : IBaseService<Product>
                 OldPrice = product.OldPrice,
                 StockQuantity = product.StockQuantity,
                 BrandId = product.BrandId,
-                ImageUrl = product.ImageUrl,
+                ImageId = product.ImageId,
                 Manufacturer = product.Manufacturer,
                 IsActive = product.IsActive,
-                Color = product.Color,
+                 Colors = product.Colors,
                 Discount = product.Discount, // Gán mặc định hoặc tính toán tùy theo logic
                 CreatedAt = product.CreatedAt,
                 UpdatedAt = product.UpdatedAt,
+                Image = product.Image != null ? new ImageRequest
+                {
+                    Name = product.Image.Name,
+                    ImageBase64 = Convert.ToBase64String(product.Image.ImageData)
+                } : null,
                 Brand = product.Brand != null ? new BrandVm
                 {
                     BrandId = product.Brand.BrandId,
                     Name = product.Brand.Name,
                     IsActive = product.Brand.IsActive,
-                    ImageUrl = product.Brand.ImageUrl,
+                    ImageId = product.Brand.ImageId,
                     ProductCount = product.Brand.Products.Count,
                     CreatedAt = product.CreatedAt,
                     UpdatedAt = product.Brand.UpdatedAt
@@ -481,8 +468,10 @@ public interface IProductService : IBaseService<Product>
 
             try
             {
-                // Xử lý và đồng bộ các ProductSpecification
-                var productSpecificationsToAddOrUpdate = await ProcessAndSyncSpecificationsAsync(id, productVm.ProductSpecifications);
+
+                 await _imageService.UpdateImageAsync(productVm.ImageId ?? 0, productVm.Image);
+            // Xử lý và đồng bộ các ProductSpecification
+            var productSpecificationsToAddOrUpdate = await ProcessAndSyncSpecificationsAsync(id, productVm.ProductSpecifications);
 
                 // Cập nhật thông tin Product
                 existingProduct.Name = productVm.Name;
@@ -491,10 +480,10 @@ public interface IProductService : IBaseService<Product>
                 existingProduct.OldPrice = productVm.OldPrice;
                 existingProduct.StockQuantity = productVm.StockQuantity;
                 existingProduct.BrandId = productVm.BrandId;
-                existingProduct.ImageUrl = productVm.ImageUrl;
+                existingProduct.ImageId = productVm.ImageId;
                 existingProduct.Manufacturer = productVm.Manufacturer;
                 existingProduct.IsActive = productVm.IsActive;
-                existingProduct.Color = productVm.Color;
+                existingProduct.Colors = productVm.Colors;
                 existingProduct.Discount = productVm.Discount;
                 existingProduct.UpdatedAt= DateTime.Now;
                 // Cập nhật Product vào cơ sở dữ liệu
@@ -538,10 +527,10 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = existingProduct.OldPrice,
                     StockQuantity = existingProduct.StockQuantity,
                     BrandId = existingProduct.BrandId,
-                    ImageUrl = existingProduct.ImageUrl,
+                    ImageId = existingProduct.ImageId,
                     Manufacturer = existingProduct.Manufacturer,
                     IsActive = existingProduct.IsActive,
-                    Color = existingProduct.Color,
+                     Colors = existingProduct.Colors,
                     Discount = existingProduct.Discount,
                     CreatedAt = existingProduct.CreatedAt,
                     UpdatedAt = existingProduct.UpdatedAt
@@ -570,13 +559,12 @@ public interface IProductService : IBaseService<Product>
             product.OldPrice = product.OldPrice;
             product.StockQuantity = product.StockQuantity;
             product.BrandId = product.BrandId;
-            product.ImageUrl = product.ImageUrl;
+            product.ImageId = product.ImageId;
             product.Manufacturer = product.Manufacturer;
             product.IsActive = product.IsActive;
-            product.Color = product.Color;
+            product.Colors = product.Colors;
             product.Discount = product.Discount;
             product.UpdatedAt = DateTime.Now;
-
         // Cập nhật Product vào cơ sở dữ liệu
 
         return await _unitOfWork.GenericRepository<Product>().ModifyAsync(product);
@@ -602,7 +590,7 @@ public interface IProductService : IBaseService<Product>
             ProductName = product.Name,
             Description = product.Description,
             Price = product.Price,
-            ImageUrl = product.ImageUrl,
+            ImageId = product.ImageId,
     
                // Lấy tên thương hiệu từ Brand
             CreatedDate = product.CreatedDate,
@@ -762,10 +750,10 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = p.OldPrice,
                     StockQuantity = p.StockQuantity,
                     BrandId = p.BrandId,
-                    ImageUrl = p.ImageUrl,
+                    ImageId = p.ImageId,
                     Manufacturer = p.Manufacturer,
                     IsActive = p.IsActive,
-                    Color = p.Color,
+                     Colors = p.Colors,
                     Discount = p.Discount,
                     CreatedAt = p.CreatedAt,
                     UpdatedAt = p.UpdatedAt,
@@ -799,10 +787,10 @@ public interface IProductService : IBaseService<Product>
                     OldPrice = p.OldPrice,
                     StockQuantity = p.StockQuantity,
                     BrandId = p.BrandId,
-                    ImageUrl = p.ImageUrl,
+                    ImageId = p.ImageId,
                     Manufacturer = p.Manufacturer,
                     IsActive = p.IsActive,
-                    Color = p.Color,
+                     Colors = p.Colors,
                     Discount = p.Discount,
                     CreatedAt = p.CreatedAt,
                     UpdatedAt = p.UpdatedAt,
