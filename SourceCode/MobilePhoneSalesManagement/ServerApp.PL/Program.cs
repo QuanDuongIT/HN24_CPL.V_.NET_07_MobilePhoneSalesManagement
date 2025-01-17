@@ -13,6 +13,7 @@ using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Repositories;
 using ServerApp.DAL.Repositories.Generic;
+using ServerApp.DAL.Seed;
 using System.Text;
 
 namespace ServerApp.PL
@@ -135,9 +136,11 @@ namespace ServerApp.PL
             builder.Services.AddScoped<IBrandService, BrandService>();
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<ICacheService, CacheService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderItemService, OrderItemService>();
+            builder.Services.AddSingleton<IEmailService, EmailService>();
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-            builder.Services.AddSingleton<IEmailService, EmailService>();
             builder.Services.AddScoped<ISpecificationTypeService, SpecificationTypeService>();
 
             builder.Services.AddHttpContextAccessor();
@@ -157,7 +160,7 @@ namespace ServerApp.PL
                 // context.Database.EnsureCreated();
 
                 // Gọi seed data
-                // await SeedData.SeedAsync(context);
+                await SeedData.SeedAsync(context);
             }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

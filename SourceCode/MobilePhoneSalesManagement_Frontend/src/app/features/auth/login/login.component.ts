@@ -30,7 +30,6 @@ export class LoginComponent {
     };
   }
 
-
   matchValidForm(form: NgForm) {
     const email = form.controls['email']?.value;
 
@@ -49,32 +48,37 @@ export class LoginComponent {
     if (!form.invalid) {
       this.authService.login(this.loginData).subscribe({
         next: (res) => {
-          this.cookieService.set(
-            'Authentication',
-            `Bearer ${res.token}`,
-            undefined,
-            '/',
-            undefined,
-            true,
-            'Strict'
-          );
-          this.cookieService.set(
-            'RefreshToken', 
-            res.refreshToken,
-            undefined, 
-            '/',       
-            undefined, 
-            true, 
-            'Strict'
-          );
-          this.authService.setUser({ email: this.loginData.email });
-          this.router.navigateByUrl('/');
+          if (res.token) {
+            this.cookieService.set(
+              'Authentication',
+              `Bearer ${res.token}`,
+              undefined,
+              '/',
+              undefined,
+              true,
+              'Strict'
+            );
+            this.cookieService.set(
+              'RefreshToken',
+              res.refreshToken,
+              undefined,
+              '/',
+              undefined,
+              true,
+              'Strict'
+            );
+            this.authService.setUser({ email: this.loginData.email });
+            this.router.navigateByUrl('/');
+          } else {
+            this.toastr.showError('Thông tin không chính xác');
+            return;
+          }
         },
         error: (err) => {
           if (!err.error.success && err.error.message) {
-            this.toastr.showError(err.error.message)
+            this.toastr.showError(err.error.message);
           } else {
-            console.log(err.error)
+            console.log(err.error);
             this.toastr.showError('Lỗi kết nối server');
           }
         },

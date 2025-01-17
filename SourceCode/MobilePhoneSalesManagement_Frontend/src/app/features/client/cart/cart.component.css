@@ -11,3 +11,46 @@ p {
   gap: 6px;
   justify-content: space-between;
 }
+
+.btn_delete {
+  padding: 6px 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(
+    90deg,
+    #3b82f6,
+    #60a5fa
+  ); /* Gradient màu xanh da trời */
+  border: none;
+  border-radius: 12px; /* Bo góc mềm mại */
+  box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3); /* Đổ bóng dịu */
+  cursor: pointer;
+  transition: all 0.3s ease; /* Hiệu ứng chuyển đổi mượt mà */
+}
+
+.btn_delete:hover {
+  background: linear-gradient(
+    90deg,
+    #2563eb,
+    #3b82f6
+  ); /* Đổi màu gradient khi hover */
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.4); /* Tăng hiệu ứng bóng */
+  transform: translateY(-2px); /* Button nâng lên nhẹ */
+}
+
+.btn_delete:active {
+  transform: translateY(2px); /* Button nhấn xuống khi click */
+  box-shadow: 0 6px 10px rgba(37, 99, 235, 0.3); /* Giảm bóng khi nhấn */
+}
+
+.cart-content .prices-summary .left-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 303px;
+  align-self: flex-start;
+}
+.cart-content .checkboxStyle {
+  cursor: pointer;
+}

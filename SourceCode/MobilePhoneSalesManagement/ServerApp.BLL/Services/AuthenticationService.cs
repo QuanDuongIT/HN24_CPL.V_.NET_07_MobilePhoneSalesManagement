@@ -155,7 +155,7 @@ namespace ServerApp.BLL.Services
                 return new OkObjectResult(token);
             }
 
-            return new BadRequestObjectResult(new
+            return new OkObjectResult(new
             {
                 success = false,
                 message = "Sai thông tin đăng nhập"

@@ -104,7 +104,7 @@
             <div class="item-center pinside10">
               <i
                 class="far fa-trash-alt"
-                (click)="removeItem(item.productId)"
+                (click)="onRemoveItem(item.productId)"
               ></i>
             </div>
           </td>
@@ -113,6 +113,7 @@
     </table>
     <div class="prices-summary">
       <div class="left-content">
+        <button class="btn_delete" (click)="onDeleteMultiCartItem()">Delete</button>
         <a href="/products" class="derection-product text-blue"
           ><i class="fas fa-long-arrow-alt-left"></i> Tiếp tục mua hàng</a
         >
@@ -158,7 +159,7 @@
             <!-- Tổng cộng -->
           </div>
         </div>
-        <a href="checkout.html" class="btn-default btn-checkout">Mua Hàng</a>
+        <a (click)="onCheckOut()" class="btn-default btn-checkout">Mua Hàng</a>
       </div>
     </div>
   </div>

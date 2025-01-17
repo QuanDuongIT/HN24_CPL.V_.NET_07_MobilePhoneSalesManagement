@@ -47,14 +47,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           }),
           catchError((refreshError) => {
             // Nếu refresh token không thành công, logout và chuyển hướng đến trang login
+            cookieService.delete('Authentication');
+            cookieService.delete('RefreshToken');
             router.navigate(['/login']);
             return of(refreshError);  // Trả về error nếu không thể làm mới token
           })
         );
       }
-
+      
+      // trường hợp client chưa xóa RefreshToken mà sang bên server đã bị xóa
       if (error.status == 440) {
+        cookieService.delete('Authentication');
+        cookieService.delete('RefreshToken');
         router.navigate(['/login']);
+        return of(error);
       }
 
       // Nếu không phải lỗi 401, ném lỗi gốc

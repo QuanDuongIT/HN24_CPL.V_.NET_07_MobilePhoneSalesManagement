@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServerApp.BLL.Services;
+using ServerApp.BLL.Services.ViewModels;
 using System.Security.Claims;
 
 namespace ServerApp.PL.Controllers
@@ -96,6 +97,45 @@ namespace ServerApp.PL.Controllers
                 {
                     success = result.Success,
                     message = result.Message,
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Đã xảy ra lỗi khi xóa sản phẩm.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("delete-multiple")]
+        public async Task<IActionResult> DeleteMultiple([FromBody] DeleteMultipleRequest request)
+        {
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null)
+                {
+                    return Ok(new
+                    {
+                        success = false,
+                        message = "Vui lòng đăng nhập"
+                    });
+                }
+
+                var user = await _userService.GetByUserIdAsync(int.Parse(userId));
+
+                if (request.ProductIds == null || !request.ProductIds.Any())
+                {
+                    return BadRequest(new { Message = "Danh sách sản phẩm cần xóa không hợp lệ." });
+                }
+
+                foreach (var productId in request.ProductIds)
+                {
+                    await _cartService.RemoveFromCartAsync(int.Parse(userId), productId);
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Cập nhật giỏ hàng thành công",
                 });
             }
             catch (Exception ex)

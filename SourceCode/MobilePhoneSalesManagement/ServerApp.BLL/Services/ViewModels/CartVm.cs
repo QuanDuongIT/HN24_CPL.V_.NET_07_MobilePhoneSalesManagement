@@ -25,4 +25,8 @@
         public int Quantity { get; set; }
         public decimal TotalPrice => Price * Quantity;
     }
+    public class DeleteMultipleRequest
+    {
+        public List<int> ProductIds { get; set; } // Danh sách các ProductId cần xóa
+    }
 }

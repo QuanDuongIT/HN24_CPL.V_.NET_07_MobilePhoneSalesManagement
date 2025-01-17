@@ -1,53 +1,64 @@
 ﻿using ServerApp.BLL.Services.Base;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
-using ServerApp.DAL.Repositories.Generic;
 
 namespace ServerApp.BLL.Services
 {
-    public class OrderItemService : BaseService<OrderItem>
+    public interface IOrderItemService
+    {
+        Task<IEnumerable<OrderItem>> GetAllOrderItemsAsync();
+        Task<OrderItem> GetOrderItemByIdAsync(int orderId, int productId);
+        Task AddOrderItemAsync(OrderItem orderItem);
+        Task UpdateOrderItemAsync(OrderItem orderItem);
+        Task DeleteOrderItemAsync(int orderId, int productId);
+    }
+
+    public class OrderItemService : BaseService<User>, IOrderItemService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IGenericRepository<OrderItem> _orderItemRepository;
 
         public OrderItemService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _orderItemRepository = unitOfWork.GenericRepository<OrderItem>();
         }
 
-        public async Task<int> AddAsync(OrderItem entity)
+        public async Task<IEnumerable<OrderItem>> GetAllOrderItemsAsync()
         {
-            await _orderItemRepository.AddAsync(entity);
-            return await _unitOfWork.SaveChangesAsync();
+            return await _unitOfWork.OrderItemRepository.GetAllAsync();
         }
 
-        public async Task<bool> UpdateAsync(OrderItem entity)
+        public async Task<OrderItem> GetOrderItemByIdAsync(int orderId, int productId)
         {
-            await _orderItemRepository.UpdateAsync(entity);
-            return await _unitOfWork.SaveChangesAsync() > 0;
+            var orderItem = await _unitOfWork.OrderItemRepository.GetByIdAsync(orderId);
+            if (orderItem == null || orderItem.ProductId != productId)
+                throw new KeyNotFoundException("Order item not found");
+            return orderItem;
         }
 
-        public bool Delete(int id)
+        public async Task AddOrderItemAsync(OrderItem orderItem)
         {
-            var entity = _orderItemRepository.GetByIdAsync(id);
-            if (entity != null)
-            {
-                _orderItemRepository.DeleteAsync(id);
-                _unitOfWork.SaveChanges();
-                return true;
-            }
-            return false;
+            await _unitOfWork.OrderItemRepository.AddAsync(orderItem);
+            await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<OrderItem?> GetByIdAsync(int id)
+        public async Task UpdateOrderItemAsync(OrderItem orderItem)
         {
-            return await _orderItemRepository.GetByIdAsync(id);
+            var existingOrderItem = await GetOrderItemByIdAsync(orderItem.OrderId, orderItem.ProductId);
+            if (existingOrderItem == null)
+                throw new KeyNotFoundException("Order item not found");
+
+            existingOrderItem.Quantity = orderItem.Quantity;
+            existingOrderItem.Price = orderItem.Price;
+
+            _unitOfWork.OrderItemRepository.Update(existingOrderItem);
+            await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<OrderItem>> GetAllAsync()
+        public async Task DeleteOrderItemAsync(int orderId, int productId)
         {
-            return await _orderItemRepository.GetAllAsync();
+            var orderItem = await GetOrderItemByIdAsync(orderId, productId);
+            _unitOfWork.OrderItemRepository.Delete(orderItem);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 

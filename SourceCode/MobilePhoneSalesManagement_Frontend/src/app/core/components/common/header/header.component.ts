@@ -8,7 +8,7 @@ import { CartService } from '../../../../features/client/cart/service/cart.servi
 
 @Component({
   selector: 'app-header',
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './header.component.html',
   styleUrl: './header.component.css',
 })
@@ -18,37 +18,44 @@ export class HeaderComponent {
   cartItems: any[] = [];
   searchKeyword: string = '';
 
-  constructor( private authService: AuthService , private cookieService: CookieService, private router: Router, private cartService: CartService) {}
+  constructor(
+    private authService: AuthService,
+    private cookieService: CookieService,
+    private router: Router,
+    private cartService: CartService
+  ) {}
 
   ngOnInit(): void {
     this.authService.isAuthenticated.subscribe((status) => {
       this.isAuthenticated = status;
     });
-    this.fetchCartItems();
+    if (this.isAuthenticated) {
+      this.fetchCartItems();
+    }
   }
-  fetchCartItems (): void {
+  fetchCartItems(): void {
     this.cartService.getCartItems().subscribe(
       (res) => {
         this.cartItems = res;
         this.count = this.cartItems.length;
       },
       (err) => {
-        console.log(err);
+        this.cartItems = [];
       }
-    )
+    );
   }
-  
-  
+
   logout(): void {
     this.authService.logout();
     this.router.navigateByUrl('/login');
   }
-  
 
   onSearch(): void {
     if (this.searchKeyword) {
       // Chuyển hướng đến trang danh sách sản phẩm và gửi từ khóa qua query params
-      this.router.navigate(['/products'], { queryParams: { search: this.searchKeyword } });
+      this.router.navigate(['/products'], {
+        queryParams: { search: this.searchKeyword },
+      });
     }
   }
 }

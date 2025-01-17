@@ -19,13 +19,14 @@ import { ContactComponent } from './features/client/contact/contact.component';
 import { BlogsComponent } from './features/client/blogs/blogs.component';
 import { WishlistComponent } from './features/client/user/wishlist/wishlist.component';
 import { CartComponent } from './features/client/cart/cart.component';
+import { CheckoutComponent } from './features/client/checkout/checkout.component';
 
 export const routes: Routes = [
   // { path: 'admin', redirectTo: '/admin/user-management', pathMatch: 'full' },
   {
     path: 'admin',
     component: AdminLayoutComponent,
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
     data: { role: 'admin', title: 'Admin - MobliePhoneSale' },
     children: [
       { path: 'user-management', component: UserManagementComponent },
@@ -46,7 +47,7 @@ export const routes: Routes = [
       { path: 'contact', component: ContactComponent, data: { title: 'Liên hệ, hỗ trợ' } }, // Danh sách sản phẩm
       // { path: 'product/:id', component: ProductDetailComponent }, // Chi tiết sản phẩm
       { path: 'cart', component: CartComponent }, // Giỏ hàng
-      // { path: 'checkout', component: CheckoutComponent }, // Thanh toán
+      { path: 'checkout', component: CheckoutComponent }, // Thanh toán
 
       // auth
       { path: 'login', component: LoginComponent, data: { title: 'Đăng nhập' } },

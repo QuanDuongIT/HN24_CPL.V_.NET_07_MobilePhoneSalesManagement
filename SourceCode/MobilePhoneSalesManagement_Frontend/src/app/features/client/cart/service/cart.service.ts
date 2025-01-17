@@ -27,4 +27,8 @@ export class CartService {
   deleteCartItem(productId: number): Observable<any>  {
     return this.http.delete(`${BASE_URL_API}/carts/remove/${productId}`);
   }
+  deleteCartItems(selectedProductIds: number[]): Observable<any> {
+    const url = `${BASE_URL_API}/carts/delete-multiple`;
+    return this.http.post(url, { productIds: selectedProductIds });
+  }
 }

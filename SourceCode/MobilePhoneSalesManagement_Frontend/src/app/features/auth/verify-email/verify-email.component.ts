@@ -37,6 +37,7 @@ export class VerifyEmailComponent {
       (response: any) => {
         if (response.success) {
           if (type === 'register') {
+            this.toastService.showSuccess('Xác thực thành công');
             window.location.href = '/login';
           } else {
             localStorage.setItem('email', email);
