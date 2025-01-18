@@ -30,28 +30,25 @@
                     </select>
                 </span>
             </div>
-
         </div>
         <div class="col-1 d-flex justify-content-end align-items-center">
-            <button *ngIf="selectedBrandIds.length > 0&&(filter === 'Active'||filter === 'Inactive')"
+            <button *ngIf="selectedBrandIds.length > 0 && (filter === 'Active' || filter === 'Inactive')"
                 class="btn btn-danger sizeTh1 mr-2" title="Hiển thị danh sách thương hiệu"
                 (click)="deleteSelectedBrands()">
-                <i class="bi bi-trash" style="transform: scale(1.5);color: white; border-radius: 4px; padding: 5px;">
-                </i>
+                <i class="fas fa-trash-alt" style="color: white; border-radius: 4px;"></i>
             </button>
             <button *ngIf="selectedBrandIds.length > 0 && filter === 'Inactive'" class="btn btn-warning sizeTh1 mr-2"
                 title="Hiển thị danh sách thương hiệu" (click)="onRestoreMultipleBrands()">
-                <i class="bi bi-arrow-counterclockwise"></i>
+                <i class="fas fa-undo-alt"></i>
             </button>
             <button class="btn btn-success sizeTh1 mr-2" value="true" data-placement="top" title="Thêm người dùng"
                 (click)="showAddBrand()">
-                <i class="txt-center fas fa-plus"></i>
+                <i class="fas fa-plus"></i>
             </button>
         </div>
     </div>
     <div class="mt-3 table-container">
         <ng-container *ngIf="page$ | async as page; else loading">
-            <!-- Kiểm tra nếu danh sách trống -->
             <ng-container *ngIf="page.items.length > 0; else noBrands">
                 <table class="table table-bordered mt-3" [class.loading]="isLoading">
                     <thead>
@@ -60,31 +57,27 @@
                             <th>Ảnh</th>
                             <th>Tên thương hiệu</th>
                             <th class="text-center">
-                                <div> Số lượng </div>
+                                <div>Số lượng</div>
                                 <div>điện thoại</div>
                             </th>
                             <th>Trạng thái</th>
                             <th>
                                 <div>Ngày tạo</div>
-                                <div> Ngày cập nhật </div>
+                                <div>Ngày cập nhật</div>
                             </th>
-                            <th *ngIf="filter === 'Active' || filter === 'Inactive'">
+                            <th *ngIf="filter === 'Active'||filter === 'Inactive'">
                                 <div class="checkbox-container">
                                     <input *ngIf="selectedBrandIds.length == 0" type="checkbox"
                                         [(ngModel)]="selectAllChecked" (change)="toggleSelectAll()" />
-                                    <i class="bi bi-x-square-fill" style="color:#ad2020;"
-                                        *ngIf="selectedBrandIds.length > 0" (click)="resetSelectedBrandIds()">
-                                    </i>
+                                    <i class="fas fa-times-circle" style="color:#ad2020;"
+                                        *ngIf="selectedBrandIds.length > 0" (click)="resetSelectedBrandIds()"></i>
                                 </div>
-
                             </th>
-                            <th>
-
-                            </th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let brand of page.items;let i = index; trackBy: trackByBrandId">
+                        <tr *ngFor="let brand of page.items; let i = index; trackBy: trackByBrandId">
                             <td class="text-center">B0{{ brand.brandId }}</td>
                             <td>
                                 <img [src]="'data:image/jpeg;base64,' + brand.image.imageBase64" alt="Brand Image"
@@ -98,71 +91,62 @@
                                 </span>
                             </td>
                             <td>
-                                <div>
-                                    {{ brand.createdAt | date:'short' }}
-                                </div>
-                                <div>
-                                    {{ brand.updatedAt | date:'short' }}
-                                </div>
+                                <div>{{ brand.createdAt | date:'short' }}</div>
+                                <div>{{ brand.updatedAt | date:'short' }}</div>
                             </td>
-                            <td *ngIf="filter === 'Active' || filter === 'Inactive'">
+                            <td *ngIf="filter === 'Active'||filter === 'Inactive'">
                                 <input type="checkbox" [(ngModel)]="brandCheckboxes[i]"
                                     (change)="updateSelectAllState()" />
                             </td>
                             <td>
                                 <div class="icon-container">
-                                    <i *ngIf="filter === 'Active'" (click)="updateBrand(brand.brandId)"
-                                        class="bi bi-pencil-square"></i>
-                                    <i class="bi bi-arrow-counterclockwise" (click)="restoreBrand(brand.brandId)"
+                                    <i *ngIf="filter !== 'Inactive'" (click)="updateBrand(brand.brandId)"
+                                        class="fas fa-edit"></i>
+                                    <i class="fas fa-undo" (click)="restoreBrand(brand.brandId)"
                                         *ngIf="filter === 'Inactive'"></i>
                                 </div>
-                                <div *ngIf="filter === 'Active'||filter === 'Inactive'"
-                                    (click)="onDeleteBrand(brand.brandId, brand.isActive)" class="icon-container">
-                                    <i class="bi bi-trash" style="transform: scale(1.5);"></i>
+                                <div (click)="onDeleteBrand(brand.brandId, brand.isActive)" class="icon-container">
+                                    <i class="fas fa-trash-alt"></i>
                                 </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </ng-container>
-
-            <!-- Thông báo không có thương hiệu -->
             <ng-template #noBrands>
                 <div class="text-center mt-3">
                     <p>Không có thương hiệu nào để hiển thị.</p>
                 </div>
             </ng-template>
         </ng-container>
-
-        <!-- Loading state -->
         <ng-template #loading>
             <div class="loading">Loading...</div>
         </ng-template>
     </div>
-
     <div class="pagination">
         <button (click)="previousPage()" [disabled]="page === 1">
-            <img class="arrow" src="./../../../../admin_assets/icon/arrow-left.png" alt="SVG Image" />
+            <i class="fas fa-arrow-left"></i>
         </button>
 
-        <span *ngIf="1 != page">{{ 1 }}</span>
+        <span *ngIf="1 != page" (click)="changePage(1)">{{ 1 }}</span>
 
         <!-- Show '...' before active page if page >= 5 -->
         <span *ngIf="page > 2">...</span>
 
-        <!-- Active page number -->
+        <!-- Active Page Number -->
         <span class="active">{{ page }}</span>
 
         <!-- Show '...' after active page if page < totalPages -->
         <span *ngIf="page + 1 < totalPages">...</span>
 
-        <!-- Show total pages if totalPages >= 5 -->
-        <span *ngIf="totalPages != page">{{ totalPages }}</span>
+        <!-- Show Total Pages if Not Active -->
+        <span *ngIf="totalPages != page" (click)="changePage(totalPages)">{{ totalPages }}</span>
 
         <button (click)="nextPage()" [disabled]="page === totalPages">
-            <img class="arrow" src="./../../../../admin_assets/icon/right-arrow.png" alt="SVG Image" />
+            <i class="fas fa-arrow-right"></i>
         </button>
     </div>
+
 
     <div *ngIf="isAddBrandVisible" class="overlay" (click)="hideAddBrand()"></div>
 

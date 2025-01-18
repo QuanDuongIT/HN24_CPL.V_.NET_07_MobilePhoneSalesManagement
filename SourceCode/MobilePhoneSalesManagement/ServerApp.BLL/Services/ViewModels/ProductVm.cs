@@ -21,6 +21,7 @@ namespace ServerApp.BLL.Services.ViewModels
         [SkipValidation]
         public string Manufacturer { get; set; }
         public bool IsActive { get; set; } = true;
+        [SkipValidation]
         public string Colors { get; set; }
         [SkipValidation]
         public int Discount { get; set; } = 0;

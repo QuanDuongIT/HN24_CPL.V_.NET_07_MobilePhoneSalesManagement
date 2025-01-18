@@ -26,9 +26,9 @@ namespace ServerApp.PL.Controllers
 
 
         [HttpGet("get-all-products-by-page")]
-        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] bool? orderBy=false)
+        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] string sortField = "updatedDate", [FromQuery] int pageSize = 10, [FromQuery] bool orderBy=false)
         {
-            var result = await _productService.GetAllProductAsync(pageNumber, pageSize,orderBy: orderBy);
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize,sortField,orderBy: orderBy);
             return Ok(result); 
         }
 
@@ -158,16 +158,16 @@ namespace ServerApp.PL.Controllers
         }
         [HttpGet("search-products-by-page")]
         public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, 
-            [FromQuery] int pageSize = 10, [FromQuery] string search = "", [FromQuery] bool orderBy = true)
+            [FromQuery] int pageSize = 10, [FromQuery] string search = "", [FromQuery] string sortField = "updatedDate", [FromQuery] bool orderBy = true)
         {
-            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, p=>p.Name.Contains(search),orderBy: false);
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, sortField, p=>p.Name.Contains(search),orderBy: false);
             return Ok(result); 
         }
         [HttpGet("filter-products-by-page")]
-        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, 
-            [FromQuery] int pageSize = 10, [FromQuery] bool filter = true, [FromQuery] bool orderBy = true)
+        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10, [FromQuery] bool filter = true, [FromQuery] string sortField = "updatedDate", [FromQuery] bool orderBy = true)
         {
-            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, p=>p.IsActive==filter, orderBy: false);
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, sortField, p=>p.IsActive==filter, orderBy: false);
             return Ok(result); 
         }
         [HttpPut("restore-multiple-product")]

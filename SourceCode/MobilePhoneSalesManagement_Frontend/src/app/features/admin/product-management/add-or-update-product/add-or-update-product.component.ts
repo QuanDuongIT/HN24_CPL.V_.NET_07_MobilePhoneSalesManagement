@@ -115,6 +115,8 @@ export class AddOrUpdateProductComponent {
     };
     this.selectedSpecificationType = undefined;
     this.colors = [];
+
+    this.specificationTypes$ = this.productService.getSpecificationTypes();
   }
 
   showOnhowOnSpecificationType() {
@@ -216,26 +218,36 @@ export class AddOrUpdateProductComponent {
   }
 
   onFormSubmit() {
-    this.model.colors = this.colors.map(color => color.color).join(', ');
-    if (this.productToUpdate) {
-      this.updateProduct();
+    const form = document.querySelector('form');
+    if (form && form.checkValidity() === false) {
+      alert('Vui lòng điền đầy đủ thông tin');
     } else {
-      this.addProductSubscription = this.productService.addProduct(this.model).subscribe({
-        next: response => {
-          this.add.emit();
-          this.closeModal();
-          this.toastr.success('Sản phẩm đã được thêm thành công!', 'Thành công');
-        },
-        error: err => {
-          console.log(err);
-          if (err.error && err.error.Message) {
-            this.toastr.error(err.error.Message, 'Lỗi');
-          } else {
-            this.toastr.error('Đã xảy ra lỗi khi thêm sản phẩm.', 'Lỗi');
+      this.model.colors = this.colors.length > 0 ? this.colors.map(color => color.color).join(', ') : '';
+      if (!this.model.image.imageBase64) {
+        this.model.image.imageBase64 = '';
+      }
+      if (this.productToUpdate) {
+        this.updateProduct();
+      } else {
+        this.addProductSubscription = this.productService.addProduct(this.model).subscribe({
+          next: response => {
+            this.add.emit();
+            this.closeModal();
+            this.toastr.success('Sản phẩm đã được thêm thành công!', 'Thành công');
+          },
+          error: err => {
+            console.log(err);
+            if (err.error && err.error.Message) {
+              this.toastr.error(err.error.Message, 'Lỗi');
+            } else {
+              this.toastr.error('Đã xảy ra lỗi khi thêm sản phẩm.', 'Lỗi');
+            }
           }
-        }
-      });
+        });
+      }
     }
+
+
   }
 
   updateProduct() {
@@ -279,5 +291,4 @@ export class AddOrUpdateProductComponent {
     )
     console.log("hi2", this.model);
   }
-
 }

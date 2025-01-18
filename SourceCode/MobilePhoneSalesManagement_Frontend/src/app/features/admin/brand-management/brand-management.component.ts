@@ -17,7 +17,7 @@ import { ToastrService } from 'ngx-toastr';
 export class BrandManagementComponent {
 
   page$?: Observable<PagedResult<Brand>>;
-  isAddBrandVisible = false;
+  isAddBrandVisible = true;
   brandToUpdate?: Brand;
   page: number = 1;
   pageSize: number = 10;
@@ -254,8 +254,12 @@ export class BrandManagementComponent {
 
   restoreBrand(brandId: string): void {
     this.brandService.getBrandById(brandId).subscribe((brand: Brand) => {
+
+      console.log("r", brandId, brand)
       if (brand.isActive == false) {
         brand.isActive = true;
+        brand.image.imageBase64 = 'data:image/jpeg;base64,' + brand.image.imageBase64;
+        console.log("r", brandId, brand)
         this.brandService.updateBrand(brandId, brand).subscribe({
           next: response => {
             this.toastr.success('Thương hiệu đã được khôi phục thành công!', 'Thành công');
@@ -279,7 +283,10 @@ export class BrandManagementComponent {
       this.onOnwitchloadBrands();
     }
   }
-
+  changePage(page: number): void {
+    this.page = page;
+    this.onOnwitchloadBrands();
+  }
   previousPage(): void {
     if (this.page > 1) {
       this.page--;

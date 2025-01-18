@@ -4,6 +4,7 @@ using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Data;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
+using ServerApp.DAL.Seed;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,6 +83,10 @@ namespace ServerApp.BLL.Services
         }
         public async Task<int> AddImageAsync(ImageRequest imageRequest)
         {
+            if (string.IsNullOrEmpty(imageRequest.ImageBase64) || !imageRequest.ImageBase64.Contains(","))
+            {
+                imageRequest.ImageBase64 = $","+SeedData.image_default;
+            }
             //ValidateModelPropertiesWithAttribute(imageRequest);
             var image_data = imageRequest.ImageBase64.Split(",")[1];
             var image = new Image { Name = imageRequest.Name, ImageData = Convert.FromBase64String(image_data) };

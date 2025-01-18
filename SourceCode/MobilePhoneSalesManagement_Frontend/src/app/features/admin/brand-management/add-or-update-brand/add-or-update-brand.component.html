@@ -1,43 +1,38 @@
 <div class="container">
-    <h1 class="mt-3 text-center">{{ brandToUpdate ? 'Update Brand' : 'Thêm thương hiệu' }}</h1>
+    <h1 class="mt-4 text-center">{{ brandToUpdate ? 'Cập nhật thương hiệu' : 'Thêm thương hiệu' }}</h1>
     <form #form="ngForm" (ngSubmit)="onFormSubmit()">
-        <div class="mt-3">
-            <label for="brandName" class="form-label">Brand Name</label>
-            <input type="text" id="brandName" name="brandName" [(ngModel)]="model.name" class="form-control" required>
+        <div class="mt-4 d-flex justify-content-center">
+            <div class="input-container">
+                <label for="brandName" class="form-label">Tên thương hiệu</label>
+                <input type="text" id="brandName" name="brandName" [(ngModel)]="model.name" class="form-control"
+                    placeholder="Nhập tên thương hiệu" required />
+            </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-3 mt-3">
-                <div style="width: 216px; height: 244px; display: flex; align-items: center; 
-                    justify-content: center; border: 1px solid #ccc; background-color: #f9f9f9;">
+        <div class="row justify-content-center">
+            <div class="col-md-6 mt-4">
+                <div class="image-container">
                     <ng-container *ngIf="model.image.imageBase64; else noImage">
-                        <img [src]="model.image.imageBase64" alt="Hình sản phẩm" class="img-thumbnail"
-                            style="max-width: 100%; max-height: 100%; object-fit: cover;" />
+                        <img [src]="model.image.imageBase64" alt="Hình sản phẩm" class="img-thumbnail" />
                     </ng-container>
                     <ng-template #noImage>
-                        <span style="color: #aaa; font-size: 14px;">Không có ảnh</span>
+                        <span class="no-image-text">Không có ảnh</span>
                     </ng-template>
-                    <button *ngIf="model.image.imageBase64" type="button" (click)="fileInput.click()"
-                        style="margin-top: 10px;" class="btn btn-secondary btn-sm">
-                        Đổi ảnh
-                    </button>
-                    <button *ngIf="!model.image.imageBase64" type="button" (click)="fileInput.click()"
-                        style="margin-top: 10px;" class="btn btn-primary btn-sm">
-                        Tải ảnh lên
-                    </button>
-                    <!-- Input file để chọn ảnh -->
-                    <input #fileInput type="file" (change)="onImageSelected($event)" style="display: none;" />
+                    <div class="mt-2 text-center">
+                        <button type="button" (click)="fileInput.click()" class="btn btn-sm"
+                            [ngClass]="model.image.imageBase64 ? 'btn-secondary' : 'btn-primary'">
+                            {{ model.image.imageBase64 ? 'Đổi ảnh' : 'Tải ảnh lên' }}
+                        </button>
+                        <input #fileInput type="file" (change)="onImageSelected($event)" hidden />
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="mt-3">
-            <input type="checkbox" id="isActive" name="isActive" [(ngModel)]="model.isActive" class="form-check-input">
-            <label for="isActive" class="form-check-label">Is Active</label>
-        </div>
-
-        <div class="mt-3 text-center">
-            <button class="btn btn-primary" type="submit" [disabled]="form.invalid">Thêm mới</button>
+        <div class="mt-4 text-center">
+            <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
+                {{ brandToUpdate ? 'Cập nhật' : 'Thêm mới' }}
+            </button>
         </div>
     </form>
 </div>

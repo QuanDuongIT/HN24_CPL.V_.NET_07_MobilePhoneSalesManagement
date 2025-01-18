@@ -20,7 +20,7 @@ export class ProductManagementComponent {
 
   page$?: Observable<PagedResult<Product>>;
   orderBy = false;
-  isAddProductVisible = false;
+  isAddProductVisible = true;
   productToUpdate?: Product;
   page: number = 1;
   pageSize: number = 10;
@@ -40,7 +40,7 @@ export class ProductManagementComponent {
 
   loadProducts(): void {
     this.isLoading = true;
-    this.page$ = this.productService.getProducts(this.page, this.pageSize, this.orderBy);
+    this.page$ = this.productService.getProducts(this.page, this.pageSize, this.sortField, this.orderBy);
     this.page$.subscribe(res => {
       if (this.totalPages > res.totalPages) this.page = 1;
       this.pageSize = res.pageSize;
@@ -53,7 +53,7 @@ export class ProductManagementComponent {
   }
   loadProductsFilter(filter: boolean): void {
     this.isLoading = true;
-    this.page$ = this.productService.filterProductsbyPage(this.page, this.pageSize, filter, this.orderBy);
+    this.page$ = this.productService.filterProductsbyPage(this.page, this.pageSize, filter, this.sortField, this.orderBy);
     this.page$.subscribe(res => {
       this.totalCount = res.totalCount;
       if (res.items.length == 0 && res.totalCount > 0) {
@@ -93,6 +93,9 @@ export class ProductManagementComponent {
       );
     });
   }
+  formatCurrencyVND(value: number): string {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+  }
 
   resetSelectedProductIds() {
     this.selectedProductIds = [];
@@ -111,7 +114,7 @@ export class ProductManagementComponent {
   onSearchKeyChange($event: Event) {
     const target = $event.target as HTMLSelectElement;
     this.isLoading = true;
-    this.page$ = this.productService.searchProductsbyPage(this.page, this.pageSize, target.value, this.orderBy);
+    this.page$ = this.productService.searchProductsbyPage(this.page, this.pageSize, target.value, this.sortField, this.orderBy);
     this.page$.subscribe(res => {
       this.pageSize = res.pageSize;
       this.totalPages = res.totalPages;
@@ -203,8 +206,9 @@ export class ProductManagementComponent {
   }
   restoreProduct(productId: string): void {
     this.productService.getProductById(productId).subscribe((product: Product) => {
-      if (product.isActive == false) {
+      if (product) {
         product.isActive = true;
+        product.image.imageBase64 = 'data:image/jpeg;base64,' + product.image.imageBase64;
         this.productService.updateProduct(productId, product).subscribe({
           next: response => {
             this.onOnwitchloadProducts();
@@ -228,7 +232,10 @@ export class ProductManagementComponent {
       )
     }
   }
-
+  changePage(page: number): void {
+    this.page = page;
+    this.onOnwitchloadProducts();
+  }
   // Điều hướng tới trang trước
   previousPage(): void {
     if (this.page > 1) {
@@ -240,4 +247,34 @@ export class ProductManagementComponent {
   trackByProductId(index: number, product: Product): string {
     return product.productId;
   }
+  sortField: string = '';
+
+  sort(field: string): void {
+    if (this.sortField === field) {
+      this.orderBy = !this.orderBy;
+    } else {
+      this.sortField = field;
+      this.orderBy = false;
+    }
+
+    // Gọi API hoặc thực hiện logic sắp xếp tại đây
+    this.applySorting();
+  }
+
+  getSortIcon(field: string): string {
+    if (this.sortField === field) {
+      return this.orderBy === false
+        ? 'fas fa-arrow-up' // Icon mũi tên lên
+        : this.orderBy === true
+          ? 'fas fa-arrow-down' // Icon mũi tên xuống
+          : 'fas fa-sort'; // Icon mặc định
+    }
+    return 'fas fa-sort'; // Icon sắp xếp mặc định
+  }
+
+  applySorting(): void {
+    this.onOnwitchloadProducts();
+    console.log(`Sorting by ${this.sortField} in ${this.orderBy} order`);
+  }
+
 }

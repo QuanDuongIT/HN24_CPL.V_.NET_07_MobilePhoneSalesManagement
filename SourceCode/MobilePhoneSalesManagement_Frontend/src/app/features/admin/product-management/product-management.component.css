@@ -5,6 +5,7 @@
 
 h1 {
     text-align: center;
+    color: #4CAF50;
 }
 
 .table {
@@ -54,7 +55,6 @@ h1 {
     z-index: 999;
 }
 
-/* Modal container khi thêm hoặc cập nhật sản phẩm */
 .modal-container {
     position: fixed;
     top: 50%;
@@ -70,6 +70,8 @@ h1 {
     min-width: 800px;
     overflow-y: auto;
     max-height: 100vh;
+    overflow: hidden;
+    scrollbar-gutter: stable;
 }
 
 /* Style cho nút Update */
@@ -205,10 +207,13 @@ h1 {
 
 .container {
     border: 1px solid #ccc;
-    padding: 10px 35px;
     margin: 15px 0;
     border-radius: 4px;
     max-width: 100%;
+    transition: height 0.3s ease-in-out, width 0.3s ease-in-out;
+    scrollbar-gutter: stable;
+    border: 1px solid #ccc;
+    background-color: #f8f9fa;
 }
 
 #showProduct {
@@ -221,10 +226,6 @@ h1 {
     object-fit: contain;
 }
 
-/* Ẩn checkbox mặc định */
-/* input[type="checkbox"] {
-    display: none;
-} */
 
 /* Tạo một vòng tròn giả thay thế checkbox */
 input[type="checkbox"]:checked+.check-icon {
@@ -255,4 +256,84 @@ input[type="checkbox"]:checked+.check-icon {
     top: 50%;
     transform: translateY(-75%);
     cursor: pointer;
+}
+
+.icon-container i {
+    color: #6c757d;
+    /* Màu xám mặc định */
+}
+
+.icon-container:hover i {
+    color: #007bff;
+    /* Màu xanh dương khi hover */
+}
+
+.pagination button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.pagination i {
+    font-size: 18px;
+    /* Thay đổi kích thước biểu tượng */
+}
+
+.pagination button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.pagination i {
+    font-size: 18px;
+    /* Thay đổi kích thước biểu tượng */
+}
+
+.pagination span {
+    margin: 0 5px;
+    font-size: 14px;
+}
+
+/* Màu sắc của trang được chọn */
+.pagination .active {
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+    /* Màu nền của trang được chọn */
+    padding: 5px 10px;
+    border-radius: 1%;
+}
+
+/* Thêm một chút bóng đổ để nổi bật hơn */
+.pagination .active:hover {
+    box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Đổi màu cho các trang không được chọn */
+.pagination span {
+    color: #007bff;
+    cursor: pointer;
+}
+
+.pagination span:hover {
+    text-decoration: underline;
+}
+
+th {
+    cursor: pointer;
+    position: relative;
+}
+
+th i {
+    margin-left: 5px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+th:hover i {
+    color: #007bff;
+    /* Màu xanh khi hover */
 }

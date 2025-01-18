@@ -25,8 +25,9 @@ public interface IProductService : IBaseService<Product>
     Task<bool> AddProductToCartAsync(int productId, CartVm cartVm);
     Task<IEnumerable<ProductVm>> GetNewestProductsAsync();
     Task<PagedResult<ProductVm>> GetAllProductAsync(
-        int? pageNumber, int? pageSize,
-        Expression<Func<Product, bool>>? filter = null, bool? orderBy = true);
+    int? pageNumber, int? pageSize, string sortField = "updatedDate",
+    Expression<Func<Product, bool>>? filter = null, bool orderBy = true);
+
     Task<IEnumerable<ProductVm>> SearchProductsByNameAsync(string name);
 }
 public class ProductService : BaseService<Product>, IProductService
@@ -328,43 +329,50 @@ IEnumerable<InputProductSpecificationVm> productSpecifications)
         return productViewModels;
     }
     public async Task<PagedResult<ProductVm>> GetAllProductAsync(
-        int? pageNumber, int? pageSize,
-        Expression<Func<Product, bool>>? filter = null, bool? orderBy = true)
+    int? pageNumber, int? pageSize, string sortField = "updatedDate",
+    Expression<Func<Product, bool>>? filter = null, bool orderBy = true)
     {
+        // Determine sorting logic based on input
+        Func<IQueryable<Product>, IOrderedQueryable<Product>> sortExpression = sortField switch
+        {
+            "productCode" => orderBy
+                ? query => query.OrderBy(p => p.ProductId)
+                : query => query.OrderByDescending(p => p.ProductId),
+            "productName" => orderBy
+                ? query => query.OrderBy(p => p.Name)
+                : query => query.OrderByDescending(p => p.Name),
+            "productPrice" => orderBy
+                ? query => query.OrderBy(p => p.Price)
+                : query => query.OrderByDescending(p => p.Price),
+            _ => orderBy
+                ? query => query.OrderBy(p => p.UpdatedAt)
+                : query => query.OrderByDescending(p => p.UpdatedAt)
+        };
 
-        Func<IQueryable<Product>, IOrderedQueryable<Product>> isOrderBy = orderBy ?? true
-       ? query => query.OrderBy(p => p.UpdatedAt)
-       : query => query.OrderByDescending(p => p.UpdatedAt);
-
-
+        // Pagination parameters
         int currentPage = pageNumber ?? 1;
         int currentPageSize = pageSize ?? 10;
 
-        var query = await GetAllProductAsync(filter, orderBy: isOrderBy);
-
+        // Get data with filtering and sorting
+        var query = await GetAllProductAsync(filter, orderBy: sortExpression);
         var totalCount = query.Count();
-        IEnumerable<ProductVm> paginatedProducts;
-        if (orderBy == true)
-            paginatedProducts = query
-               .OrderBy(p => p.UpdatedAt)
-               .Skip((currentPage - 1) * currentPageSize)
-               .Take(currentPageSize)
-               .ToList();
-        else
-            paginatedProducts = query
-               .OrderByDescending(p => p.UpdatedAt)
-               .Skip((currentPage - 1) * currentPageSize)
-               .Take(currentPageSize)
-               .ToList();
+
+        var paginatedProducts = query
+            .Skip((currentPage - 1) * currentPageSize)
+            .Take(currentPageSize)
+            .ToList();
+
+        // Prepare paginated result
         return new PagedResult<ProductVm>
         {
             CurrentPage = currentPage,
             PageSize = currentPageSize,
             TotalCount = totalCount,
             TotalPages = (int)Math.Ceiling((double)totalCount / currentPageSize),
-            Items = paginatedProducts
+            Items = paginatedProducts,
         };
     }
+
 
     public async Task<IEnumerable<ProductSpecificationVm>> GetProductSpecificationsByProductIdAsync(int productId)
     {
