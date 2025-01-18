@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MailKit.Search;
+using Microsoft.EntityFrameworkCore;
 using ServerApp.BLL.Services.Base;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using System;
+using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 using static System.Net.Mime.MediaTypeNames;
 using Image = ServerApp.DAL.Models.Image;
@@ -21,9 +24,12 @@ namespace ServerApp.BLL.Services
 
         Task<IEnumerable<BrandVm>> GetAllBrandAsync();
         Task<int> UpdateBrandAsync(Brand brand);
-        Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize);
-        Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, bool filter = true);
-        Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, string search = "");
+        Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, Expression<Func<Brand, bool>>? filter = null,
+      string sortField = "updatedDate", bool orderBy = true);
+        Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, bool filter = true,
+            string sortField = "updatedDate", bool orderBy = true);
+        Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, string search = "",
+            string sortField = "updatedDate", bool orderBy = true);
     }
     public class BrandService : BaseService<Brand>, IBrandService
     {
@@ -55,34 +61,49 @@ namespace ServerApp.BLL.Services
 
             return BrandViewModels;
         }
-        public async Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize)
+        public async Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, Expression<Func<Brand, bool>>? filter = null,
+      string sortField = "updatedDate",bool orderBy = true)
         {
             int currentPage = pageNumber ?? 1; 
             int currentPageSize = pageSize ?? 10;
+            // Determine sorting logic based on input
+            Func<IQueryable<Brand>, IOrderedQueryable<Brand>> sortExpression = sortField switch
+            {
+                "brandCode" => orderBy
+                    ? query => query.OrderBy(p => p.BrandId)
+                    : query => query.OrderByDescending(p => p.BrandId),
+                "brandName" => orderBy
+                    ? query => query.OrderBy(p => p.Name)
+                    : query => query.OrderByDescending(p => p.Name),
+                "brandProductCount" => orderBy
+                    ? query => query.OrderBy(p => p.Products.Count)
+                    : query => query.OrderByDescending(p => p.Products.Count),
+                _ => orderBy
+                    ? query => query.OrderBy(p => p.UpdatedAt)
+                    : query => query.OrderByDescending(p => p.UpdatedAt)
+            };
 
-            var query = await GetAllAsync(
-                includesProperties: "Image,Products"
-            );
+            var query = await GetAllBrandAsync(pageNumber, pageSize, filter, orderBy: sortExpression );
 
             var totalCount = query.Count();
             var paginatedBrands = query
-                .OrderBy(u => u.BrandId)
                 .Skip((currentPage - 1) * currentPageSize)
                 .Take(currentPageSize)
                 .ToList();
+
             var brandVms = paginatedBrands.Select(brand => new BrandVm
             {
                 BrandId = brand.BrandId,
                 Name = brand.Name,
                 ImageId = brand.ImageId,
                 IsActive = brand.IsActive,
-                ProductCount = brand.Products?.Count ?? 0, 
+                ProductCount = brand.ProductCount, 
                 CreatedAt = brand.CreatedAt,
                 UpdatedAt = brand.UpdatedAt,
                 Image = brand.Image != null ? new ImageRequest
                 {
                     Name = brand.Image.Name,
-                    ImageBase64 = Convert.ToBase64String(brand.Image.ImageData)
+                    ImageBase64 = brand.Image.ImageBase64
                 } : null
             });
            
@@ -97,7 +118,38 @@ namespace ServerApp.BLL.Services
             };
         }
 
+        public async Task<IEnumerable<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize,
+        Expression<Func<Brand, bool>>? filter = null,
+        Func<IQueryable<Brand>, IOrderedQueryable<Brand>>? orderBy = null)
+        {
+            int currentPage = pageNumber ?? 1;
+            int currentPageSize = pageSize ?? 10;
+            var query = await GetAllAsync(
+                filter, orderBy,
+            includesProperties: "Image,Products"
+                );
+            var paginatedBrands = query
+                .Skip((currentPage - 1) * currentPageSize)
+                .Take(currentPageSize)
+                .ToList();
+            var brandVms = paginatedBrands.Select(brand => new BrandVm
+            {
+                BrandId = brand.BrandId,
+                Name = brand.Name,
+                ImageId = brand.ImageId,
+                IsActive = brand.IsActive,
+                ProductCount = brand.Products?.Count ?? 0,
+                CreatedAt = brand.CreatedAt,
+                UpdatedAt = brand.UpdatedAt,
+                Image = brand.Image != null ? new ImageRequest
+                {
+                    Name = brand.Image.Name,
+                    ImageBase64 = Convert.ToBase64String(brand.Image.ImageData)
+                } : null
+            });
 
+            return brandVms;
+        }
         public async Task<BrandVm?> GetByBrandIdAsync(int id)
         {
             var brand = await GetOneAsync(b=>b.BrandId==id,
@@ -126,89 +178,31 @@ namespace ServerApp.BLL.Services
 
         }
         
-        public async Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize,bool filter= true)
+        public async Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize,bool filter= true,
+            string sortField = "updatedDate", bool orderBy = true)
         {
             int currentPage = pageNumber ?? 1;
             int currentPageSize = pageSize ?? 10;
 
-            var query = await GetAllAsync(b=>
-            b.IsActive== filter&&b.BrandId!=0,
-                includesProperties: "Image,Products"
+            var query = await GetAllBrandAsync(pageNumber, pageSize, b =>
+                filter,
+                sortField, orderBy
             );
 
-            var totalCount = query.Count();
-            var paginatedBrands = query
-                .OrderBy(u => u.BrandId)
-                .Skip((currentPage - 1) * currentPageSize)
-                .Take(currentPageSize)
-                .ToList();
-            var brandVms = paginatedBrands.Select(brand => new BrandVm
-            {
-                BrandId = brand.BrandId,
-                Name = brand.Name,
-                ImageId = brand.ImageId,
-                IsActive = brand.IsActive,
-                ProductCount = brand.Products?.Count ?? 0, 
-                CreatedAt = brand.CreatedAt,
-                UpdatedAt=brand.UpdatedAt,
-                Image = brand.Image != null ? new ImageRequest
-                {
-                    Name = brand.Image.Name,
-                    ImageBase64 = Convert.ToBase64String(brand.Image.ImageData)
-                } : null
-            });
-            ;
-
-            return new PagedResult<BrandVm>
-            {
-                CurrentPage = currentPage,
-                PageSize = currentPageSize,
-                TotalCount = totalCount,
-                TotalPages = (int)Math.Ceiling((double)totalCount / currentPageSize),
-                Items = brandVms
-            };
+            return query;
         }
-        public async Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, string search)
+        public async Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, string search,
+            string sortField = "updatedDate", bool orderBy = true)
         {
             int currentPage = pageNumber ?? 1;
             int currentPageSize = pageSize ?? 10;
 
-            var query = await GetAllAsync(b =>
+            var query = await GetAllBrandAsync(pageNumber, pageSize, b =>
                 b.Name.Contains(search),
-                includesProperties: "Image,Products"
+                sortField, orderBy
             );
 
-            var totalCount = query.Count();
-            var paginatedBrands = query
-                .OrderBy(u => u.BrandId)
-                .Skip((currentPage - 1) * currentPageSize)
-                .Take(currentPageSize)
-                .ToList();
-            var brandVms = paginatedBrands.Select(brand => new BrandVm
-            {
-                BrandId = brand.BrandId,
-                Name = brand.Name,
-                ImageId = brand.ImageId,
-                IsActive = brand.IsActive,
-                ProductCount = brand.Products?.Count ?? 0, 
-                CreatedAt = brand.CreatedAt,
-                UpdatedAt = brand.UpdatedAt,
-                Image = brand.Image != null ? new ImageRequest
-                {
-                    Name = brand.Image.Name,
-                    ImageBase64 = Convert.ToBase64String(brand.Image.ImageData)
-                } : null
-            });
-
-
-            return new PagedResult<BrandVm>
-            {
-                CurrentPage = currentPage,
-                PageSize = currentPageSize,
-                TotalCount = totalCount,
-                TotalPages = (int)Math.Ceiling((double)totalCount / currentPageSize),
-                Items = brandVms
-            };
+            return query;
         }
         public async Task<BrandVm> AddBrandAsync(InputBrandVm brandVm)
         {

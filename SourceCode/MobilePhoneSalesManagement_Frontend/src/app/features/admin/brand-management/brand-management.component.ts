@@ -16,6 +16,8 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class BrandManagementComponent {
 
+  sortField: string = '';
+  orderBy = false;
   page$?: Observable<PagedResult<Brand>>;
   isAddBrandVisible = false;
   brandToUpdate?: Brand;
@@ -52,7 +54,7 @@ export class BrandManagementComponent {
   }
   loadBrands(): void {
     this.isLoading = true;
-    this.page$ = this.brandService.getBrandsbyPage(this.page, this.pageSize);
+    this.page$ = this.brandService.getBrandsbyPage(this.page, this.pageSize, this.sortField, this.orderBy);
     this.page$.subscribe(res => {
       if (this.totalPages > res.totalPages) this.page = 1;
       this.pageSize = res.pageSize;
@@ -66,7 +68,7 @@ export class BrandManagementComponent {
 
   loadBrandsFilter(filter: boolean): void {
     this.isLoading = true;
-    this.page$ = this.brandService.filterBrandsbyPage(this.page, this.pageSize, filter);
+    this.page$ = this.brandService.filterBrandsbyPage(this.page, this.pageSize, filter, this.sortField, this.orderBy);
     this.page$.subscribe(res => {
       this.totalCount = res.totalCount;
       if (res.items.length == 0 && res.totalCount > 0) {
@@ -133,7 +135,7 @@ export class BrandManagementComponent {
   onSearchKeyChange($event: Event) {
     const target = $event.target as HTMLSelectElement;
     this.isLoading = true;
-    this.page$ = this.brandService.searchBrandsbyPage(this.page, this.pageSize, target.value);
+    this.page$ = this.brandService.searchBrandsbyPage(this.page, this.pageSize, target.value, this.sortField, this.orderBy);
     this.page$.subscribe(res => {
       this.pageSize = res.pageSize;
       this.totalPages = res.totalPages;
@@ -254,8 +256,12 @@ export class BrandManagementComponent {
 
   restoreBrand(brandId: string): void {
     this.brandService.getBrandById(brandId).subscribe((brand: Brand) => {
+
+      console.log("r", brandId, brand)
       if (brand.isActive == false) {
         brand.isActive = true;
+        brand.image.imageBase64 = 'data:image/jpeg;base64,' + brand.image.imageBase64;
+        console.log("r", brandId, brand)
         this.brandService.updateBrand(brandId, brand).subscribe({
           next: response => {
             this.toastr.success('Thương hiệu đã được khôi phục thành công!', 'Thành công');
@@ -279,7 +285,10 @@ export class BrandManagementComponent {
       this.onOnwitchloadBrands();
     }
   }
-
+  changePage(page: number): void {
+    this.page = page;
+    this.onOnwitchloadBrands();
+  }
   previousPage(): void {
     if (this.page > 1) {
       this.page--;
@@ -289,5 +298,32 @@ export class BrandManagementComponent {
 
   trackByBrandId(index: number, brand: Brand): string {
     return brand.brandId;
+  }
+  sort(field: string): void {
+    if (this.sortField === field) {
+      this.orderBy = !this.orderBy;
+    } else {
+      this.sortField = field;
+      this.orderBy = false;
+    }
+
+    // Gọi API hoặc thực hiện logic sắp xếp tại đây
+    this.applySorting();
+  }
+
+  getSortIcon(field: string): string {
+    if (this.sortField === field) {
+      return this.orderBy === false
+        ? 'fas fa-arrow-up' // Icon mũi tên lên
+        : this.orderBy === true
+          ? 'fas fa-arrow-down' // Icon mũi tên xuống
+          : 'fas fa-sort'; // Icon mặc định
+    }
+    return 'fas fa-sort'; // Icon sắp xếp mặc định
+  }
+
+  applySorting(): void {
+    this.onOnwitchloadBrands();
+    console.log(`Sorting by ${this.sortField} in ${this.orderBy} order`);
   }
 }

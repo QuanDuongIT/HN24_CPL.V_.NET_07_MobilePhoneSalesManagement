@@ -256,3 +256,182 @@ input[type="checkbox"]:checked+.check-icon {
     transform: translateY(-75%);
     cursor: pointer;
 }
+
+.text-center {
+    text-align: center !important;
+    vertical-align: middle !important;
+    color: #333333;
+    /* Màu xám đậm cho văn bản căn giữa */
+}
+
+h1 {
+    text-align: center;
+    color: #4CAF50;
+    /* Màu xanh lá cây cho tiêu đề */
+}
+
+.table {
+    width: 100%;
+    opacity: 0;
+    animation: fadeIn 1.5s forwards;
+    color: #212529;
+    /* Màu đen nhẹ cho nội dung bảng */
+}
+
+.table.loading {
+    opacity: 0.5;
+    background-color: #f5f5f5;
+    /* Màu nền nhạt khi đang tải */
+}
+
+.loading {
+    color: #007bff;
+    /* Màu xanh cho chữ 'loading' */
+}
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Màu nền tối mờ */
+}
+
+.modal-container {
+    background-color: white;
+    /* Màu trắng cho nền modal */
+    color: #212529;
+    /* Màu đen nhẹ cho nội dung modal */
+}
+
+.link-update {
+    color: #28a745;
+    /* Màu xanh lá cây */
+}
+
+.link-update:hover {
+    color: #bbff00;
+    /* Màu xanh neon khi hover */
+}
+
+.table td {
+    height: 65px;
+    vertical-align: middle;
+    color: #495057;
+    /* Màu xám đậm cho văn bản trong ô */
+}
+
+.icon-container i {
+    color: #6c757d;
+    /* Màu xám mặc định */
+}
+
+.icon-container:hover i {
+    color: #007bff;
+    /* Màu xanh dương khi hover */
+}
+
+.bi-pencil-square:hover,
+.bi-arrow-counterclockwise:hover {
+    color: rgb(235, 118, 10);
+    /* Màu cam đậm khi hover */
+}
+
+.bi-trash:hover {
+    color: red;
+    /* Màu đỏ khi hover */
+}
+
+.link-delete {
+    color: #dc3545;
+    /* Màu đỏ */
+}
+
+.link-delete:hover {
+    color: #f01026;
+    /* Màu đỏ đậm khi hover */
+}
+
+.table thead th {
+    background-color: #f0f0f0;
+    /* Màu nền xám nhạt */
+    color: #212529;
+    /* Màu đen nhẹ cho tiêu đề cột */
+}
+
+.table tbody tr {
+    border-bottom: 1px solid #adAAAA;
+    /* Viền xám nhạt */
+    color: #495057;
+    /* Màu xám đậm */
+}
+
+.container {
+    border: 1px solid #ccc;
+    /* Màu viền xám */
+    background-color: #f8f9fa;
+    /* Màu nền xám nhạt */
+    color: #212529;
+    /* Màu đen nhẹ */
+}
+
+input[type="checkbox"]:checked+.check-icon {
+    color: #28a745;
+    /* Màu xanh lá khi checkbox được chọn */
+}
+
+.check-icon {
+    color: grey;
+    /* Màu xám cho icon chưa chọn */
+}
+
+.pagination button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.pagination i {
+    font-size: 18px;
+    /* Thay đổi kích thước biểu tượng */
+}
+
+.pagination button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.pagination i {
+    font-size: 18px;
+    /* Thay đổi kích thước biểu tượng */
+}
+
+.pagination span {
+    margin: 0 5px;
+    font-size: 14px;
+}
+
+/* Màu sắc của trang được chọn */
+.pagination .active {
+    font-weight: bold;
+    color: white !important;
+    background-color: #007bff;
+    /* Màu nền của trang được chọn */
+    padding: 5px 10px;
+    border-radius: 1%;
+}
+
+/* Thêm một chút bóng đổ để nổi bật hơn */
+.pagination .active:hover {
+    box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5) !important;
+}
+
+/* Đổi màu cho các trang không được chọn */
+.pagination span {
+    color: #007bff !important;
+    cursor: pointer;
+}
+
+.pagination span:hover {
+    text-decoration: underline;
+}
