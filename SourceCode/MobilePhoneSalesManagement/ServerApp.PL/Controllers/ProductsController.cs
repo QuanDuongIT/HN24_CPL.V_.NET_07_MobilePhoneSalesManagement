@@ -220,5 +220,18 @@ namespace ServerApp.PL.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+        [HttpGet("get-discounted-product")]
+        public async Task<ActionResult<IEnumerable<ProductVm>>> DiscountedProducts()
+        {
+            try
+            {
+                var discountedProducts = await _productService.GetTopDiscountedProductsAsync();
+                return Ok(discountedProducts);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Internal server error: {e.Message}");
+            }
+        }
     }
 }
