@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BASE_URL_API } from '../../../../app.config';
-import { Product } from '../models/product.model';
+import { Product } from '../../../admin/product-management/models/product';
 
 @Injectable({
   providedIn: 'root'
@@ -18,5 +18,8 @@ export class ProductService {
   }
   newestProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(`${BASE_URL_API}/Products/get-newest-product`);
+  }
+  discountedProducts(): Observable<Product[]> {
+    return this.http.get<Product[]>(`${BASE_URL_API}/Products/get-discounted-product`);
   }
 }

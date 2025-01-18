@@ -1,5 +1,7 @@
 .card {
+    display: flex;
     transition: transform 0.3s, box-shadow 0.3s;
+    flex-direction: column;
 }
 
 .card:hover {
@@ -46,4 +48,39 @@
     /* Đảm bảo hình ảnh chiếm toàn bộ chiều rộng của block */
     object-fit: cover;
     /* Hình ảnh không bị méo và giữ tỷ lệ */
+}
+
+.current-price {
+    font-weight: bold;
+}
+
+.old-price {
+    text-decoration-line: line-through;
+}
+
+p {
+    margin: -18px 0 24px;
+    line-height: 1.8;
+}
+
+h5 {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+p {
+    margin: 0px 0 0px;
+}
+
+.newestproductbox {
+    background-color: e8e8e8;
+    width: 100%;
+    padding-bottom: 13px;
+    margin-top: 15px;
+}
+
+.btn-sm {
+    width: 100%;
+    padding: 12px 22px;
+    font-size: 12px;
 }

@@ -18,22 +18,58 @@
     </div>
 
     <!-- New Products -->
-    <div class="mt-5">
-        <div class="col-12">
-            <h2 class="text-center">Sản phẩm mới nhất</h2>
+    <div class="newestproductbox">
+        <div class="mt-5">
+            <div class="col-12">
+                <h2 class="text-center">Sản phẩm mới nhất</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3" *ngFor="let product of newestProducts">
+                <div class="card mb-4 shadow-sm">
+                    <img [src]="'data:image/jpeg;base64,' + product.image.imageBase64" class="card-img-top"
+                        alt="{{ product.name }}" />
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-danger current-price">{{
+                            product.price-(product.price*product.discount/100)
+                            | currency:
+                            'VND' }}</p>
+                        <p class="card-text text-danger old-price">{{ product.price | currency: 'VND' }}
+                            -{{product.discount}}%</p>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-primary btn-sm">Thêm vào giỏ hàng</button>
+                            <button class="btn btn-outline-secondary btn-sm">Thêm vào Wishlist</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-3" *ngFor="let product of newestProducts">
-            <div class="card mb-4 shadow-sm">
-                <img [src]="product.imageUrl" class="card-img-top" alt="{{ product.name }}" />
-                <div class="card-body">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text text-muted">{{ product.description }}</p>
-                    <p class="card-text text-danger">{{ product.price | currency: 'VND' }}</p>
-                    <div class="d-flex justify-content-between">
-                        <button class="btn btn-primary btn-sm">Thêm vào giỏ hàng</button>
-                        <button class="btn btn-outline-secondary btn-sm">Thêm vào Wishlist</button>
+    <!-- Discounted Products -->
+    <div class="newestproductbox">
+        <div class="mt-5">
+            <div class="col-12">
+                <h2 class="text-center">Sản phẩm ưu đãi lớn nhất</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3" *ngFor="let product of discountedProducts">
+                <div class="card mb-4 shadow-sm">
+                    <img [src]="'data:image/jpeg;base64,' + product.image.imageBase64" class="card-img-top"
+                        alt="{{ product.name }}" />
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-danger current-price">{{
+                            product.price-(product.price*product.discount/100)
+                            | currency:
+                            'VND' }}</p>
+                        <p class="card-text text-danger old-price">{{ product.price | currency: 'VND' }}
+                            -{{product.discount}}%</p>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-primary btn-sm">Thêm vào giỏ hàng</button>
+                            <button class="btn btn-outline-secondary btn-sm">Thêm vào Wishlist</button>
+                        </div>
                     </div>
                 </div>
             </div>
