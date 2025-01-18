@@ -53,17 +53,19 @@
                 <table class="table table-bordered mt-3" [class.loading]="isLoading">
                     <thead>
                         <tr>
-                            <th>Mã thương hiệu</th>
+                            <th (click)="sort('brandCode')">Mã thương hiệu<i [class]="getSortIcon('brandCode')"></i>
+                            </th>
                             <th>Ảnh</th>
-                            <th>Tên thương hiệu</th>
-                            <th class="text-center">
-                                <div>Số lượng</div>
-                                <div>điện thoại</div>
+                            <th (click)="sort('brandName')">Tên thương hiệu<i [class]="getSortIcon('brandName')"></i>
+                            </th>
+                            <th (click)="sort('brandProductCount')" class="text-center">
+                                <span>Số lượng</span>
+                                <span>điện thoại</span><i [class]="getSortIcon('brandProductCount')"></i>
                             </th>
                             <th>Trạng thái</th>
-                            <th>
-                                <div>Ngày tạo</div>
-                                <div>Ngày cập nhật</div>
+                            <th (click)="sort('updatedDate')">
+                                <span>Ngày tạo</span>
+                                <span> ,cập nhật </span><i [class]="getSortIcon('updatedDate')"></i>
                             </th>
                             <th *ngIf="filter === 'Active'||filter === 'Inactive'">
                                 <div class="checkbox-container">

@@ -13,14 +13,14 @@ export class BrandService {
   getBrands(): Observable<any> {
     return this.http.get<any>(`${BASE_URL_API}/Brands/get-all-brands`);
   }
-  getBrandsbyPage(pageNumber: number, pageSize: number): Observable<any> {
-    return this.http.get<any>(`${BASE_URL_API}/Brands/get-all-brands-by-page?pageNumber=${pageNumber}&pageSize=${pageSize}`);
+  getBrandsbyPage(pageNumber: number, pageSize: number, sortField: string, orderBy: boolean): Observable<any> {
+    return this.http.get<any>(`${BASE_URL_API}/Brands/get-all-brands-by-page?pageNumber=${pageNumber}&pageSize=${pageSize}&sortField=${sortField}&orderBy=${orderBy}`);
   }
-  searchBrandsbyPage(pageNumber: number, pageSize: number, search: string): Observable<any> {
-    return this.http.get<any>(`${BASE_URL_API}/Brands/search-brands-by-page?pageNumber=${pageNumber}&pageSize=${pageSize}&search=${search}`);
+  searchBrandsbyPage(pageNumber: number, pageSize: number, search: string, sortField: string, orderBy: boolean): Observable<any> {
+    return this.http.get<any>(`${BASE_URL_API}/Brands/search-brands-by-page?pageNumber=${pageNumber}&pageSize=${pageSize}&search=${search}&sortField=${sortField}&orderBy=${orderBy}`);
   }
-  filterBrandsbyPage(pageNumber: number, pageSize: number, filter: boolean): Observable<any> {
-    return this.http.get<any>(`${BASE_URL_API}/Brands/filter-brands-by-page?pageNumber=${pageNumber}&pageSize=${pageSize}&filter=${filter}`);
+  filterBrandsbyPage(pageNumber: number, pageSize: number, filter: boolean, sortField: string, orderBy: boolean): Observable<any> {
+    return this.http.get<any>(`${BASE_URL_API}/Brands/filter-brands-by-page?pageNumber=${pageNumber}&pageSize=${pageSize}&filter=${filter}&sortField=${sortField}&orderBy=${orderBy}`);
   }
   getBrandById(brandId: string): Observable<any> {
     return this.http.get(`${BASE_URL_API}/Brands/get-brand-by-id/${brandId}`);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MailKit.Search;
+using Microsoft.AspNetCore.Mvc;
 using PresentationLayer.Exceptions;
 using ServerApp.BLL.Services;
 using ServerApp.BLL.Services.ViewModels;
@@ -26,21 +27,21 @@ namespace ServerApp.PL.Controllers
         }
 
         [HttpGet("get-all-brands-by-page")]
-        public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortField = "updatedDate", [FromQuery] bool orderBy = true)
         {
-            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize);
+            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize, filter:null, sortField, orderBy);
             return Ok(result); // 200 OK nếu có dữ liệu.
         }
         [HttpGet("search-brands-by-page")]
-        public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string search="")
+        public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string search="", [FromQuery] string sortField = "updatedDate", [FromQuery] bool orderBy = true)
         {
-            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize,search);
+            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize,search, sortField, orderBy);
             return Ok(result); // 200 OK nếu có dữ liệu.
         }
         [HttpGet("filter-brands-by-page")]
-        public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] bool filter = true)
+        public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] bool filter = true, [FromQuery] string sortField = "updatedDate", [FromQuery] bool orderBy = true)
         {
-            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize, filter);
+            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize, b => b.IsActive == filter, sortField, orderBy);
             return Ok(result); // 200 OK nếu có dữ liệu.
         }
         [HttpGet("get-brand-by-id/{id}")]

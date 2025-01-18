@@ -16,8 +16,10 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class BrandManagementComponent {
 
+  sortField: string = '';
+  orderBy = false;
   page$?: Observable<PagedResult<Brand>>;
-  isAddBrandVisible = true;
+  isAddBrandVisible = false;
   brandToUpdate?: Brand;
   page: number = 1;
   pageSize: number = 10;
@@ -52,7 +54,7 @@ export class BrandManagementComponent {
   }
   loadBrands(): void {
     this.isLoading = true;
-    this.page$ = this.brandService.getBrandsbyPage(this.page, this.pageSize);
+    this.page$ = this.brandService.getBrandsbyPage(this.page, this.pageSize, this.sortField, this.orderBy);
     this.page$.subscribe(res => {
       if (this.totalPages > res.totalPages) this.page = 1;
       this.pageSize = res.pageSize;
@@ -66,7 +68,7 @@ export class BrandManagementComponent {
 
   loadBrandsFilter(filter: boolean): void {
     this.isLoading = true;
-    this.page$ = this.brandService.filterBrandsbyPage(this.page, this.pageSize, filter);
+    this.page$ = this.brandService.filterBrandsbyPage(this.page, this.pageSize, filter, this.sortField, this.orderBy);
     this.page$.subscribe(res => {
       this.totalCount = res.totalCount;
       if (res.items.length == 0 && res.totalCount > 0) {
@@ -133,7 +135,7 @@ export class BrandManagementComponent {
   onSearchKeyChange($event: Event) {
     const target = $event.target as HTMLSelectElement;
     this.isLoading = true;
-    this.page$ = this.brandService.searchBrandsbyPage(this.page, this.pageSize, target.value);
+    this.page$ = this.brandService.searchBrandsbyPage(this.page, this.pageSize, target.value, this.sortField, this.orderBy);
     this.page$.subscribe(res => {
       this.pageSize = res.pageSize;
       this.totalPages = res.totalPages;
@@ -296,5 +298,32 @@ export class BrandManagementComponent {
 
   trackByBrandId(index: number, brand: Brand): string {
     return brand.brandId;
+  }
+  sort(field: string): void {
+    if (this.sortField === field) {
+      this.orderBy = !this.orderBy;
+    } else {
+      this.sortField = field;
+      this.orderBy = false;
+    }
+
+    // Gọi API hoặc thực hiện logic sắp xếp tại đây
+    this.applySorting();
+  }
+
+  getSortIcon(field: string): string {
+    if (this.sortField === field) {
+      return this.orderBy === false
+        ? 'fas fa-arrow-up' // Icon mũi tên lên
+        : this.orderBy === true
+          ? 'fas fa-arrow-down' // Icon mũi tên xuống
+          : 'fas fa-sort'; // Icon mặc định
+    }
+    return 'fas fa-sort'; // Icon sắp xếp mặc định
+  }
+
+  applySorting(): void {
+    this.onOnwitchloadBrands();
+    console.log(`Sorting by ${this.sortField} in ${this.orderBy} order`);
   }
 }
