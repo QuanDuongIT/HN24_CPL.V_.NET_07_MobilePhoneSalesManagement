@@ -65,7 +65,7 @@
               <label
                 title="Xác nhận đơn hàng"
                 class="label-check active"
-                (click)="openModal('confirmOrder')"
+                (click)="openModal({ type: 'confirmOrder', orderId: order.orderId })"
               >
                 <i class="fas fa-check-square"></i>
               </label>
@@ -81,7 +81,7 @@
               <label
                 title="Xác nhận vận chuyển thành công"
                 class="label-delivered"
-                (click)="openModal('confirmDelivery')"
+                (click)="openModal({ type: 'confirmDelivery', orderId: order.orderId })"
               >
                 <i class="fas fa-truck"></i>
               </label>
@@ -97,7 +97,7 @@
               <label
                 title="Hủy đơn hàng"
                 class="label-cancel warning"
-                (click)="openModal('cancelOrder')"
+                (click)="openModal({ type: 'cancelOrder', orderId: order.orderId })"
               >
                 <i class="fas fa-trash"></i>
               </label>
@@ -123,7 +123,7 @@
                   <button
                     type="button"
                     class="btn-primary"
-                    (click)="confirmAction(order.orderId)"
+                    (click)="confirmAction()"
                   >
                     Xác nhận
                   </button>
@@ -131,21 +131,6 @@
               </div>
             </div>
           </td>
-
-          <!-- <td class="confirm">
-                  <span>
-                    <input type="checkbox" (change)="confirmOrder(order)">
-                    <label title="Xác nhận đơn hàng" class="label-check active"><i class="fas fa-check-square"></i></label>
-                  </span>
-                  <span>
-                    <input type="checkbox" (change)="markAsDelivered(order)">
-                    <label title="Xác nhận vận chuyển thành công" class="label-delivered disable"><i class="fas fa-truck"></i></label>
-                  </span>
-                  <span>
-                    <input type="checkbox" (change)="cancelOrder(order)">
-                    <label title="Hủy đơn hàng" class="label-cancel warning"><i class="fas fa-trash"></i></label>
-                  </span>
-                </td> -->
         </tr>
       </tbody>
     </table>
@@ -212,12 +197,14 @@
               <tbody>
                 <tr *ngFor="let item of selectedOrder?.cartItems">
                   <td>
-                    <img
+                    <div class="box_img">
+                      <img
                       [src]="'data:image/jpeg;base64,' + item.product?.imageUrl"
                       width="100px"
                       height="100px"
                       [alt]="item.product?.productName"
                     />
+                    </div>
                   </td>
                   <td>SP{{ item.product?.productId }}</td>
                   <td>{{ item.product?.productName }}</td>

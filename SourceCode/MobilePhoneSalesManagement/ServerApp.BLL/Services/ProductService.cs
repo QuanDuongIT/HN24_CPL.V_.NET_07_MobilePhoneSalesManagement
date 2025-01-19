@@ -25,9 +25,11 @@ public interface IProductService : IBaseService<Product>
     Task<bool> AddProductToCartAsync(int productId, CartVm cartVm);
     Task<IEnumerable<ProductVm>> GetNewestProductsAsync();
     Task<PagedResult<ProductVm>> GetAllProductAsync(
-        int? pageNumber, int? pageSize,
-        Expression<Func<Product, bool>>? filter = null, bool? orderBy = true);
+    int? pageNumber, int? pageSize, string sortField = "updatedDate",
+    Expression<Func<Product, bool>>? filter = null, bool orderBy = true);
+
     Task<IEnumerable<ProductVm>> SearchProductsByNameAsync(string name);
+    Task<IEnumerable<ProductVm>> GetTopDiscountedProductsAsync();
 }
 public class ProductService : BaseService<Product>, IProductService
 {
@@ -328,43 +330,50 @@ IEnumerable<InputProductSpecificationVm> productSpecifications)
         return productViewModels;
     }
     public async Task<PagedResult<ProductVm>> GetAllProductAsync(
-        int? pageNumber, int? pageSize,
-        Expression<Func<Product, bool>>? filter = null, bool? orderBy = true)
+    int? pageNumber, int? pageSize, string sortField = "updatedDate",
+    Expression<Func<Product, bool>>? filter = null, bool orderBy = true)
     {
+        // Determine sorting logic based on input
+        Func<IQueryable<Product>, IOrderedQueryable<Product>> sortExpression = sortField switch
+        {
+            "productCode" => orderBy
+                ? query => query.OrderBy(p => p.ProductId)
+                : query => query.OrderByDescending(p => p.ProductId),
+            "productName" => orderBy
+                ? query => query.OrderBy(p => p.Name)
+                : query => query.OrderByDescending(p => p.Name),
+            "productPrice" => orderBy
+                ? query => query.OrderBy(p => p.Price)
+                : query => query.OrderByDescending(p => p.Price),
+            _ => orderBy
+                ? query => query.OrderBy(p => p.UpdatedAt)
+                : query => query.OrderByDescending(p => p.UpdatedAt)
+        };
 
-        Func<IQueryable<Product>, IOrderedQueryable<Product>> isOrderBy = orderBy ?? true
-       ? query => query.OrderBy(p => p.UpdatedAt)
-       : query => query.OrderByDescending(p => p.UpdatedAt);
-
-
+        // Pagination parameters
         int currentPage = pageNumber ?? 1;
         int currentPageSize = pageSize ?? 10;
 
-        var query = await GetAllProductAsync(filter, orderBy: isOrderBy);
-
+        // Get data with filtering and sorting
+        var query = await GetAllProductAsync(filter, orderBy: sortExpression);
         var totalCount = query.Count();
-        IEnumerable<ProductVm> paginatedProducts;
-        if (orderBy == true)
-            paginatedProducts = query
-               .OrderBy(p => p.UpdatedAt)
-               .Skip((currentPage - 1) * currentPageSize)
-               .Take(currentPageSize)
-               .ToList();
-        else
-            paginatedProducts = query
-               .OrderByDescending(p => p.UpdatedAt)
-               .Skip((currentPage - 1) * currentPageSize)
-               .Take(currentPageSize)
-               .ToList();
+
+        var paginatedProducts = query
+            .Skip((currentPage - 1) * currentPageSize)
+            .Take(currentPageSize)
+            .ToList();
+
+        // Prepare paginated result
         return new PagedResult<ProductVm>
         {
             CurrentPage = currentPage,
             PageSize = currentPageSize,
             TotalCount = totalCount,
             TotalPages = (int)Math.Ceiling((double)totalCount / currentPageSize),
-            Items = paginatedProducts
+            Items = paginatedProducts,
         };
     }
+
 
     public async Task<IEnumerable<ProductSpecificationVm>> GetProductSpecificationsByProductIdAsync(int productId)
     {
@@ -603,7 +612,7 @@ IEnumerable<InputProductSpecificationVm> productSpecifications)
     {
         try
         {
-            var query = await GetAllAsync(includesProperties: "Brand,ProductSpecifications,ProductSpecifications.SpecificationType");
+            var query = await GetAllAsync(includesProperties: "Image,Brand,ProductSpecifications,ProductSpecifications.SpecificationType");
 
             // Lọc theo Hãng sản xuất
             if (filterRequest.Brands != null && filterRequest.Brands.Any())
@@ -739,22 +748,52 @@ IEnumerable<InputProductSpecificationVm> productSpecifications)
 
             var pagedQuery = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
             // Chuyển sang ViewModel và trả về
-            var products = pagedQuery.Select(p => new ProductVm
+            var products = pagedQuery.Select(product => new ProductVm
             {
-                ProductId = p.ProductId,
-                Name = p.Name,
-                Description = p.Description,
-                Price = p.Price,
-                OldPrice = p.OldPrice,
-                StockQuantity = p.StockQuantity,
-                BrandId = p.BrandId,
-                ImageId = p.ImageId,
-                Manufacturer = p.Manufacturer,
-                IsActive = p.IsActive,
-                Colors = p.Colors,
-                Discount = p.Discount,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt,
+                ProductId = product.ProductId,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                OldPrice = product.OldPrice,
+                StockQuantity = product.StockQuantity,
+                BrandId = product.BrandId,
+                ImageId = product.ImageId,
+                Manufacturer = product.Manufacturer,
+                IsActive = product.IsActive,
+                Colors = product.Colors,
+                Discount = product.Discount,
+                CreatedAt = product.CreatedAt,
+                UpdatedAt = product.UpdatedAt,
+                Image = product.Image != null ? new ImageRequest
+                {
+                    Name = product.Image.Name,
+                    ImageBase64 = Convert.ToBase64String(product.Image.ImageData)
+                } : null,
+                Brand = product.Brand != null ? new BrandVm
+                {
+                    BrandId = product.Brand.BrandId,
+                    Name = product.Brand.Name,
+                    IsActive = product.Brand.IsActive,
+                    ImageId = product.Brand.ImageId,
+                    ProductCount = product.Brand.Products.Count,
+                    CreatedAt = product.CreatedAt,
+                    UpdatedAt = product.Brand.UpdatedAt
+                } : null, // Bao gồm dữ liệu liên kết Brand
+                ProductSpecifications = product.ProductSpecifications.Select(ps => new ProductSpecificationVm
+                {
+                    ProductId = ps.ProductId,
+                    SpecificationTypeId = ps.SpecificationTypeId,
+                    Value = ps.Value,
+                    CreatedAt = ps.CreatedAt,
+                    UpdatedAt = ps.UpdatedAt,
+                    SpecificationType = new SpecificationTypeVm
+                    {
+                        SpecificationTypeId = ps.SpecificationType.SpecificationTypeId,
+                        Name = ps.SpecificationType.Name,
+                        CreatedAt = ps.SpecificationType.CreatedAt,
+                        UpdatedAt = ps.SpecificationType.UpdatedAt,
+                    }
+                }).ToList()
             }).ToList();
             return (products, totalPages);
         }
@@ -770,28 +809,58 @@ IEnumerable<InputProductSpecificationVm> productSpecifications)
         try
         {
             // Lấy danh sách sản phẩm bao gồm các thuộc tính cần thiết
-            var query = await GetAllAsync(includesProperties: "Brand,ProductSpecifications,ProductSpecifications.SpecificationType");
+            var query = await GetAllAsync(includesProperties: "Image,Brand,ProductSpecifications,ProductSpecifications.SpecificationType");
 
             // Sắp xếp theo ngày tạo (CreatedAt) giảm dần và lấy 4 sản phẩm mới nhất
             var newestProducts = query
-                .OrderByDescending(p => p.CreatedAt)
+                .OrderByDescending(product => product.CreatedAt)
                 .Take(4)
-                .Select(p => new ProductVm
+                .Select(product => new ProductVm
                 {
-                    ProductId = p.ProductId,
-                    Name = p.Name,
-                    Description = p.Description,
-                    Price = p.Price,
-                    OldPrice = p.OldPrice,
-                    StockQuantity = p.StockQuantity,
-                    BrandId = p.BrandId,
-                    ImageId = p.ImageId,
-                    Manufacturer = p.Manufacturer,
-                    IsActive = p.IsActive,
-                    Colors = p.Colors,
-                    Discount = p.Discount,
-                    CreatedAt = p.CreatedAt,
-                    UpdatedAt = p.UpdatedAt,
+                    ProductId = product.ProductId,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    OldPrice = product.OldPrice,
+                    StockQuantity = product.StockQuantity,
+                    BrandId = product.BrandId,
+                    ImageId = product.ImageId,
+                    Manufacturer = product.Manufacturer,
+                    IsActive = product.IsActive,
+                    Colors = product.Colors,
+                    Discount = product.Discount,
+                    CreatedAt = product.CreatedAt,
+                    UpdatedAt = product.UpdatedAt,
+                    Image = product.Image != null ? new ImageRequest
+                    {
+                        Name = product.Image.Name,
+                        ImageBase64 = Convert.ToBase64String(product.Image.ImageData)
+                    } : null,
+                    Brand = product.Brand != null ? new BrandVm
+                    {
+                        BrandId = product.Brand.BrandId,
+                        Name = product.Brand.Name,
+                        IsActive = product.Brand.IsActive,
+                        ImageId = product.Brand.ImageId,
+                        ProductCount = product.Brand.Products.Count,
+                        CreatedAt = product.CreatedAt,
+                        UpdatedAt = product.Brand.UpdatedAt
+                    } : null, // Bao gồm dữ liệu liên kết Brand
+                    ProductSpecifications = product.ProductSpecifications.Select(ps => new ProductSpecificationVm
+                    {
+                        ProductId = ps.ProductId,
+                        SpecificationTypeId = ps.SpecificationTypeId,
+                        Value = ps.Value,
+                        CreatedAt = ps.CreatedAt,
+                        UpdatedAt = ps.UpdatedAt,
+                        SpecificationType = new SpecificationTypeVm
+                        {
+                            SpecificationTypeId = ps.SpecificationType.SpecificationTypeId,
+                            Name = ps.SpecificationType.Name,
+                            CreatedAt = ps.SpecificationType.CreatedAt,
+                            UpdatedAt = ps.SpecificationType.UpdatedAt,
+                        }
+                    }).ToList()
                 })
                 .ToList();
 
@@ -838,6 +907,76 @@ IEnumerable<InputProductSpecificationVm> productSpecifications)
         });
 
         return result;
+    }
+    public async Task<IEnumerable<ProductVm>> GetTopDiscountedProductsAsync()
+    {
+        try
+        {
+            // Lấy danh sách sản phẩm bao gồm các thuộc tính cần thiết
+            var query = await GetAllAsync(includesProperties: "Image,Brand,ProductSpecifications,ProductSpecifications.SpecificationType");
+
+            // Sắp xếp theo mức giảm giá (Discount) giảm dần và lấy 4 sản phẩm giảm giá nhiều nhất
+            var topDiscountedProducts = query
+                .Where(product => product.Discount > 0) // Lọc những sản phẩm có giảm giá
+                .OrderByDescending(product => product.Discount)
+                .Take(4)
+                .Select(product => new ProductVm
+                {
+                    ProductId = product.ProductId,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    OldPrice = product.OldPrice,
+                    StockQuantity = product.StockQuantity,
+                    BrandId = product.BrandId,
+                    ImageId = product.ImageId,
+                    Manufacturer = product.Manufacturer,
+                    IsActive = product.IsActive,
+                    Colors = product.Colors,
+                    Discount = product.Discount,
+                    CreatedAt = product.CreatedAt,
+                    UpdatedAt = product.UpdatedAt,
+                    Image = product.Image != null ? new ImageRequest
+                    {
+                        Name = product.Image.Name,
+                        ImageBase64 = Convert.ToBase64String(product.Image.ImageData)
+                    } : null,
+                    Brand = product.Brand != null ? new BrandVm
+                    {
+                        BrandId = product.Brand.BrandId,
+                        Name = product.Brand.Name,
+                        IsActive = product.Brand.IsActive,
+                        ImageId = product.Brand.ImageId,
+                        ProductCount = product.Brand.Products.Count,
+                        CreatedAt = product.CreatedAt,
+                        UpdatedAt = product.Brand.UpdatedAt
+                    } : null, // Bao gồm dữ liệu liên kết Brand
+                    ProductSpecifications = product.ProductSpecifications.Select(ps => new ProductSpecificationVm
+                    {
+                        ProductId = ps.ProductId,
+                        SpecificationTypeId = ps.SpecificationTypeId,
+                        Value = ps.Value,
+                        CreatedAt = ps.CreatedAt,
+                        UpdatedAt = ps.UpdatedAt,
+                        SpecificationType = new SpecificationTypeVm
+                        {
+                            SpecificationTypeId = ps.SpecificationType.SpecificationTypeId,
+                            Name = ps.SpecificationType.Name,
+                            CreatedAt = ps.SpecificationType.CreatedAt,
+                            UpdatedAt = ps.SpecificationType.UpdatedAt,
+                        }
+                    }).ToList()
+                })
+                .ToList();
+
+            return topDiscountedProducts;
+        }
+        catch (Exception ex)
+        {
+            // Ghi log lỗi hoặc xử lý tùy theo yêu cầu dự án
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            return Enumerable.Empty<ProductVm>();
+        }
     }
 }
 

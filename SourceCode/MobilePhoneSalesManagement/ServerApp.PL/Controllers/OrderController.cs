@@ -32,7 +32,7 @@ namespace ServerApp.PL.Controllers
 
         // Tạo đơn hàng mới
         [HttpPost("create")]
-        public async Task<IActionResult> CreateOrder([FromBody] OrderAdminVm customerInfo)
+        public async Task<IActionResult> CreateOrder([FromBody] OrderVm orderVm)
         {
             if (!ModelState.IsValid)
             {
@@ -46,7 +46,7 @@ namespace ServerApp.PL.Controllers
                 {
                     return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
                 }
-                var createdOrder = await _orderService.CreateOrderAsync(int.Parse(userId), customerInfo);
+                var createdOrder = await _orderService.CreateOrderAsync(int.Parse(userId), orderVm);
                 return Ok(new { success = true, message = "Tạo đơn hàng thành công" });
             }
             catch (Exception ex)
@@ -102,6 +102,33 @@ namespace ServerApp.PL.Controllers
                 success = result.Success,
                 message = result.Message
             });
+        }
+
+        [HttpGet("get-all-order-by-user-id")]
+        public async Task<IActionResult> GetAllOrdersByUserId()
+        {
+            // Lấy thông tin userId từ Claim
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            // Nếu không có claim NameIdentifier, trả về lỗi yêu cầu người dùng đăng nhập
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { success = false, message = "Vui lòng đăng nhập." });
+            }
+
+            var userId = int.Parse(userIdClaim.Value);
+
+            // Gọi dịch vụ để lấy danh sách đơn hàng
+            var orders = await _orderService.GetAllOrdersByUserIdAsync(userId);
+
+            // Nếu không có đơn hàng, trả về danh sách rỗng với thông báo
+            if (orders == null || !orders.Any())
+            {
+                return Ok(new { success = true, message = "Không tìm thấy đơn hàng.", data = new List<OrderClientVm>() });
+            }
+
+            // Trả về danh sách đơn hàng
+            return Ok(new { success = true, data = orders });
         }
     }
 }

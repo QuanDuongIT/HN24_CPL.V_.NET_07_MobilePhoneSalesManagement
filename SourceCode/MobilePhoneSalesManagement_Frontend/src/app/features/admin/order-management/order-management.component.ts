@@ -99,28 +99,39 @@ export class OrderManagementComponent {
   modalTitle: string = '';
   modalMessage: string = '';
 
-  openModal(modalType: string) {
-    this.currentModal = modalType;
+  selectedOrderId: number | null = null;
 
-    if (modalType === 'confirmOrder') {
-      this.modalTitle = 'Xác nhận đơn hàng';
-      this.modalMessage = 'Bạn có muốn xác nhận đơn hàng này không?';
-    } else if (modalType === 'confirmDelivery') {
-      this.modalTitle = 'Xác nhận vận chuyển';
-      this.modalMessage = 'Bạn có muốn xác nhận vận chuyển thành công?';
-    } else if (modalType === 'cancelOrder') {
-      this.modalTitle = 'Xác nhận hủy đơn';
-      this.modalMessage = 'Bạn có muốn xác nhận hủy đơn hàng này không?';
+  openModal(modalData: { type: string; orderId: number }): void {
+    const modalType = modalData.type;
+    const orderId = modalData.orderId;
+
+    this.currentModal = modalType;
+    this.selectedOrderId = orderId;
+    switch (modalType) {
+      case 'confirmOrder':
+        this.modalTitle = 'Xác nhận đơn hàng';
+        this.modalMessage = 'Bạn có chắc muốn xác nhận đơn hàng này?';
+        break;
+      case 'confirmDelivery':
+        this.modalTitle = 'Xác nhận vận chuyển';
+        this.modalMessage =
+          'Bạn có chắc muốn xác nhận vận chuyển đơn hàng này?';
+        break;
+      case 'cancelOrder':
+        this.modalTitle = 'Hủy đơn hàng';
+        this.modalMessage = 'Bạn có chắc muốn hủy đơn hàng này?';
+        break;
     }
   }
 
   closeModal() {
     this.currentModal = null;
+    this.selectedOrderId = null;
   }
 
-  confirmAction(orderId: number) {
+  confirmAction() {
     if (this.currentModal === 'confirmOrder') {
-      this.orderService.confirmOrder(orderId).subscribe(
+      this.orderService.confirmOrder(Number(this.selectedOrderId)).subscribe(
         (res) => {
           if (res.success) {
             this.toastService.showSuccess(res.message);
@@ -135,7 +146,7 @@ export class OrderManagementComponent {
         }
       );
     } else if (this.currentModal === 'confirmDelivery') {
-      this.orderService.confirmDelivery(orderId).subscribe(
+      this.orderService.confirmDelivery(Number(this.selectedOrderId)).subscribe(
         (res) => {
           if (res.success) {
             this.toastService.showSuccess(res.message);
@@ -150,7 +161,7 @@ export class OrderManagementComponent {
         }
       );
     } else if (this.currentModal === 'cancelOrder') {
-      this.orderService.cancelOrder(orderId).subscribe(
+      this.orderService.cancelOrder(Number(this.selectedOrderId)).subscribe(
         (res) => {
           if (res.success) {
             this.toastService.showSuccess(res.message);

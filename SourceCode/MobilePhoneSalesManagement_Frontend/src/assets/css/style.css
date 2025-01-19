@@ -134,6 +134,7 @@ a {
   -webkit-transition: all 0.3s;
   -moz-transition: all 0.3s;
   transition: all 0.3s;
+  cursor: pointer;
 }
 a:focus,
 a:hover {
@@ -3724,6 +3725,7 @@ td {
   margin-right: 10px;
 }
 .receipt-infor-details .title-receipt .right-content {
+  width: 60%;
 }
 .receipt-infor-details .title-receipt .content {
   border: 1px solid rgb(165, 165, 165);

@@ -9,13 +9,14 @@ namespace ServerApp.BLL.Services
     public interface IOrderService
     {
         Task<PagedResult<OrderAdminVm>> GetAllOrdersAsync(int? pageNumber, int? pageSize, string? keySearch);
-        Task<Order> CreateOrderAsync(int userId, OrderAdminVm orderAdminVm);
+        Task<Order> CreateOrderAsync(int userId, OrderVm orderVm);
         Task<Order> GetOrderByIdAsync(int orderId);
         Task<bool> ProcessPaymentAsync(int orderId, PaymentVm paymentVm);
         Task<bool> CompleteOrderAsync(int orderId);
         Task<ServiceResult> ConfirmOrderAsync(int orderId);
         Task<ServiceResult> ConfirmDeliveryAsync(int orderId);
         Task<ServiceResult> CancelOrderAsync(int orderId);
+        Task<List<OrderClientVm>> GetAllOrdersByUserIdAsync(int userId);
     }
 
 
@@ -58,7 +59,7 @@ namespace ServerApp.BLL.Services
                 OrderId = order.OrderId,
                 CreatedDate = order.CreatedAt,
                 CustomerId = order.UserId,
-                OrderInfo = new CustomerInfoVm
+                OrderInfo = new OrderInfoVm
                 {
                     Address = order.Address,
                     Country = order.Country,
@@ -97,17 +98,17 @@ namespace ServerApp.BLL.Services
             };
         }
 
-        public async Task<Order> CreateOrderAsync(int userId, OrderAdminVm customerInfo)
+        public async Task<Order> CreateOrderAsync(int userId, OrderVm orderVm)
         {
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                var model = customerInfo.OrderInfo;
+                var model = orderVm.OrderInfo;
                 var order = new Order
                 {
                     UserId = userId,
-                    TotalPrice = customerInfo.TotalAmount,
-                    OrderStatus = customerInfo.OrderStatus ?? "pending",
+                    TotalPrice = orderVm.TotalAmount,
+                    OrderStatus = "Pending",
                     Address = model.Address,
                     Country = model.Country,
                     Email = model.Email,
@@ -122,12 +123,14 @@ namespace ServerApp.BLL.Services
                 await _unitOfWork.OrderRepository.AddAsync(order);
                 await _unitOfWork.SaveChangesAsync();
 
-                foreach (var item in customerInfo.CartItems)
+                foreach (var item in orderVm.CartItems)
                 {
                     await _orderItemService.AddOrderItemAsync(new OrderItem
                     {
                         OrderId = order.OrderId,
                         Quantity = item.Quantity,
+                        ProductId = item.ProductId,
+                        Price = item.Price
                     });
                 }
                 await _unitOfWork.SaveChangesAsync();
@@ -220,12 +223,12 @@ namespace ServerApp.BLL.Services
                 };
             }
 
-            if (order.OrderStatus != "Delivered")
+            if (order.OrderStatus == "Delivered")
             {
                 return new ServiceResult
                 {
                     Success = false,
-                    Message = "Đơn hàng phải ở trạng thái vận chuyển"
+                    Message = "Đơn hàng đang vận chuyển"
                 };
             }
 
@@ -305,6 +308,63 @@ namespace ServerApp.BLL.Services
             }
 
             return false;
+        }
+
+        public async Task<List<OrderClientVm>> GetAllOrdersByUserIdAsync(int userId)
+        {
+
+            // Lọc dữ liệu
+            var query = await _unitOfWork.OrderRepository.GetAllAsync(
+            filter: order =>
+            order.UserId == userId,
+                include: x => x.Include(x => x.OrderItems).ThenInclude(oi => oi.Product).ThenInclude(p => p.Image)
+            );
+
+            var ordersQuery = query
+                .OrderBy(u => u.UserId)
+                .ToList();
+
+            var orderVms = ordersQuery.Select(order => new OrderClientVm
+            {
+                OrderId = order.OrderId,
+                CustomerName = order.FirstName + " " + order.LastName,
+                OrderDate = order.CreatedAt,
+                OrderStatus = order.OrderStatus,
+                OrderClientDetailVm = new OrderClientDetailVm
+                {
+                    OrderId = order.OrderId,
+                    CartItems = order.OrderItems.Select(item => new OrderItemVm
+                    {
+                        OrderId = item.OrderId,
+                        Quantity = item.Quantity,
+                        Product = new ProductOrderVm
+                        {
+                            ProductId = item.Product.ProductId,
+                            ImageUrl = item.Product.Image != null
+                                ? Convert.ToBase64String(item.Product.Image.ImageData)
+                                : null,
+                            ProductName = item.Product.Name,
+                            Price = item.Product.Price,
+                            Color = item.Product.Colors
+                        }
+                    }).ToList(),
+                    CreatedDate = order.CreatedAt,
+                    OrderInfoVm = new OrderInfoVm
+                    {
+                        Address = order.Address,
+                        Country = order.Country,
+                        Email = order.Email,
+                        FirstName = order.FirstName,
+                        LastName = order.LastName,
+                        Note = order.Note,
+                        Phone = order.Phone
+                    },
+                    TotalAmount = order.TotalPrice,
+                    OrderStatus = order.OrderStatus
+                }
+            });
+
+            return orderVms.ToList();
         }
     }
 }

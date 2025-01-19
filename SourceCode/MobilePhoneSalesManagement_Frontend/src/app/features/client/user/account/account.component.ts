@@ -9,6 +9,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { log } from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
 import { Router } from '@angular/router';
 import { UserClientService } from '../service/user-client.service';
+import { OrderService } from '../../../admin/order-management/service/order.service';
 
 @Component({
   selector: 'app-account',
@@ -25,17 +26,22 @@ export class AccountComponent {
     dateOfBirth: '',
     gender: 'male',
   };
+  orders: any [] = []
   passwordModel = {
     currentPassword: '',
     password: '',
     re_password: '',
   };
+  isDetailView = false;
+  selectedOrder: any = null;
+
   private modelChangePassword: any;
 
   currentTab: string = 'account-info';
 
   constructor(
     private router: Router,
+    private orderAdminService: OrderService,
     private userService: UserClientService,
     private toastService: ToastService,
     private validateService: ValidatorsService
@@ -57,7 +63,63 @@ export class AccountComponent {
         this.router.navigateByUrl('/login');
       }
     );
+
+    // get orders
+    this.userService.getOrders().subscribe(
+      (res) => {
+        this.orders = res.data
+        console.log(res.data);
+        
+      },
+      (err) => {
+        console.error(err);
+      }
+    )
   }
+  
+  // order tab
+  viewOrderDetails(order: any) {
+    this.selectedOrder = order;
+    this.isDetailView = true;
+    
+  }
+  goBack() {
+    this.isDetailView = false;
+    this.selectedOrder = null;
+  }
+  transform(status: string): string {
+    switch (status) {
+      case 'Pending':
+        return 'Chờ xác nhận';
+      case 'Delivered':
+        return 'Đang vận chuyển';
+      case 'Shipped':
+        return 'Đã vận chuyển';
+      default:
+        return 'Không xác định';
+    }
+  }
+  cancelOrder(orderId: number): void {
+    if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) {
+      // Gửi yêu cầu đến API để hủy đơn hàng
+      this.orderAdminService.cancelOrder(orderId).subscribe(
+        (response) => {
+          this.goBack();
+          if (response.success) {
+            this.toastService.showSuccess(response.message);
+          } else {
+            this.toastService.showError(response.message);
+          }
+        },
+        (error) => {
+          console.error('Lỗi khi hủy đơn hàng:', error);
+          this.toastService.showError('Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại.');
+        }
+      );
+    }
+  }
+
+  // account tab
   onSubmit(): void {
     this.userService.updateCurrentUser(this.user).subscribe(
       (res) => {
@@ -81,6 +143,7 @@ export class AccountComponent {
     this.currentTab = tab;
   }
 
+  // chage password tab
   onChangePassword(form: NgForm) {
     this.validateService.matchPasswords(form);
     // Gửi dữ liệu tới server hoặc xử lý logic khác
@@ -94,9 +157,6 @@ export class AccountComponent {
         (res) => {
           if (res.success) {
             this.toastService.showSuccess(res.message);
-            setTimeout(() => {
-              window.location.reload();
-            }, 600);
           } else {
             this.toastService.showError(res.message);
           }

@@ -50,7 +50,8 @@ export class CheckoutComponent {
       cartItems: this.cartItems.map((item: any) => ({
         productId: item.productId,
         quantity: item.quantity,
-        price: item.price
+        price: item.price,
+        color: item.color
       })),
       discountAmount: this.discountAmount,
       totalAmount: this.totalAmount,
@@ -70,11 +71,7 @@ export class CheckoutComponent {
       },
       (err) => {
         console.error(err);
-        
       }
     )
-    // console.log(JSON.parse(data));
-
-    // Thực hiện thao tác khi gửi form, ví dụ như gửi dữ liệu tới server
   }
 }

@@ -57,4 +57,8 @@ export class UserClientService {
       withCredentials: true,
     });
   }
+
+  getOrders(): Observable<any> {
+    return this.http.get(`${BASE_URL_API}/order/get-all-order-by-user-id`)
+  }
 }

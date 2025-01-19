@@ -146,9 +146,119 @@
             </div>
           </div>
           <div *ngIf="currentTab === 'order-management'">
-            <h3 class="title-content">Quản lý đơn hàng</h3>
-            <p>Danh sách đơn hàng của bạn sẽ hiển thị tại đây.</p>
+            <h3 class="title-content" *ngIf="!isDetailView">Đơn hàng đã đặt</h3>
+            <h3 class="title-content" *ngIf="isDetailView">Chi tiết đơn hàng</h3>
+          
+            <div *ngIf="!isDetailView">
+              <div class="receipt-infor">
+                <!-- Danh sách đơn hàng -->
+                
+                <table class="table table-hover">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">Mã đơn hàng</th>
+                      <th scope="col">Tên khách hàng</th>
+                      <th scope="col">Ngày đặt hàng</th>
+                      <th scope="col">Chi tiết đơn hàng</th>
+                      <th scope="col">Tình trạng đơn hàng</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of orders">
+                      <th scope="row">{{ 'DH00' + item.orderId }}</th>
+                      <td>{{ item.customerName }}</td>
+                      <td>{{ item.orderDate | date: 'dd/MM/yyyy' }}</td>
+                      <td><a (click)="viewOrderDetails(item)">Xem chi tiết</a></td>
+                      <td>{{ transform(item.orderStatus) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+            
+              </div>
+            </div>
+            
+            <!-- Nội dung chi tiết đơn hàng -->
+            <div *ngIf="isDetailView">
+              <div class="receipt-infor-details">
+                <div class="title-receipt">
+                  <div class="left-content content">
+                    <h4>ĐƠN HÀNG</h4>
+                    <p class="receipt-id">Mã đơn hàng: DH00{{ selectedOrder?.orderId }}</p>
+                    <p class="receipt-time">Đặt hàng: {{ selectedOrder?.orderDate | date: 'dd/MM/yyyy' }}</p>
+                  </div>
+                  <p></p>
+                  <div class="right-content content">
+                    <h4>THÔNG TIN NHẬN HÀNG</h4>
+                    <p><strong>{{ selectedOrder?.customerName }}</strong> - {{ selectedOrder?.orderClientDetailVm.orderInfoVm.phone }}</p>
+                    <p class="address">{{ selectedOrder?.orderClientDetailVm.orderInfoVm.address }}</p>
+                  </div>
+                </div>
+            
+                <table class="table">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Sản phẩm</th>
+                      <th scope="col">Đơn giá</th>
+                      <th scope="col">Số lượng</th>
+                      <th scope="col">Thành tiền</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of selectedOrder?.orderClientDetailVm?.cartItems">
+                      <td>
+                        <div class="product-title">
+                          <div class="box_img">
+                            <img [src]="'data:image/jpeg;base64,' + item.product.imageUrl"  alt="{{ item.product.productName }}">
+                          </div>
+                          <div>
+                            <p>{{ item.product.productName }}</p>
+                            <p>Màu sắc: {{ item.product.color }}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td><div class="item-center">{{ item.product.price | currency: 'VND' }}</div></td>
+                      <td><div class="item-center">{{ item.quantity }}</div></td>
+                      <td><div class="item-center">{{ item.quantity * item.product.price | currency: 'VND' }}</div></td>
+                    </tr>
+                  </tbody>
+            
+                  <tfoot>
+                    <tr>
+                      <td scope="row"></td>
+                      <td></td>
+                      <td scope="row">
+                        <div>
+                          <p>Tổng tiền:</p>
+                          <p>Phí vận chuyển:</p>
+                          <p>Tổng thanh toán:</p>
+                        </div>
+                      </td>
+                      <td>
+                        <div>
+                          <p>{{ selectedOrder?.orderClientDetailVm?.totalAmount | currency: 'VND' }}</p>
+                          <p>
+                            {{ (selectedOrder?.orderClientDetailVm?.totalAmount * 0.02) | currency: 'VND' }}
+                          </p>
+                          <p>
+                            {{ (selectedOrder?.orderClientDetailVm?.totalAmount + (selectedOrder?.orderClientDetailVm?.totalAmount * 0.02)) | currency: 'VND' }}
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+                <div class="cancel-order-btn" *ngIf="selectedOrder?.orderStatus === 'Pending'">
+                  <button class="btn btn-danger btn_cancel" (click)="cancelOrder(selectedOrder?.orderId)">
+                    Hủy đơn hàng
+                  </button>
+                </div>
+                <a class="redirect-to-receipt text-blue" (click)="goBack()">
+                  <i class="fas fa-long-arrow-alt-left"></i> Danh sách đơn hàng
+                </a>
+              </div>
+            </div>
           </div>
+          
 
           <div *ngIf="currentTab === 'change-password'">
             <h3 class="title-content">Đổi mật khẩu</h3>

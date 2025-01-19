@@ -176,7 +176,7 @@ namespace ServerApp.PL.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new { success = false, message = "Mật khẩu xác nhận phải trùng với mật khẩu mới và có chiều dài từ 6 ký tự trở lên chứa ký tự hóa, thương và ký tự số." });
+                return Ok(new { success = false, message = "Mật khẩu xác nhận phải trùng với mật khẩu mới và có chiều dài từ 6 ký tự trở lên chứa ký tự hóa, thương và ký tự số." });
             }
 
             try
@@ -187,7 +187,7 @@ namespace ServerApp.PL.Controllers
                 // Nếu không có claim NameIdentifier, trả về lỗi yêu cầu người dùng đăng nhập
                 if (userIdClaim == null)
                 {
-                    return Unauthorized(new { success = false, message = "Vui lòng đăng nhập" });
+                    return Ok(new { success = false, message = "Vui lòng đăng nhập" });
                 }
 
                 var userId = int.Parse(userIdClaim.Value);
@@ -199,12 +199,12 @@ namespace ServerApp.PL.Controllers
                     return Ok(new { success = true, message = "Thay đổi mật khẩu thành công." });
                 }
 
-                return BadRequest(new { success = false, message = "Thay đổi mật khẩu thất bại." });
+                return Ok(new { success = false, message = "Thay đổi mật khẩu thất bại." });
 
             }
             catch (Exception ex)
             {
-                return BadRequest(new { success = false, message = ex.Message });
+                return Ok(new { success = false, message = ex.Message });
             }
         }
 

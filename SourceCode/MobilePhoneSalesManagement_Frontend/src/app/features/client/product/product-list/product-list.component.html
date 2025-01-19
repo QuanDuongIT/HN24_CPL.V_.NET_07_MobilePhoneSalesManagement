@@ -1,3 +1,18 @@
+<!-- page-header -->
+<div class="page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="page-breadcrumb">
+                    <ol class="breadcrumb">
+                        <li><a href="/">Trang chủ</a></li>
+                        <li>Sản phẩm</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="container py-4">
     <div class="row">
         <!-- Bộ lọc -->
@@ -78,18 +93,23 @@
             <div class="row g-4">
                 <div class="col-md-4" *ngFor="let product of products">
                     <div class="card h-100">
-                        <img [src]="product.imageUrl" class="card-img-top" [alt]="product.name"
-                            style="height: 200px; object-fit: cover;" />
+                        <img [src]="'data:image/jpeg;base64,' + product.image.imageBase64" class="card-img-top"
+                            [alt]="product.name" style="height: 200px; object-fit: cover;" />
                         <div class="card-body d-flex flex-column">
-                            <h6 class="card-title">{{ product.name }}</h6>
-                            <p class="card-text text-danger fw-bold">
-                                {{ product.price | currency: 'VND':'symbol' }}
-                            </p>
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-danger current-price">{{
+                                product.price-(product.price*product.discount/100)
+                                | currency:
+                                'VND' }}</p>
+                            <p class="card-text text-danger old-price">{{ product.price | currency: 'VND' }}
+                                -{{product.discount}}%</p>
                             <div class="mt-auto">
-                                <button class="btn btn-primary btn-sm w-100 mb-2" (click)="addToCart(product.productId)">
+                                <button class="btn btn-primary btn-sm w-100 mb-2"
+                                    (click)="addToCart(product.productId)">
                                     Thêm vào giỏ hàng
                                 </button>
-                                <button class="btn btn-outline-secondary btn-sm w-100" (click)="toggleWishList(product.productId)">
+                                <button class="btn btn-outline-secondary btn-sm w-100"
+                                    (click)="toggleWishList(product.productId)">
                                     Thêm vào Wishlist
                                 </button>
                             </div>

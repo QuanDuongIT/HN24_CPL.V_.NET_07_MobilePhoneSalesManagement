@@ -27,7 +27,6 @@ export class OrderService {
     return this.http.post(`${BASE_URL_API}/order/create`, orderData, {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
     }).pipe(
-      tap(response => console.log('Response from API:', response)), // Debug phản hồi từ API
       catchError(error => {
         console.error('Error from API:', error); // Debug lỗi nếu xảy ra
         return throwError(() => new Error(error.message || 'Server Error'));

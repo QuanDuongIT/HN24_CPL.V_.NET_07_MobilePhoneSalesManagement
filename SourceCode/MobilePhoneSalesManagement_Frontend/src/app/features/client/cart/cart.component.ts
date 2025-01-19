@@ -218,8 +218,5 @@ export class CartComponent {
 
     // Điều hướng đến trang thanh toán
     this.router.navigate(['/checkout']);
-
-    // Hiển thị thông báo thành công
-    this.toastService.showSuccess('Đang chuyển đến trang thanh toán...');
   }
 }

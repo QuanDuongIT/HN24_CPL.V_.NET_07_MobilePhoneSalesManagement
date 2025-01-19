@@ -5,7 +5,7 @@
         public int OrderId { get; set; }
         public int UserId { get; set; }
         public decimal TotalPrice { get; set; }
-        public string OrderStatus { get; set; } = "pending";
+        public string OrderStatus { get; set; } = "Pending";
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
