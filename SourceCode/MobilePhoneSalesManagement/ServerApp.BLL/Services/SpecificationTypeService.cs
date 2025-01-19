@@ -1,22 +1,12 @@
 ﻿using ServerApp.BLL.Services.Base;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
-using System;
 
 namespace ServerApp.BLL.Services
 {
-    public interface ISpecificationTypeService : IBaseService<SpecificationType>
-    {
-        Task<SpecificationTypeVm> AddSpecificationTypeAsync(InputSpecificationTypeVm specificationTypeVm);
-        Task<SpecificationTypeVm> UpdateSpecificationTypeAsync(int id, InputSpecificationTypeVm specificationTypeVm);
 
-        Task<SpecificationTypeVm> DeleteSpecificationTypeAsync(int id);
-
-        Task<SpecificationTypeVm?> GetBySpecificationTypeIdAsync(int id);
-
-        Task<IEnumerable<SpecificationTypeVm>> GetAllSpecificationTypeAsync();
-    }
     public class SpecificationTypeService : BaseService<SpecificationType>, ISpecificationTypeService
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -34,8 +24,8 @@ namespace ServerApp.BLL.Services
             {
                 SpecificationTypeId = specificationType.SpecificationTypeId,
                 Name = specificationType.Name,
-                CreatedAt=specificationType.CreatedAt,
-                UpdatedAt=specificationType.UpdatedAt
+                CreatedAt = specificationType.CreatedAt,
+                UpdatedAt = specificationType.UpdatedAt
             });
 
             return SpecificationTypeViewModels;

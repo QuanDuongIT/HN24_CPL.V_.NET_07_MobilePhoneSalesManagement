@@ -1,14 +1,9 @@
 ﻿using ServerApp.BLL.Services.Base;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ServerApp.BLL.Services
+namespace ServerApp.BLL.Services.InterfaceServices
 {
     public interface IBrandService : IBaseService<Brand>
     {

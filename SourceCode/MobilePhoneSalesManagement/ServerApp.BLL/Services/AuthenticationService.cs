@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.BLL.ViewModels.Authentication;
 using ServerApp.DAL.Infrastructure;
@@ -15,16 +16,6 @@ using ResetPasswordVm = ServerApp.BLL.ViewModels.Authentication.ResetPasswordVm;
 
 namespace ServerApp.BLL.Services
 {
-    public interface IAuthenticationService
-    {
-        Task<ServiceResult> RegisterUserAsync(UserVm register);
-        Task<IActionResult> LoginUserAsync(LoginVm loginVm);
-        Task<IActionResult> ForgotPasswordUserAsync(string email);
-        Task<IActionResult> ResetPasswordUserAsync(ResetPasswordVm resetPasswordVm);
-        Task<ServiceResult> VerifyEmailAsync(string email, string code);
-        Task<AuthResultVm> RefreshTokenAsync(string refreshToken);
-    }
-
     public class AuthenticationService : IAuthenticationService
     {
         private readonly UserManager<User> _userManager;

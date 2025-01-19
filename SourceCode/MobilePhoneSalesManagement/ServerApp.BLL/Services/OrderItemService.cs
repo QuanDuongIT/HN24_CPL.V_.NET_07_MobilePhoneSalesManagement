@@ -1,18 +1,10 @@
 ﻿using ServerApp.BLL.Services.Base;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 
 namespace ServerApp.BLL.Services
 {
-    public interface IOrderItemService
-    {
-        Task<IEnumerable<OrderItem>> GetAllOrderItemsAsync();
-        Task<OrderItem> GetOrderItemByIdAsync(int orderId, int productId);
-        Task AddOrderItemAsync(OrderItem orderItem);
-        Task UpdateOrderItemAsync(OrderItem orderItem);
-        Task DeleteOrderItemAsync(int orderId, int productId);
-    }
-
     public class OrderItemService : BaseService<User>, IOrderItemService
     {
         private readonly IUnitOfWork _unitOfWork;

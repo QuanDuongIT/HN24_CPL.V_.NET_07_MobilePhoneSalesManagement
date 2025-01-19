@@ -1,14 +1,9 @@
-﻿using MailKit.Search;
-using Microsoft.EntityFrameworkCore;
-using ServerApp.BLL.Services.Base;
+﻿using ServerApp.BLL.Services.Base;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
-using System;
 using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static Org.BouncyCastle.Asn1.Cmp.Challenge;
-using static System.Net.Mime.MediaTypeNames;
 using Image = ServerApp.DAL.Models.Image;
 
 namespace ServerApp.BLL.Services
@@ -36,17 +31,17 @@ namespace ServerApp.BLL.Services
                 Name = brand.Name,
                 ImageId = brand.ImageId,
                 IsActive = brand.IsActive,
-                ProductCount=brand.Products.Count,
-                CreatedAt= brand.CreatedAt,
-                UpdatedAt= brand.UpdatedAt
+                ProductCount = brand.Products.Count,
+                CreatedAt = brand.CreatedAt,
+                UpdatedAt = brand.UpdatedAt
             });
 
             return BrandViewModels;
         }
         public async Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, Expression<Func<Brand, bool>>? filter = null,
-      string sortField = "updatedDate",bool orderBy = true)
+      string sortField = "updatedDate", bool orderBy = true)
         {
-            int currentPage = pageNumber ?? 1; 
+            int currentPage = pageNumber ?? 1;
             int currentPageSize = pageSize ?? 10;
             // Determine sorting logic based on input
             Func<IQueryable<Brand>, IOrderedQueryable<Brand>> sortExpression = sortField switch
@@ -65,7 +60,7 @@ namespace ServerApp.BLL.Services
                     : query => query.OrderByDescending(p => p.UpdatedAt)
             };
 
-            var query = await GetAllBrandAsync(pageNumber, pageSize, filter, orderBy: sortExpression );
+            var query = await GetAllBrandAsync(pageNumber, pageSize, filter, orderBy: sortExpression);
 
             var totalCount = query.Count();
             var paginatedBrands = query
@@ -79,7 +74,7 @@ namespace ServerApp.BLL.Services
                 Name = brand.Name,
                 ImageId = brand.ImageId,
                 IsActive = brand.IsActive,
-                ProductCount = brand.ProductCount, 
+                ProductCount = brand.ProductCount,
                 CreatedAt = brand.CreatedAt,
                 UpdatedAt = brand.UpdatedAt,
                 Image = brand.Image != null ? new ImageRequest
@@ -88,7 +83,7 @@ namespace ServerApp.BLL.Services
                     ImageBase64 = brand.Image.ImageBase64
                 } : null
             });
-           
+
 
             return new PagedResult<BrandVm>
             {
@@ -134,7 +129,7 @@ namespace ServerApp.BLL.Services
         }
         public async Task<BrandVm?> GetByBrandIdAsync(int id)
         {
-            var brand = await GetOneAsync(b=>b.BrandId==id,
+            var brand = await GetOneAsync(b => b.BrandId == id,
                 includesProperties: "Image,Products");
             if (brand == null)
             {
@@ -146,7 +141,7 @@ namespace ServerApp.BLL.Services
                 Name = brand.Name,
                 ImageId = brand.ImageId,
                 IsActive = brand.IsActive,
-                ProductCount = brand.Products?.Count ?? 0, 
+                ProductCount = brand.Products?.Count ?? 0,
                 CreatedAt = brand.CreatedAt,
                 UpdatedAt = brand.UpdatedAt,
                 Image = brand.Image != null ? new ImageRequest
@@ -159,8 +154,8 @@ namespace ServerApp.BLL.Services
             return brandVm;
 
         }
-        
-        public async Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize,bool filter= true,
+
+        public async Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, bool filter = true,
             string sortField = "updatedDate", bool orderBy = true)
         {
             int currentPage = pageNumber ?? 1;
@@ -195,7 +190,7 @@ namespace ServerApp.BLL.Services
             //);
             if (true)
             {
-                var id= await _imageService.AddImageAsync(brandVm.Image);
+                var id = await _imageService.AddImageAsync(brandVm.Image);
                 if (id != null)
                 {
                     var brand = new Brand
@@ -216,7 +211,7 @@ namespace ServerApp.BLL.Services
                         };
                     }
                 }
-                
+
                 throw new ArgumentException("Failed to update brand");
             }
             throw new ExceptionBusinessLogic("Brand name is already in use.");
@@ -261,11 +256,11 @@ namespace ServerApp.BLL.Services
                 BrandId = brand.BrandId,
                 Name = brand.Name,
                 ImageId = brand.ImageId,
-                ProductCount = brand.Products?.Count ?? 0, 
+                ProductCount = brand.Products?.Count ?? 0,
                 IsActive = brand.IsActive,
                 CreatedAt = brand.CreatedAt
             };
-            
+
         }
         public async Task<int> UpdateBrandAsync(Brand brand)
         {
@@ -305,7 +300,7 @@ namespace ServerApp.BLL.Services
                 {
                     BrandId = brand.BrandId,
                     Name = brand.Name,
-                    ProductCount = brand.Products?.Count ?? 0, 
+                    ProductCount = brand.Products?.Count ?? 0,
                     ImageId = brand.ImageId,
                     IsActive = brand.IsActive
                 };

@@ -1,14 +1,11 @@
 ﻿using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.BLL.Services.ViewModels;
 
 namespace ServerApp.BLL.Services
 {
-    public interface IEmailService
-    {
-        Task SendAsync(string to, string subject, string body);
-    }
 
     public class EmailService : IEmailService
     {

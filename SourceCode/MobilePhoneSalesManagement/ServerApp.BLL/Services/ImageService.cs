@@ -1,26 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ServerApp.BLL.Services.Base;
+﻿using ServerApp.BLL.Services.Base;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Data;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 using ServerApp.DAL.Seed;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 namespace ServerApp.BLL.Services
 {
-    public interface IImageService : IBaseService<Image>
-    {
-        Task<int> AddImageAsync(ImageRequest imageRequest);
-
-        Task<int> UpdateImageAsync(int id, ImageRequest imageRequest);
-        Task<ImageRequest?> GetByImageIdAsync(int id);
-        Task<PagedResult<Image>> GetAllImageId(int? pageNumber, int? pageSize);
-
-    }
     public class ImageService : BaseService<Image>, IImageService
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -85,7 +71,7 @@ namespace ServerApp.BLL.Services
         {
             if (string.IsNullOrEmpty(imageRequest.ImageBase64) || !imageRequest.ImageBase64.Contains(","))
             {
-                imageRequest.ImageBase64 = $","+SeedData.image_default;
+                imageRequest.ImageBase64 = $"," + SeedData.image_default;
             }
             //ValidateModelPropertiesWithAttribute(imageRequest);
             var image_data = imageRequest.ImageBase64.Split(",")[1];
@@ -94,7 +80,7 @@ namespace ServerApp.BLL.Services
             await _context.SaveChangesAsync();
             return image.ImageId;
         }
-        public async Task<int> UpdateImageAsync(int id,ImageRequest imageRequest)
+        public async Task<int> UpdateImageAsync(int id, ImageRequest imageRequest)
         {
 
             //ValidateModelPropertiesWithAttribute(imageRequest);
@@ -110,7 +96,7 @@ namespace ServerApp.BLL.Services
             var image_data = imageRequest.ImageBase64.Split(",")[1];
             image.Name = imageRequest.Name;
             image.ImageData = Convert.FromBase64String(image_data);
-            
+
             return await _unitOfWork.GenericRepository<Image>().ModifyAsync(image);
         }
 

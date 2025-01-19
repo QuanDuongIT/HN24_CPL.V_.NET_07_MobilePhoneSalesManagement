@@ -1,19 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServerApp.BLL.Services.Base;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 
 namespace ServerApp.BLL.Services
 {
-    public interface ICartService : IBaseService<Cart>
-    {
-
-        Task<List<CartViewModel>> GetCartItemsAsync(int userId);
-        Task<ServiceResult> UpdateCartAsync(int userId, int productId, int quantity);
-        Task<ServiceResult> RemoveFromCartAsync(int userId, int productId);
-        Task<decimal> GetCartTotalAsync(int userId);
-    }
     public class CartService : BaseService<Cart>, ICartService
     {
         private readonly IUnitOfWork _unitOfWork;

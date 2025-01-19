@@ -1,25 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ServerApp.BLL.Services.Base;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.DAL.Infrastructure;
 using ServerApp.DAL.Models;
 
 namespace ServerApp.BLL.Services
 {
-    public interface IOrderService
-    {
-        Task<PagedResult<OrderAdminVm>> GetAllOrdersAsync(int? pageNumber, int? pageSize, string? keySearch);
-        Task<Order> CreateOrderAsync(int userId, OrderVm orderVm);
-        Task<Order> GetOrderByIdAsync(int orderId);
-        Task<bool> ProcessPaymentAsync(int orderId, PaymentVm paymentVm);
-        Task<bool> CompleteOrderAsync(int orderId);
-        Task<ServiceResult> ConfirmOrderAsync(int orderId);
-        Task<ServiceResult> ConfirmDeliveryAsync(int orderId);
-        Task<ServiceResult> CancelOrderAsync(int orderId);
-        Task<List<OrderClientVm>> GetAllOrdersByUserIdAsync(int userId);
-    }
-
-
     public class OrderService : BaseService<Order>, IOrderService
     {
         private readonly IUnitOfWork _unitOfWork;

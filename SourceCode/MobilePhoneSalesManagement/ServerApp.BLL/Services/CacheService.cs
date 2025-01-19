@@ -1,14 +1,10 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
+using ServerApp.BLL.Services.InterfaceServices;
 
 namespace ServerApp.BLL.Services
 {
-    public interface ICacheService
-    {
-        Task SetAsync<T>(string key, T value, TimeSpan expiration);
-        Task<T> GetAsync<T>(string key);
-        Task RemoveAsync(string key);
-    }
+
 
     public class CacheService : ICacheService
     {
