@@ -20,7 +20,7 @@ export class ProductManagementComponent {
 
   page$?: Observable<PagedResult<Product>>;
   orderBy = false;
-  isAddProductVisible = true;
+  isAddProductVisible = false;
   productToUpdate?: Product;
   page: number = 1;
   pageSize: number = 10;

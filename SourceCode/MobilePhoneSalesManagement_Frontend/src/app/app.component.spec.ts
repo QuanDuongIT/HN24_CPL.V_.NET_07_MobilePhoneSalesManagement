@@ -4,7 +4,7 @@ import { AppComponent } from './app.component';
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppComponent],
+      declarations: [AppComponent], // Sử dụng declarations thay vì imports
     }).compileComponents();
   });
 
@@ -27,3 +27,4 @@ describe('AppComponent', () => {
     expect(compiled.querySelector('h1')?.textContent).toContain('Hello, MobilePhoneSalesManagement_Frontend');
   });
 });
+
