@@ -87,9 +87,9 @@ namespace ServerApp.DAL.Seed
                         {
                             Name = $"Product {i}",
                             Description = $"Description for Product {i}",
-                            Price = 10000000,
+                            Price = 10000000+i*1000* random.Next(1, 10),
                             OldPrice = 10500000,
-                            StockQuantity = 50,
+                            StockQuantity = 5*i* random.Next(1, 10),
                             BrandId = random.Next(1, 10),
                             ImageId = i+13,
                             Manufacturer = "Manufacturer 8",

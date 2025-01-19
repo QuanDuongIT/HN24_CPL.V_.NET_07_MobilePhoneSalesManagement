@@ -58,9 +58,10 @@
                             <th (click)="sort('productCode')">Mã SP<i [class]="getSortIcon('productCode')"></i>
                             </th>
                             <th>Ảnh</th>
-                            <th (click)="sort('productCode')"> Tên <i [class]="getSortIcon('productName')"></i>
+                            <th (click)="sort('productName')"> Tên <i [class]="getSortIcon('productName')"></i>
                             </th>
-                            <th>Số lượng</th>
+                            <th (click)="sort('productstockQuantity')">Số lượng<i
+                                    [class]="getSortIcon('productstockQuantity')"></i></th>
                             <th (click)="sort('productPrice')">
                                 <span>Giá Bán</span><i [class]="getSortIcon('productPrice')"></i>
                             </th>

@@ -320,6 +320,9 @@ namespace ServerApp.BLL.Services
                 "productName" => orderBy
                     ? query => query.OrderBy(p => p.Name)
                     : query => query.OrderByDescending(p => p.Name),
+                "productstockQuantity" => orderBy
+                    ? query => query.OrderBy(p => p.StockQuantity)
+                    : query => query.OrderByDescending(p => p.Price),
                 "productPrice" => orderBy
                     ? query => query.OrderBy(p => p.Price)
                     : query => query.OrderByDescending(p => p.Price),

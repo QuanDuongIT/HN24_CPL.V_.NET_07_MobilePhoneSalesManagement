@@ -12,6 +12,7 @@ export class ProductService {
 
   getProducts(pageNumber: number, pageSize: number, sortField: string, orderBy: boolean): Observable<any> {
     console.log(sortField)
+    console.log(orderBy)
     return this.http.get<any>
       (`${BASE_URL_API}/Products/get-all-products-by-page?pageNumber=${pageNumber}&pageSize=${pageSize}&sortField=${sortField}&orderBy=${orderBy}`);
   }
