@@ -17,10 +17,22 @@ namespace ServerApp.PL.Controllers
             _orderService = orderService;
             _userService = userService;
         }
+        [HttpGet]
+        public async Task<ActionResult<PagedResult<OrderAdminVm>>> GetAllOrders(int? pageNumber, int? pageSize, string? keySearch)
+        {
+            // Lấy danh sách người dùng từ dịch vụ User
+            var orders = await _orderService.GetAllOrdersAsync(pageNumber, pageSize, keySearch);
+            if (orders == null || !orders.Items.Any())
+            {
+                return NotFound(new { success = false, message = "Không tìm thấy người dùng." });
+            }
+            // Trả về danh sách PagedResult UserVm
+            return Ok(orders);
+        }
 
         // Tạo đơn hàng mới
         [HttpPost("create")]
-        public async Task<IActionResult> CreateOrder([FromBody] CustomerInfoVm customerInfo)
+        public async Task<IActionResult> CreateOrder([FromBody] OrderAdminVm customerInfo)
         {
             if (!ModelState.IsValid)
             {
@@ -59,19 +71,37 @@ namespace ServerApp.PL.Controllers
             }
         }
 
-        // Cập nhật trạng thái đơn hàng
-        [HttpPut("{orderId}/status")]
-        public async Task<IActionResult> UpdateOrderStatus(int orderId, [FromBody] string status)
+        [HttpPost("{orderId}/confirm")]
+        public async Task<IActionResult> ConfirmOrder(int orderId)
         {
-            try
+            var result = await _orderService.ConfirmOrderAsync(orderId);
+            return Ok(new
             {
-                await _orderService.UpdateOrderStatusAsync(orderId, status);
-                return Ok(new { message = "Order status updated successfully" });
-            }
-            catch (KeyNotFoundException)
+                success = result.Success,
+                message = result.Message
+            });
+        }
+
+        [HttpPost("{orderId}/deliver")]
+        public async Task<IActionResult> ConfirmDelivery(int orderId)
+        {
+            var result = await _orderService.ConfirmDeliveryAsync(orderId);
+            return Ok(new
             {
-                return NotFound(new { message = "Order not found" });
-            }
+                success = result.Success,
+                message = result.Message
+            });
+        }
+
+        [HttpPost("{orderId}/cancel")]
+        public async Task<IActionResult> CancelOrder(int orderId)
+        {
+            var result = await _orderService.CancelOrderAsync(orderId);
+            return Ok(new
+            {
+                success = result.Success,
+                message = result.Message
+            });
         }
     }
 }

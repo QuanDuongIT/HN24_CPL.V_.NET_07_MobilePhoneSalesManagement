@@ -17,6 +17,7 @@ namespace ServerApp.DAL.Repositories
             _context = context;
         }
 
+
     }
 
 }

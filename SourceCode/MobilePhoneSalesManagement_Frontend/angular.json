@@ -22,6 +22,7 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/assets",
+              "src/admin_assets",
               "src/favicon.ico",
               {
                 "glob": "**/*",
@@ -39,7 +40,6 @@
               "node_modules/bootstrap-icons/font/bootstrap-icons.css"
             ],
             "scripts": [
-              
             ]
           },
           "configurations": {
@@ -103,7 +103,6 @@
               }
             ],
             "styles": [
-              "src/styles.css",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css"
             ],
             "scripts": []

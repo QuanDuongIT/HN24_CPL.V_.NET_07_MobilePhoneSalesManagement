@@ -51,9 +51,7 @@ namespace ServerApp.PL.Controllers
             var orderItem = new OrderItem
             {
                 OrderId = model.OrderId,
-                ProductId = model.ProductId,
                 Quantity = model.Quantity,
-                Price = model.Price
             };
 
             await _orderItemService.AddOrderItemAsync(orderItem);
@@ -76,7 +74,6 @@ namespace ServerApp.PL.Controllers
                     OrderId = orderId,
                     ProductId = productId,
                     Quantity = model.Quantity,
-                    Price = model.Price
                 };
 
                 await _orderItemService.UpdateOrderItemAsync(orderItem);

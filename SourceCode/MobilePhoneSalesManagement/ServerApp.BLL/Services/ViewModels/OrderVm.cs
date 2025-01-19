@@ -20,11 +20,10 @@
     public class OrderItemVm
     {
         public int OrderId { get; set; }
-        public int ProductId { get; set; }
         public int Quantity { get; set; }
-        public decimal Price { get; set; }
+        public ProductOrderVm? Product { get; set; }
     }
-    public class OrderInfoVm
+    public class CustomerInfoVm
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -35,12 +34,22 @@
         public string Postcode { get; set; }
         public string Note { get; set; }
     }
-    public class CustomerInfoVm
+    public class OrderAdminVm
     {
+        public int OrderId { get; set; }
+        public DateTime CreatedDate { get; set; }
         public List<OrderItemVm> CartItems { get; set; }
         public decimal DiscountAmount { get; set; }
         public decimal TotalAmount { get; set; }
         public string? OrderStatus { get; set; }
-        public OrderInfoVm OrderInfo { get; set; }
+        public int? CustomerId { get; set; }
+        public CustomerInfoVm OrderInfo { get; set; }
+    }
+    public class ProductOrderVm
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; }
+        public string ImageUrl { get; set; }
+        public decimal Price { get; set; }
     }
 }

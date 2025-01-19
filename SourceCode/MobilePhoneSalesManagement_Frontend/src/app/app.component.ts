@@ -99,8 +99,8 @@ export class AppComponent {
     // Thêm các file JS
     this.addScript('/assets/vendor/jquery/jquery.min.js');
     this.addScript('/assets/vendor/bootstrap/js/bootstrap.bundle.min.js');
-    this.addScript('node_modules/jquery/dist/jquery.min.js');
-    this.addScript('node_modules/bootstrap/dist/js/bootstrap.bundle.min.js');
+    // this.addScript('node_modules/bootstrap/dist/js/bootstrap.bundle.min.js');
+    this.addScript('/admin_assets/js/custome.js');
     this.addScript('/assets/js/menumaker.js');
     this.addScript('/assets/js/jquery.sticky.js');
     this.addScript('/assets/js/sticky-header.js');

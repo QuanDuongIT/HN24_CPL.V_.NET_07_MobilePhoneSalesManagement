@@ -27,6 +27,7 @@ export class HeaderComponent {
     // Lắng nghe trạng thái xác thực
     this.authService.isAuthenticated.subscribe((status) => {
       this.isAuthenticated = status;
+      
       if (this.isAuthenticated) {
         this.cartService.fetchCartCount();
       } else {

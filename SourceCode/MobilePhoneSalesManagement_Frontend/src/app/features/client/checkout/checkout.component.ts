@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OrderService } from './service/order.service';
 import { error } from 'jquery';
+import { ToastService } from '../../../core/services/toast-service/toast.service';
 
 @Component({
   selector: 'app-checkout',
@@ -18,7 +19,7 @@ export class CheckoutComponent {
 
   formData: any;
 
-  constructor(private router: Router, private orderService: OrderService) {
+  constructor(private router: Router, private orderService: OrderService, private toastService: ToastService) {
     this.formData = {
       firstName: '',
       lastName: '',
@@ -60,7 +61,11 @@ export class CheckoutComponent {
     
     this.orderService.createOrder(dataSend).subscribe(
       (res) => {
-        console.log(res);
+        if (res.success) {
+          this.toastService.showSuccess(res.message);
+        } else {
+          this.toastService.showError(res.message);
+        }
         
       },
       (err) => {
