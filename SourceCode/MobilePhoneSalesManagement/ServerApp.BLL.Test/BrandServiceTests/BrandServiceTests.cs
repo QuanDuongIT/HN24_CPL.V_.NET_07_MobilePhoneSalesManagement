@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ServerApp.DAL.Data;
 using System.Linq.Expressions;
+using ServerApp.BLL.Services.InterfaceServices;
 
 namespace ServerApp.Tests
 {
