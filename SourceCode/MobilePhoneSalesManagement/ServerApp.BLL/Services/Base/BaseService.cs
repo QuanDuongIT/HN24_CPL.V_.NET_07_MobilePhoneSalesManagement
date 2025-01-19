@@ -139,6 +139,145 @@ namespace ServerApp.BLL.Services.Base
         }
 
 
+        
+        
+        
+        
+        
+
+        //Các phương thức tùy chỉnh đã dùng
+
+        public void ValidateModelPropertiesWithAttribute<T>(T model)
+        {
+            var properties = typeof(T).GetProperties();
+
+            foreach (var property in properties)
+            {
+                // Bỏ qua các thuộc tính có attribute SkipValidation
+                if (property.GetCustomAttributes(typeof(SkipValidationAttribute), false).Any())
+                {
+                    continue;
+                }
+
+                // Lấy giá trị của thuộc tính
+                var value = property.GetValue(model);
+
+                // Kiểm tra nếu giá trị là null
+                if (value == null)
+                {
+                    throw new ArgumentException($"Property '{property.Name}' in model '{typeof(T).Name}' cannot be null.");
+                }
+
+                // Kiểm tra nếu là chuỗi rỗng hoặc chỉ chứa khoảng trắng
+                if (value is string strValue && string.IsNullOrWhiteSpace(strValue))
+                {
+                    throw new ArgumentException($"Property '{property.Name}' in model '{typeof(T).Name}' cannot be an empty string or whitespace.");
+                }
+
+                // Thêm các kiểm tra khác nếu cần
+            }
+        }
+
+        public async Task<(int countRemoved, int countUpdated)> DeleteMultipleAsync(
+             IEnumerable<int> ids,
+             Func<T, bool> condition,
+             Func<T?, Task> onConditionFailed)
+        {
+            // Bắt đầu transaction
+            await _unitOfWork.BeginTransactionAsync();
+
+            int countRemoved = 0;
+            int countUpdated = 0;
+
+            try
+            {
+                foreach (var id in ids)
+                {
+                    var entity = await _unitOfWork.GenericRepository<T>().GetByIdAsync(id);
+                    if (entity == null)
+                    {
+                        throw new ExceptionBusinessLogic($"'{typeof(T).Name}' not found.");
+                    }
+                    if (condition(entity))
+                    {
+                        // Xóa thực thể
+                        await _unitOfWork.GenericRepository<T>().DeleteAsync(id);
+                        countRemoved++;
+                    }
+                    else
+                    {
+                        // Gọi action khi không thỏa mãn điều kiện
+                        await onConditionFailed(entity);
+                        countUpdated++;
+                    }
+                }
+
+                // Lưu các thay đổi
+                await _unitOfWork.SaveChangesAsync();
+
+                // Commit transaction
+                await _unitOfWork.CommitTransactionAsync();
+
+                return (countRemoved, countUpdated);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                Console.WriteLine($"Error: {ex.Message}");
+
+                // Rollback transaction nếu có lỗi
+                await _unitOfWork.RollbackTransactionAsync();
+
+                // Ném lại ngoại lệ
+                throw new ArgumentException("Failed to delete entities. " + ex.Message, ex);
+            }
+        }
+
+        public async Task<int> RestoreMultipleAsync(
+             IEnumerable<int> ids,
+             Func<T, bool> condition,
+             Func<T?, Task> onCondition)
+        {
+            // Bắt đầu transaction
+            await _unitOfWork.BeginTransactionAsync();
+
+            int countUpdated = 0;
+
+            try
+            {
+                foreach (var id in ids)
+                {
+                    var entity = await _unitOfWork.GenericRepository<T>().GetByIdAsync(id);
+                    if (entity == null)
+                    {
+                        throw new ExceptionBusinessLogic($"'{typeof(T).Name}' not found.");
+                    }
+                    if (condition(entity))
+                    {
+                        await onCondition(entity);
+                        countUpdated++;
+                    }
+                }
+
+
+                // Commit transaction
+                await _unitOfWork.CommitTransactionAsync();
+
+                return countUpdated;
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi nếu cần
+                Console.WriteLine($"Error: {ex.Message}");
+
+                // Rollback transaction nếu có lỗi
+                await _unitOfWork.RollbackTransactionAsync();
+
+                // Ném lại ngoại lệ
+                throw new ArgumentException("Failed to delete entities. " + ex.Message, ex);
+            }
+        }
+
         public async Task<PaginatedResult<T>> GetAsync(
             Expression<Func<T, bool>>? filter = null,
             Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
@@ -171,11 +310,11 @@ namespace ServerApp.BLL.Services.Base
             // Trả về kết quả phân trang
             return await PaginatedResult<T>.CreateAsync(query, pageIndex, pageSize);
         }
+
         public async Task<IEnumerable<T>> GetAllAsync(
-    Expression<Func<T, bool>>? filter = null,
-    Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
-    string includesProperties = ""
-)
+            Expression<Func<T, bool>>? filter = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+            string includesProperties = "")
         {
             // Lấy repository tương ứng với loại T
             var repository = _unitOfWork.GenericRepository<T>();
@@ -244,136 +383,6 @@ namespace ServerApp.BLL.Services.Base
             // Trả về đối tượng đầu tiên hoặc null nếu không tìm thấy
             return await query.FirstOrDefaultAsync();
         }
-
-        public void ValidateModelPropertiesWithAttribute<T>(T model)
-        {
-            var properties = typeof(T).GetProperties();
-
-            foreach (var property in properties)
-            {
-                // Bỏ qua các thuộc tính có attribute SkipValidation
-                if (property.GetCustomAttributes(typeof(SkipValidationAttribute), false).Any())
-                {
-                    continue;
-                }
-
-                // Lấy giá trị của thuộc tính
-                var value = property.GetValue(model);
-
-                // Kiểm tra nếu giá trị là null
-                if (value == null)
-                {
-                    throw new ArgumentException($"Property '{property.Name}' in model '{typeof(T).Name}' cannot be null.");
-                }
-
-                // Kiểm tra nếu là chuỗi rỗng hoặc chỉ chứa khoảng trắng
-                if (value is string strValue && string.IsNullOrWhiteSpace(strValue))
-                {
-                    throw new ArgumentException($"Property '{property.Name}' in model '{typeof(T).Name}' cannot be an empty string or whitespace.");
-                }
-
-                // Thêm các kiểm tra khác nếu cần
-            }
-        }
-        public async Task<(int countRemoved, int countUpdated)> DeleteMultipleAsync(
-     IEnumerable<int> ids,
-     Func<T, bool> condition,
-     Func<T?, Task> onConditionFailed)
-        {
-            // Bắt đầu transaction
-            await _unitOfWork.BeginTransactionAsync();
-
-            int countRemoved = 0;
-            int countUpdated = 0;
-
-            try
-            {
-                foreach (var id in ids)
-                {
-                    var entity = await _unitOfWork.GenericRepository<T>().GetByIdAsync(id);
-                    if(entity == null)
-                    {
-                        throw new ExceptionBusinessLogic($"'{typeof(T).Name}' not found.");
-                    }
-                    if (condition(entity))
-                    {
-                        // Xóa thực thể
-                        await _unitOfWork.GenericRepository<T>().DeleteAsync(id);
-                        countRemoved++;
-                    }
-                    else
-                    {
-                        // Gọi action khi không thỏa mãn điều kiện
-                        await onConditionFailed(entity);
-                        countUpdated++;
-                    }
-                }
-
-                // Lưu các thay đổi
-                await _unitOfWork.SaveChangesAsync();
-
-                // Commit transaction
-                await _unitOfWork.CommitTransactionAsync();
-
-                return (countRemoved, countUpdated);
-            }
-            catch (Exception ex)
-            {
-                // Log lỗi nếu cần
-                Console.WriteLine($"Error: {ex.Message}");
-
-                // Rollback transaction nếu có lỗi
-                await _unitOfWork.RollbackTransactionAsync();
-
-                // Ném lại ngoại lệ
-                throw new ArgumentException("Failed to delete entities. " + ex.Message, ex);
-            }
-        }
-        public async Task<int> RestoreMultipleAsync(
-     IEnumerable<int> ids,
-     Func<T, bool> condition,
-     Func<T?, Task> onCondition)
-        {
-            // Bắt đầu transaction
-            await _unitOfWork.BeginTransactionAsync();
-
-            int countUpdated = 0;
-
-            try
-            {
-                foreach (var id in ids)
-                {
-                    var entity = await _unitOfWork.GenericRepository<T>().GetByIdAsync(id);
-                    if(entity == null)
-                    {
-                        throw new ExceptionBusinessLogic($"'{typeof(T).Name}' not found.");
-                    }
-                    if (condition(entity))
-                    {
-                        await onCondition(entity);
-                        countUpdated++;
-                    }
-                }
-
-
-                // Commit transaction
-                await _unitOfWork.CommitTransactionAsync();
-
-                return countUpdated;
-            }
-            catch (Exception ex)
-            {
-                // Log lỗi nếu cần
-                Console.WriteLine($"Error: {ex.Message}");
-
-                // Rollback transaction nếu có lỗi
-                await _unitOfWork.RollbackTransactionAsync();
-
-                // Ném lại ngoại lệ
-                throw new ArgumentException("Failed to delete entities. " + ex.Message, ex);
-            }
-        }
-
 
     }
 

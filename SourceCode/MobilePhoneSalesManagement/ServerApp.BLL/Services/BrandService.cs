@@ -13,24 +13,6 @@ using Image = ServerApp.DAL.Models.Image;
 
 namespace ServerApp.BLL.Services
 {
-    public interface IBrandService : IBaseService<Brand>
-    {
-        Task<BrandVm> AddBrandAsync(InputBrandVm brandVm);
-        Task<BrandVm> UpdateBrandAsync(int id, InputBrandVm brandVm);
-
-        Task<BrandVm> DeleteBrandAsync(int id);
-
-        Task<BrandVm?> GetByBrandIdAsync(int id);
-
-        Task<IEnumerable<BrandVm>> GetAllBrandAsync();
-        Task<int> UpdateBrandAsync(Brand brand);
-        Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, Expression<Func<Brand, bool>>? filter = null,
-      string sortField = "updatedDate", bool orderBy = true);
-        Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, bool filter = true,
-            string sortField = "updatedDate", bool orderBy = true);
-        Task<PagedResult<BrandVm>> GetAllBrandAsync(int? pageNumber, int? pageSize, string search = "",
-            string sortField = "updatedDate", bool orderBy = true);
-    }
     public class BrandService : BaseService<Brand>, IBrandService
     {
         private readonly IUnitOfWork _unitOfWork;

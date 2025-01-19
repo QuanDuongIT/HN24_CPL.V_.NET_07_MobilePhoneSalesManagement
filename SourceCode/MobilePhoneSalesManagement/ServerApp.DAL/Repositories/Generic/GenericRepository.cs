@@ -39,18 +39,7 @@ namespace ServerApp.DAL.Repositories.Generic
         {
             _dbSet.Update(entity);
         }
-        public async Task<int> ModifyAsync(T entity)
-        {
-            // Cập nhật thực thể
-            _dbSet.Update(entity);
-
-            // Lưu các thay đổi vào cơ sở dữ liệu
-            int affectedRows = await _context.SaveChangesAsync();
-
-            // Kiểm tra nếu có bản ghi nào bị ảnh hưởng, nghĩa là cập nhật thành công
-            return affectedRows;
-        }
-
+        
         // Delete entity by Id
         public async Task DeleteAsync(int id)
         {
@@ -120,11 +109,56 @@ namespace ServerApp.DAL.Repositories.Generic
 
             return orderBy != null ? orderBy(query) : query;
         }
+        
+
+        public T? GetById(Guid id)
+        {
+            return _dbSet.Find(id);
+        }
+        public T? GetById(int id)
+        {
+            return _dbSet.Find(id);
+        }
+        public async Task<T?> GetByIdAsync(Guid id)
+        {
+            return await _dbSet.FindAsync(id);
+        }
+        
+
+        public IQueryable<T> GetQuery(Expression<Func<T, bool>> predicate)
+        {
+            return _dbSet.Where(predicate);
+        }
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null)
+        {
+            if (predicate != null)
+            {
+                return await _dbSet.Where(predicate).ToListAsync();
+            }
+            return await _dbSet.ToListAsync();
+        }
+
+
+
+        /// <summary>
+        /// Các phiên bản tùy chỉnh đã dùng
+        /// </summary>
+        /// <returns></returns>
+        public IQueryable<T> GetQuery()
+        {
+            return _dbSet;
+        }
+
+        public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.FirstOrDefaultAsync(predicate);
+        }
+
         public async Task<T?> GetAsync(
-    Expression<Func<T, bool>> filter,
-    Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
-    Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null
-)
+            Expression<Func<T, bool>> filter,
+            Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+            Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null
+        )
         {
             IQueryable<T> query = _dbSet;
 
@@ -145,42 +179,6 @@ namespace ServerApp.DAL.Repositories.Generic
 
             // Trả về kết quả đầu tiên hoặc null
             return await query.FirstOrDefaultAsync();
-        }
-
-
-        public T? GetById(Guid id)
-        {
-            return _dbSet.Find(id);
-        }
-        public T? GetById(int id)
-        {
-            return _dbSet.Find(id);
-        }
-        public async Task<T?> GetByIdAsync(Guid id)
-        {
-            return await _dbSet.FindAsync(id);
-        }
-        public IQueryable<T> GetQuery()
-        {
-            return _dbSet;
-        }
-
-        public IQueryable<T> GetQuery(Expression<Func<T, bool>> predicate)
-        {
-            return _dbSet.Where(predicate);
-        }
-        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? predicate = null)
-        {
-            if (predicate != null)
-            {
-                return await _dbSet.Where(predicate).ToListAsync();
-            }
-            return await _dbSet.ToListAsync();
-        }
-
-        public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _dbSet.FirstOrDefaultAsync(predicate);
         }
 
         public async Task<IEnumerable<T>> GetAllAsync(
@@ -204,6 +202,18 @@ namespace ServerApp.DAL.Repositories.Generic
 
             return query;
         }
+        public async Task<int> ModifyAsync(T entity)
+        {
+            // Cập nhật thực thể
+            _dbSet.Update(entity);
+
+            // Lưu các thay đổi vào cơ sở dữ liệu
+            int affectedRows = await _context.SaveChangesAsync();
+
+            // Kiểm tra nếu có bản ghi nào bị ảnh hưởng, nghĩa là cập nhật thành công
+            return affectedRows;
+        }
+
     }
 
 
