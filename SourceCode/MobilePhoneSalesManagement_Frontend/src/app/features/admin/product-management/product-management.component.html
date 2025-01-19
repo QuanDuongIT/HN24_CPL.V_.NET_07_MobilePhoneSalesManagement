@@ -55,17 +55,18 @@
                 <table class="table table-bordered mt-3" [class.loading]="isLoading">
                     <thead>
                         <tr>
-                            <th (click)="sort('productCode')">Mã sản phẩm<i [class]="getSortIcon('productCode')"></i>
+                            <th (click)="sort('productCode')">Mã SP<i [class]="getSortIcon('productCode')"></i>
                             </th>
                             <th>Ảnh</th>
-                            <th (click)="sort('productCode')"> Tên sản phẩm<i [class]="getSortIcon('productName')"></i>
+                            <th (click)="sort('productCode')"> Tên <i [class]="getSortIcon('productName')"></i>
                             </th>
-                            <th>Tên thương hiệu</th>
-                            <th>Các Thông số</th>
-                            <th>Trạng thái</th>
+                            <th>Số lượng</th>
                             <th (click)="sort('productPrice')">
                                 <span>Giá Bán</span><i [class]="getSortIcon('productPrice')"></i>
                             </th>
+                            <th>thương hiệu</th>
+                            <th>Các Thông số</th>
+                            <th>Trạng thái</th>
                             <th (click)="sort('updatedDate')">
                                 <span>Ngày tạo</span>
                                 <span> ,cập nhật </span><i [class]="getSortIcon('updatedDate')"></i>
@@ -92,8 +93,20 @@
                                     class="img-thumbnail" style="max-width: 100px; max-height: 100px;" />
                             </td>
                             <td>{{ product.name }}</td>
+                            <td>{{ product.stockQuantity }}</td>
+                            <td style="text-align: center; vertical-align: middle;">
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                                    <div style="font-size: 10px; text-decoration: line-through;">
+                                        {{ formatCurrencyVND(product.oldPrice) }}
+                                    </div>
+                                    <div>
+                                        {{ formatCurrencyVND(product.price) }}
+                                    </div>
+                                </div>
+                            </td>
+
                             <td *ngIf="product.brand !== null">{{ product.brand.name || 'N/A' }}</td>
-                            <td *ngIf="product.brand  === null">KHông có thương hiệu</td>
+                            <td *ngIf="product.brand  === null">KHông</td>
                             <td>
                                 <ul>
                                     <li *ngFor="let spec of product.productSpecifications">
@@ -105,14 +118,6 @@
                                 <span [class.text-success]="product.isActive" [class.text-danger]="!product.isActive">
                                     {{ product.isActive ? 'Active' : 'Inactive' }}
                                 </span>
-                            </td>
-                            <td>
-                                <div style="font-size: 10px; text-decoration: line-through;">
-                                    <div>{{ formatCurrencyVND(product.oldPrice) }}</div>
-                                </div>
-                                <div>
-                                    <div>{{ formatCurrencyVND(product.price) }}</div>
-                                </div>
                             </td>
                             <td>
                                 <div>
