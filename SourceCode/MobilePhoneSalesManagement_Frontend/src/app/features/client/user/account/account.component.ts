@@ -26,7 +26,7 @@ export class AccountComponent {
     dateOfBirth: '',
     gender: 'male',
   };
-  orders: any [] = []
+  orders: any[] = [];
   passwordModel = {
     currentPassword: '',
     password: '',
@@ -65,23 +65,25 @@ export class AccountComponent {
     );
 
     // get orders
+    this.loadOrders();
+  }
+
+  loadOrders(): void {
     this.userService.getOrders().subscribe(
       (res) => {
-        this.orders = res.data
+        this.orders = res.data;
         console.log(res.data);
-        
       },
       (err) => {
         console.error(err);
       }
-    )
+    );
   }
-  
+
   // order tab
   viewOrderDetails(order: any) {
     this.selectedOrder = order;
     this.isDetailView = true;
-    
   }
   goBack() {
     this.isDetailView = false;
@@ -104,16 +106,19 @@ export class AccountComponent {
       // Gửi yêu cầu đến API để hủy đơn hàng
       this.orderAdminService.cancelOrder(orderId).subscribe(
         (response) => {
-          this.goBack();
           if (response.success) {
+            this.loadOrders();
             this.toastService.showSuccess(response.message);
+            this.goBack();
           } else {
             this.toastService.showError(response.message);
           }
         },
         (error) => {
           console.error('Lỗi khi hủy đơn hàng:', error);
-          this.toastService.showError('Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại.');
+          this.toastService.showError(
+            'Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại.'
+          );
         }
       );
     }
@@ -151,8 +156,8 @@ export class AccountComponent {
       this.modelChangePassword = {
         currentPassword: this.passwordModel.currentPassword,
         newPassword: this.passwordModel.password,
-        confirmPassword: this.passwordModel.re_password
-      }
+        confirmPassword: this.passwordModel.re_password,
+      };
       this.userService.changePassword(this.modelChangePassword).subscribe(
         (res) => {
           if (res.success) {
@@ -165,8 +170,7 @@ export class AccountComponent {
           console.error('Đổi mật khẩu thất bại:', err);
           if (!err.error.success) {
             this.toastService.showError(err.error.message);
-          }
-          else {
+          } else {
             this.toastService.showError('Lỗi gửi yêu cầu');
           }
         }

@@ -1,4 +1,3 @@
-﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServerApp.BLL.Services;
 using ServerApp.BLL.Services.InterfaceServices;
@@ -33,7 +32,7 @@ namespace ServerApp.PL.Controllers
         {
             var order = await _orderService.CompleteOrderAsync(orderId);
             if (order != null)
-            {  
+            {
                 return Ok(order);
             }
             return NotFound($"Order with ID {orderId} not found.");

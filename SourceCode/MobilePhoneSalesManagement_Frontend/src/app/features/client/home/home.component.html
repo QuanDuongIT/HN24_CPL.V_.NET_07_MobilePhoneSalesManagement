@@ -38,8 +38,14 @@
                         <p class="card-text text-danger old-price">{{ product.price | currency: 'VND' }}
                             -{{product.discount}}%</p>
                         <div class="d-flex justify-content-between">
-                            <button class="btn btn-primary btn-sm">Thêm vào giỏ hàng</button>
-                            <button class="btn btn-outline-secondary btn-sm">Thêm vào Wishlist</button>
+                            <button class="btn btn-primary btn-sm w-100 mb-2"
+                                    (click)="addToCart(product.productId)">
+                                    Thêm vào giỏ hàng
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm w-100"
+                                    (click)="toggleWishList(product.productId)">
+                                    Thêm vào Wishlist
+                                </button>
                         </div>
                     </div>
                 </div>

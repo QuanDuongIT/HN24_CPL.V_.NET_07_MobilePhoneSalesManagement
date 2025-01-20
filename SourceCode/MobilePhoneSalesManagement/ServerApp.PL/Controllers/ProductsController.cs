@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.BLL.Services.ViewModels;
 using ServerApp.BLL.Services;
 using ServerApp.DAL.Models;
@@ -27,10 +27,10 @@ namespace ServerApp.PL.Controllers
 
 
         [HttpGet("get-all-products-by-page")]
-        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] string sortField = "updatedDate", [FromQuery] int pageSize = 10, [FromQuery] bool orderBy=false)
+        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, [FromQuery] string sortField = "updatedDate", [FromQuery] int pageSize = 10, [FromQuery] bool orderBy = false)
         {
-            var result = await _productService.GetAllProductAsync(pageNumber, pageSize,sortField,orderBy: orderBy);
-            return Ok(result); 
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, sortField, orderBy: orderBy);
+            return Ok(result);
         }
 
         [HttpPost("filter")]
@@ -70,7 +70,7 @@ namespace ServerApp.PL.Controllers
 
             if (result == null)
             {
-                return NotFound(new { Message = $"Product with ID {id} not found." }); 
+                return NotFound(new { Message = $"Product with ID {id} not found." });
             }
 
             return Ok(result); // 200 OK nếu tìm thấy.
@@ -94,10 +94,10 @@ namespace ServerApp.PL.Controllers
             var result = await _productService.UpdateProductAsync(id, productVm);
             if (result == null)
             {
-                return NotFound(new { Message = $"Product with ID {id} not found." }); 
+                return NotFound(new { Message = $"Product with ID {id} not found." });
             }
 
-            return Ok(result); 
+            return Ok(result);
         }
 
         [HttpDelete("delete-product-by-id/{id}")]
@@ -129,7 +129,7 @@ namespace ServerApp.PL.Controllers
                     async product =>
                     {
                         product.IsActive = false;
-                        await _productService.UpdateProductAsync(product); 
+                        await _productService.UpdateProductAsync(product);
                     });
 
                 if (deletedCount + updateCount > 0)
@@ -158,18 +158,18 @@ namespace ServerApp.PL.Controllers
             }
         }
         [HttpGet("search-products-by-page")]
-        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1, 
+        public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10, [FromQuery] string search = "", [FromQuery] string sortField = "updatedDate", [FromQuery] bool orderBy = true)
         {
-            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, sortField, p=>p.Name.Contains(search),orderBy: false);
-            return Ok(result); 
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, sortField, p => p.Name.Contains(search), orderBy: false);
+            return Ok(result);
         }
         [HttpGet("filter-products-by-page")]
         public async Task<ActionResult<IEnumerable<ProductVm>>> GetProducts([FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10, [FromQuery] bool filter = true, [FromQuery] string sortField = "updatedDate", [FromQuery] bool orderBy = true)
         {
-            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, sortField, p=>p.IsActive==filter, orderBy: false);
-            return Ok(result); 
+            var result = await _productService.GetAllProductAsync(pageNumber, pageSize, sortField, p => p.IsActive == filter, orderBy: false);
+            return Ok(result);
         }
         [HttpPut("restore-multiple-product")]
         public async Task<IActionResult> UpdateMultiple([FromBody] List<int> productIds)
