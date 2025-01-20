@@ -1,0 +1,27 @@
+<p>product-detail xcvxcvxcvcx!</p>
+<!-- product-list.component.html -->
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-md-4" *ngIf="product">
+            <div class="card h-100">
+                <img [src]="'data:image/jpeg;base64,' + product.image.imageBase64" class="card-img-top"
+                    [alt]="product.name" style="height: 200px; object-fit: cover;" />
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-danger current-price">
+                        {{ product.price | currency: 'VND' }}
+                    </p>
+                    <p class="card-text text-danger old-price">{{ product.price | currency: 'VND' }} - {{
+                        product.discount }}%</p>
+
+                    <!-- View product details -->
+                    <div class="mt-auto">
+                        <a [routerLink]="['/product', product.productId]" class="btn btn-info btn-sm w-100">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -6,6 +6,7 @@ import { UserClientService } from '../../user/service/user-client.service';
 import { error } from 'jquery';
 import { ToastService } from '../../../../core/services/toast-service/toast.service';
 import { CartService } from '../../cart/service/cart.service';
+import { BASE_URL_API } from '../../../../app.config';
 
 @Component({
   selector: 'app-product-list',
@@ -15,6 +16,7 @@ import { CartService } from '../../cart/service/cart.service';
 })
 export class ProductListComponent implements OnInit {
 
+  path: string = '';
   products: any[] = [];
   brands: string[] = ['Samsung', 'Apple', 'Xiaomi', 'Vsmart', 'Oppo', 'Vivo', 'Nokia', 'Huawei'];
   priceRanges = [
@@ -44,10 +46,9 @@ export class ProductListComponent implements OnInit {
     PageNumber: 1,
     PageSize: 15
   };
-  
   totalPages: number = 1; // Tổng số trang
 
-  constructor(private productService: ProductService, private userService: UserClientService, private cartService: CartService, private toastService: ToastService,  private route: ActivatedRoute) { }
+  constructor(private productService: ProductService, private userService: UserClientService, private cartService: CartService, private toastService: ToastService, private route: ActivatedRoute) { }
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
       if (params['search']) {
@@ -55,7 +56,8 @@ export class ProductListComponent implements OnInit {
       }
       this.getFilteredProducts();
     });
-    
+
+    this.path = this.route.snapshot.url.join('/');
   }
   getFilteredProducts() {
     console.log('filterRequest:', this.filterRequest);
@@ -127,7 +129,7 @@ export class ProductListComponent implements OnInit {
         } else {
           this.toastService.showError(res.message);
         }
-        
+
       },
       (err) => {
         this.toastService.showError('Lỗi khi gửi yêu cầu');
@@ -148,7 +150,7 @@ export class ProductListComponent implements OnInit {
       },
       (err) => {
         console.log(err);
-        
+
       }
     )
   }

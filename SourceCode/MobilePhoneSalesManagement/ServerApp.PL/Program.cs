@@ -159,12 +159,12 @@ namespace ServerApp.PL
                 var context = services.GetRequiredService<ShopDbContext>();
 
 
-                // context.Database.EnsureDeleted();
+                 context.Database.EnsureDeleted();
                 // Áp dụng migrations nếu chưa có
-                // context.Database.EnsureCreated();
+                context.Database.EnsureCreated();
 
                 // Gọi seed data
-                // await SeedData.SeedAsync(context);
+                await SeedData.SeedAsync(context);
             }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
