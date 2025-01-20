@@ -1,10 +1,6 @@
-﻿using MailKit.Search;
-using Microsoft.AspNetCore.Mvc;
-using PresentationLayer.Exceptions;
-using ServerApp.BLL.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.BLL.Services.ViewModels;
-using ServerApp.DAL.Models;
-using System;
 namespace ServerApp.PL.Controllers
 {
     [Route("api/[controller]")]
@@ -29,13 +25,13 @@ namespace ServerApp.PL.Controllers
         [HttpGet("get-all-brands-by-page")]
         public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string sortField = "updatedDate", [FromQuery] bool orderBy = true)
         {
-            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize, filter:null, sortField, orderBy);
+            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize, filter: null, sortField, orderBy);
             return Ok(result); // 200 OK nếu có dữ liệu.
         }
         [HttpGet("search-brands-by-page")]
-        public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string search="", [FromQuery] string sortField = "updatedDate", [FromQuery] bool orderBy = true)
+        public async Task<ActionResult<IEnumerable<BrandVm>>> GetBrands([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string search = "", [FromQuery] string sortField = "updatedDate", [FromQuery] bool orderBy = true)
         {
-            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize,search, sortField, orderBy);
+            var result = await _brandService.GetAllBrandAsync(pageNumber, pageSize, search, sortField, orderBy);
             return Ok(result); // 200 OK nếu có dữ liệu.
         }
         [HttpGet("filter-brands-by-page")]
@@ -91,7 +87,7 @@ namespace ServerApp.PL.Controllers
                 return NotFound(new { Message = $"Brand with ID {id} not found." }); // 404 Not Found nếu không tìm thấy.
             }
 
-            return NoContent(); 
+            return NoContent();
         }
         [HttpDelete("delete-multiple-brand")]
         public async Task<IActionResult> DeleteMultiple([FromBody] List<int> brandIds)
@@ -147,7 +143,7 @@ namespace ServerApp.PL.Controllers
 
                 if (updateCount > 0)
                 {
-                    return Ok(new { Message = "Brands restore successfully.",  UpdateCount = updateCount });
+                    return Ok(new { Message = "Brands restore successfully.", UpdateCount = updateCount });
                 }
 
                 return NotFound("No brands were restore.");

@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using PresentationLayer.Exceptions;
-using ServerApp.BLL.Services;
+﻿using Microsoft.AspNetCore.Mvc;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.BLL.Services.ViewModels;
-using ServerApp.DAL.Models;
-using System;
 namespace ServerApp.PL.Controllers
 {
     [Route("api/[controller]")]
@@ -34,7 +30,7 @@ namespace ServerApp.PL.Controllers
 
             if (result == null)
             {
-                return NotFound(new { Message = $"SpecificationType with ID {id} not found." }); 
+                return NotFound(new { Message = $"SpecificationType with ID {id} not found." });
             }
 
             return Ok(result); // 200 OK nếu tìm thấy.
@@ -47,10 +43,10 @@ namespace ServerApp.PL.Controllers
 
             if (result == null)
             {
-                return BadRequest(new { Message = "Failed to create the specificationType." }); 
+                return BadRequest(new { Message = "Failed to create the specificationType." });
             }
 
-            return CreatedAtAction(nameof(GetSpecificationType), new { id = result.SpecificationTypeId }, result); 
+            return CreatedAtAction(nameof(GetSpecificationType), new { id = result.SpecificationTypeId }, result);
         }
 
         [HttpPut("update-specificationType/{id}")]
@@ -59,10 +55,10 @@ namespace ServerApp.PL.Controllers
             var result = await _specificationTypeService.UpdateSpecificationTypeAsync(id, specificationTypeVm);
             if (result == null)
             {
-                return NotFound(new { Message = $"SpecificationType with ID {id} not found." }); 
+                return NotFound(new { Message = $"SpecificationType with ID {id} not found." });
             }
 
-            return Ok(result); 
+            return Ok(result);
         }
 
         [HttpDelete("delete-specificationType-by-id/{id}")]
@@ -74,7 +70,7 @@ namespace ServerApp.PL.Controllers
                 return NotFound(new { Message = $"SpecificationType with ID {id} not found." });
             }
 
-            return NoContent(); 
+            return NoContent();
         }
     }
 }

@@ -1,14 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
 using ServerApp.BLL.Services;
-using ServerApp.DAL.Models;
-using ServerApp.DAL.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using ServerApp.BLL.Services.InterfaceServices;
 using ServerApp.DAL.Data;
-using System.Linq.Expressions;
+using ServerApp.DAL.Infrastructure;
+using ServerApp.DAL.Models;
 
 namespace ServerApp.Tests
 {
@@ -76,13 +71,12 @@ namespace ServerApp.Tests
             // Act
             var result = await _brandService.GetAllBrandAsync();
 
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Count());
-            Assert.AreEqual("Brand 1", result.First().Name);
-            Assert.AreEqual("Brand 2", result.Last().Name);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Count(), Is.EqualTo(2));
+            Assert.That(result.First().Name, Is.EqualTo("Brand 1"));
+            Assert.That(result.Last().Name, Is.EqualTo("Brand 2"));
         }
-        
+
 
         //[Test]
         //public async Task GetAllBrandAsync_ShouldReturnPagedResult()
