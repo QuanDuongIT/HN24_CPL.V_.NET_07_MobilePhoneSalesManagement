@@ -9,25 +9,28 @@ import { AuthService } from './features/auth/services/auth.service';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
+  templateUrl: './src.html',
   imports: [RouterOutlet],
   standalone: true,
-  styleUrl: './app.component.css',
+  styleUrl: './src.css',
 })
 export class AppComponent {
+  title(title: any) {
+    throw new Error('Method not implemented.');
+  }
   isClientLayout: boolean = false;
   isAdminLayout: boolean = false;
   isAuthenticated = false;
 
 
-  constructor(private renderer: Renderer2, private router: Router, private titleService: Title, private authService: AuthService) {}
+  constructor(private renderer: Renderer2, private router: Router, private titleService: Title, private authService: AuthService) { }
 
   ngOnInit() {
     // check login
     this.authService.isAuthenticated.subscribe((status) => {
       this.isAuthenticated = status;
     });
-    
+
     // Kiểm tra route hiện tại để xác định layout
     if (window.location.pathname.startsWith('/admin')) {
       this.isAdminLayout = true;
@@ -73,7 +76,7 @@ export class AppComponent {
     //   'anonymous',
     //   'no-referrer'
     // );
-    
+
 
     this.addScript('/assets/js/jquery.min.js', () => {
       // Sau khi jQuery đã sẵn sàng, load Bootstrap và các tệp khác
@@ -110,10 +113,10 @@ export class AppComponent {
 
   addStylesheet(href: string, integrity?: string, crossorigin?: string, referrerPolicy?: string): void {
     const link = this.renderer.createElement('link');
-    
+
     this.renderer.setAttribute(link, 'rel', 'stylesheet');
     this.renderer.setAttribute(link, 'href', href);
-    
+
     if (integrity) {
       this.renderer.setAttribute(link, 'integrity', integrity);
     }
@@ -123,10 +126,10 @@ export class AppComponent {
     if (referrerPolicy) {
       this.renderer.setAttribute(link, 'referrerpolicy', referrerPolicy);
     }
-    
+
     this.renderer.appendChild(document.head, link);
   }
-  
+
   addScript(src: string, callback?: () => void) {
     const script = document.createElement('script');
     script.src = src;
