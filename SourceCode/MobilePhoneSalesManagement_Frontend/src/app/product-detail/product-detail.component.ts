@@ -15,6 +15,7 @@ import { Product } from '../features/admin/product-management/models/product';
 
 export class ProductDetailComponent implements OnInit {
   pagination: any;
+  reviews: any;
   changePage(arg0: number) {
     throw new Error('Method not implemented.');
   }
@@ -53,7 +54,8 @@ export class ProductDetailComponent implements OnInit {
     console.log(id);
     if (id) {
       this.productService.getProductById(id).subscribe((data: any) => {
-        this.product = data;
+        this.product = data.product;
+        this.reviews = data.reviews;
         console.log(data)
       });
     }
