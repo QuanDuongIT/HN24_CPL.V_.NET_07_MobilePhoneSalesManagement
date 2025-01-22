@@ -20,6 +20,7 @@ import { BlogsComponent } from './features/client/blogs/blogs.component';
 import { WishlistComponent } from './features/client/user/wishlist/wishlist.component';
 import { CartComponent } from './features/client/cart/cart.component';
 import { CheckoutComponent } from './features/client/checkout/checkout.component';
+import { ProductDetailComponent } from './product-detail/product-detail.component';
 
 export const routes: Routes = [
   // { path: 'admin', redirectTo: '/admin/user-management', pathMatch: 'full' },
@@ -45,7 +46,7 @@ export const routes: Routes = [
       { path: 'about', component: AboutComponent, data: { title: 'Thông tin' } }, // Danh sách sản phẩm
       { path: 'blogs', component: BlogsComponent, data: { title: 'Bài viết' } }, // Danh sách sản phẩm
       { path: 'contact', component: ContactComponent, data: { title: 'Liên hệ, hỗ trợ' } }, // Danh sách sản phẩm
-      // { path: 'product/:id', component: ProductDetailComponent }, // Chi tiết sản phẩm
+      { path: 'products/:id', component: ProductDetailComponent }, // Chi tiết sản phẩm
       { path: 'cart', component: CartComponent }, // Giỏ hàng
       { path: 'checkout', component: CheckoutComponent }, // Thanh toán
 
