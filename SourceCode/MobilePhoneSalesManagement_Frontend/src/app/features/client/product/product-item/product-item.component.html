@@ -1,0 +1,51 @@
+<div class="container py-4" *ngIf="product">
+
+    <div class="container">
+        <!-- Thông tin sản phẩm -->
+        <div class="text-center">
+            <img [src]="product.image ? 'data:image/jpeg;base64,' + product.image.imageBase64 : 'https://via.placeholder.com/800x400'"
+                [alt]="product.name || 'Tên sản phẩm'" class="product-image img-fluid mb-3">
+        </div>
+        <h1 class="product-title">{{ product.name || 'Tên sản phẩm' }}</h1>
+        <p class="product-price">{{ product.price | currency: 'VND' }}</p>
+        <p class="product-description">
+            <span *ngFor="let productSpecifications of product.productSpecifications">
+                <p>{{ productSpecifications.specificationType.name }}: {{ productSpecifications.value }}</p>
+            </span>
+            {{ product.description }}.
+            Đây là mô tả chi tiết của sản phẩm. Sản phẩm này có chất lượng cao, thiết kế hiện đại và
+            phù hợp với nhiều nhu cầu sử dụng khác nhau. Hãy tận hưởng trải nghiệm tuyệt vời khi sử dụng sản phẩm này!
+            Hệ thống camera mới.
+            Chụp gần chụp xa,
+            đẹp hoàn hảo cả.
+            Hệ thống camera linh hoạt mới của iPhone 16 chụp ảnh đẹp lung linh - dù từ xa hay gần. Camera Fusion 48MP
+            hai trong một
+            cho phép bạn chụp hình ảnh có độ phân giải cao tuyệt đẹp hoặc phóng to với Telephoto chất lượng quang học
+            2x. Camera
+            Ultra Wide chụp ảnh macro cực cận cảnh hoặc toàn cảnh rộng hơn nữa. Tất cả giống như bạn đang sở hữu bốn ống
+            kính ngay
+            trong túi.
+        </p>
+
+        <!-- Đánh giá -->
+        <div class="reviews">
+            <h2>Đánh giá</h2>
+            <div class="review">
+                <p class="review-author">Nguyễn Văn A</p>
+                <p class="review-comment">Sản phẩm rất tốt, đáng tiền!</p>
+                <p class="review-rating">★★★★★</p>
+            </div>
+            <div class="review">
+                <p class="review-author">Trần Thị B</p>
+                <p class="review-comment">Mình đã dùng thử và thấy rất hài lòng.</p>
+                <p class="review-rating">★★★★☆</p>
+            </div>
+            <div class="review">
+                <p class="review-author">Lê Văn C</p>
+                <p class="review-comment">Chất lượng ổn, trang nay uy tín mọi nên mua hàng trang web nàynày.</p>
+                <p class="review-rating">★★★★☆</p>
+            </div>
+        </div>
+    </div>
+
+</div>

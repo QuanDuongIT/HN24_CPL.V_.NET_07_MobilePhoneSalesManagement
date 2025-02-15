@@ -21,26 +21,26 @@ export class HeaderComponent {
     private authService: AuthService,
     private router: Router,
     private cartService: CartService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Lắng nghe trạng thái xác thực
     this.authService.isAuthenticated.subscribe((status) => {
       this.isAuthenticated = status;
-      
+
       if (this.isAuthenticated) {
         this.cartService.fetchCartCount();
       } else {
         this.count = 0;
       }
     });
-  
+    console.log(this.authService.getUser())
     // Lắng nghe thay đổi số lượng giỏ hàng
     this.cartService.cartCount$.subscribe((count) => {
       this.count = count;
     });
   }
-  
+
 
   logout(): void {
     this.authService.logout();

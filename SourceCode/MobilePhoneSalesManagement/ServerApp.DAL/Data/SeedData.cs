@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ServerApp.DAL.Data;
 using ServerApp.DAL.Models;
 using System;
@@ -127,7 +129,6 @@ namespace ServerApp.DAL.Seed
                     );
                     await context.SaveChangesAsync();
                 }
-               
 
                 // Commit transaction nếu mọi thứ thành công
                 await transaction.CommitAsync();
@@ -139,7 +140,7 @@ namespace ServerApp.DAL.Seed
                 throw;
             }
         }
-
+        
         private static void EnableIdentityInsert(ShopDbContext context, string tableName, bool enable)
         {
             var rawSql = enable
